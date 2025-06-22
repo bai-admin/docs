@@ -38,7 +38,7 @@ jobs:
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
 ###############################################################################
-# 2. One “sync” job per entry
+# 2. One "sync" job per entry
 ###############################################################################
   sync:
     needs: generate-matrix
@@ -117,16 +117,16 @@ jobs:
             if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
               echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
               mkdir -p "$DEST_DIR"
-              rsync -a "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+              rsync -a --exclude='.git' "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
             else
               # Regular sync with --delete for existing directories
-              rsync -a --delete "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+              rsync -a --delete --exclude='.git' "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
             fi
 
           # ---------- PRE-PROCESS MODE --------------------------------------
           else
             WORKDIR=$(mktemp -d)
-            rsync -a "$TMP_CLONE/$SCRIPT_IN_DIR/" "$WORKDIR/"
+            rsync -a --exclude='.git' "$TMP_CLONE/$SCRIPT_IN_DIR/" "$WORKDIR/"
 
             # ①  compute relative output dir
             REL_OUT_DIR=${SCRIPT_OUT_DIR#"$SCRIPT_IN_DIR"/}
@@ -150,10 +150,10 @@ jobs:
             if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
               echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
               mkdir -p "$DEST_DIR"
-              rsync -a "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+              rsync -a --exclude='.git' "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
             else
               # Regular sync with --delete for existing directories
-              rsync -a --delete "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+              rsync -a --delete --exclude='.git' "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
             fi
             rm -rf "$WORKDIR"
           fi
