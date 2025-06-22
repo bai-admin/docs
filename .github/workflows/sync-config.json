@@ -1,5 +1,4 @@
 [
-
     {
       "repoUrl": "https://github.com/ollama/ollama.git",
       "branch":  "main",
@@ -59,17 +58,13 @@
       "branch":  "main",
       "srcDir":  ".",
       "destDir": "convex/libs/components/crons"
-    },    
-
+    },
     {
       "repoUrl":            "https://github.com/get-convex/convex-backend.git",
       "branch":             "main",
-  
       "srcScriptInputDir":  "npm-packages",
       "srcScriptOutputDir": "npm-packages/docs/docs",
       "destDir":            "convex/docs",
-  
-      "preprocessScript":   "node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js"
+      "preprocessScript":   "( [ -f package-lock.json ] && npm ci || npm install --no-audit --no-fund ) && node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js"
     }
-  ]
-  
+] 
