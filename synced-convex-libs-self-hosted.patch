@@ -1,0 +1,1546 @@
+diff --git a/synced/convex/libs/self-hosted/CHANGELOG.md b/synced/convex/libs/self-hosted/CHANGELOG.md
+new file mode 100644
+index 0000000..feea56d
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/CHANGELOG.md
+@@ -0,0 +1,86 @@
++# Changelog
++
++Find the latest versions of the `convex-backend` package
++[here](https://github.com/get-convex/convex-backend/pkgs/container/convex-backend)
++and `convex-dashboard` package
++[here](https://github.com/get-convex/convex-backend/pkgs/container/convex-dashboard).
++Make sure to use the same version of `convex-backend` and `convex-dashboard`.
++Different versions are not guaranteed to be compatible with one another.
++
++Follow the instructions in the [README](README.md#software-upgrades) to upgrade
++your self-hosted backend and dashboard.
++
++## 2025-05-29 `c1a7ac393888d743e704de56cf569a154b4526d4`
++
++- Fix bug that prevented folks with crons from upgrading existing older
++  self-hosted deployments to `478d197d54ee6e873f06cf9e9deae1eb4aa35bb5`.
++
++## 2025-05-23 `478d197d54ee6e873f06cf9e9deae1eb4aa35bb5`
++
++- Tons and tons of backend improvements.
++- MCP + Self-hosting works (requires npm package convex >= 1.24.1)
++- Speed up pushing to node actions with
++  [external packages](https://docs.convex.dev/functions/bundling#external-packages).
++- Support setting `CONVEX_CLOUD_ORIGIN`, `CONVEX_SITE_ORIGIN`, and
++  `NEXT_PUBLIC_DEPLOYMENT_URL` in .env next to docker compose file. (Thx
++  @natac13)
++- Add support for CA file for postgres (thx @tahvane1)
++- Docs improvements. Incl DevContainer guide (thx @iamfj).
++
++## 2025-03-10 `5143fec81f146ca67495c12c6b7a15c5802c37e2`
++
++- Speed up Node actions by 50x. No more cold starts on every request. See
++  [this commit](https://github.com/get-convex/convex-backend/commit/6be386a490909dda5b8fb1c12b6cca25326847c6)
++  for more details.
++
++## 2025-03-06 `be8a4f397810ce3d04dc3cb32bc81969fe64685a`
++
++- Add R2 compatibility. See
++  https://github.com/get-convex/convex-backend/pull/53.
++  [Docs](https://github.com/get-convex/convex-backend/blob/main/self-hosted/README.md#using-s3-storage)
++- Tolerate missing or malformed sourcemaps (eg. from `ai` npm library).
++
++## 2025-02-26 `161e32648a971fb8ef591e61212f7b9fb7ff4f2c`
++
++- Add support for S3 storage for exports, snapshots, modules, files, and search
++  indexes. Read more on how to set up S3 storage
++  [here](README.md#using-s3-storage).
++
++## 2025-02-24 `fff8e431b95f4d9fde899ce348f8e8f23210aad3`
++
++- Support streaming import. Read more on how to set up streaming import
++  [here](https://docs.convex.dev/production/integrations/streaming-import-export#streaming-import)
++- Fix bug in routing to HTTP actions. Read more
++  [here](https://github.com/get-convex/convex-backend/commit/1652ee81d8a01fdeed98b0e4c923a89d1672f8ad).
++
++## 2025-02-19 `86ae5d34c8164075b66fa0c52beabd19212d8df7`
++
++- Fix bug in MySQL where certificates were not verified upon connection. Now,
++  you must set `DO_NOT_REQUIRE_SSL` for running locally.
++
++## 2025-02-19 `663640f5a01018914dc4314145f23a31f3afdca6`
++
++- Add support for MySQL! The `DATABASE_URL` env variable is now `POSTGRES_URL`
++  or `MYSQL_URL`. Known issue: MySQL certificates are not verified upon
++  connection. The next release will include a fix.
++- Optimize database queries, so simple mutations get 4x faster when running
++  against a Postgres or MySQL db in a different datacenter or region.
++
++## 2025-02-18 `62ef09aa604b0c5f873b59e0944b5e89f84b66b2`
++
++- Add support for running Docker image with local Postgres using the
++  `DO_NOT_REQUIRE_SSL` environment variable.
++
++## 2025-02-13 `6c974d219776b753cd23d26f4a296629ff7c2cad`
++
++- Fix a bug where every node action request would write to temporary files that
++  were never cleaned up. Caused disk space to fill up on volumes.
++
++## 2025-02-12 `4499dd4fd7f2148687a7774599c613d052950f46`
++
++> ⚠️ **WARNING**: DO NOT use this version in production! This initial release
++> contains a critical bug that fills up disk space. Use version
++> [6c974d219776b753cd23d26f4a296629ff7c2cad](##6c974d219776b753cd23d26f4a296629ff7c2cad)
++> or later.
++
++- Initial release of self-hosted backend and dashboard.
+diff --git a/synced/convex/libs/self-hosted/README.md b/synced/convex/libs/self-hosted/README.md
+new file mode 100644
+index 0000000..6650d2a
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/README.md
+@@ -0,0 +1,482 @@
++<p align="center">
++<picture>
++  <source media="(prefers-color-scheme: dark)" srcset="https://static.convex.dev/logo/convex-logo-light.svg" width="600">
++  <source media="(prefers-color-scheme: light)" srcset="https://static.convex.dev/logo/convex-logo.svg" width="600">
++  <img alt="Convex logo" src="https://static.convex.dev/logo/convex-logo.svg" width="600">
++</picture>
++</p>
++
++If you're new to Convex we recommend starting with the
++[onboarding tutorial](https://docs.convex.dev/tutorial/) to familiarize yourself
++with the Convex development experience.
++
++If you're in this README, you're interested in self-hosting
++[Convex](https://www.convex.dev) on your own infrastructure or a managed hosting
++provider. Support is available on the
++[Convex Discord](https://discord.gg/convex) in the `#self-hosted` channel.
++
++If you don't specifically want to self-host, head over to
++[the Convex docs](https://docs.convex.dev/) to use the cloud-hosted product.
++Cloud-hosted Convex includes a generous free tier and provides a seamless,
++reliable, cost-effective platform that allows you to focus on building your
++application without worrying about infrastructure.
++
++Self-hosting Convex requires deploying three services:
++
++1. The Convex backend
++1. The Convex dashboard
++1. Your frontend app, which you can either host yourself or on a managed service
++   like Netlify or Vercel.
++
++# Self-hosting Convex
++
++By default the Convex backend will store all state in a local SQLite database.
++We recommend starting with this basic configuration and then moving the
++container to a hosting provider or pointing the backend to a separate SQL
++database for a production-ready configuration as needed.
++
++## Docker configuration
++
++First download the
++[`docker-compose.yml` file](https://github.com/get-convex/convex-backend/tree/main/self-hosted/docker/docker-compose.yml).
++Then, to start the backend and dashboard:
++
++```sh
++docker compose up
++```
++
++Once the backend is running you can use it to generate admin keys for the
++dashboard/CLI:
++
++```sh
++docker compose exec backend ./generate_admin_key.sh
++```
++
++Visit the dashboard at `http://localhost:6791`. The backend listens on
++`http://127.0.0.1:3210`. The backend's http actions are available at
++`http://127.0.0.1:3211`.
++
++In your Convex project, add your url and admin key to a `.env.local` file (which
++should not be committed to source control):
++
++```sh
++CONVEX_SELF_HOSTED_URL='http://127.0.0.1:3210'
++CONVEX_SELF_HOSTED_ADMIN_KEY='<your admin key>'
++```
++
++Now you can run commands in your Convex project, to push code, run queries,
++import data, etc. To use these commands, you'll need the latest version of
++Convex.
++
++```sh
++npm install convex@latest
++```
++
++Now you can push code, run queries, import data, etc.
++
++```sh
++npx convex dev
++npx convex --help  # see all available commands
++```
++
++By default, the backend will store its data in a volume managed by Docker. Note
++that you'll need to set up persistent storage on whatever cloud hosting platform
++you choose to run the Docker container on (e.g. AWS EBS). By default the
++database is stored locally in SQLite but you may also point it to a SQL database
++either locally or on a cloud service of your choice following
++[these instructions](#running-the-database-on-postgres-or-mysql). You can also
++configure the backend to use S3 storage for exports, snapshots, modules, files,
++and search indexes following [these instructions](#using-s3-storage).
++
++You should now be able to use the self-hosted backend. Read on for alternative
++hosting options for production workloads.
++
++## Running the binary directly
++
++<details>
++<summary>Getting the binary</summary>
++
++You can either [build from source](../README.md) or use the precompiled
++binaries. You can download the latest precompiled binary release from
++[Releases](https://github.com/get-convex/convex-backend/releases). If your
++platform is not supported, leave us a GitHub issue. In the meantime, you can
++build from source.
++
++_Note: On MacOS you might need to hold the `option` key and double click the
++binary file in Finder once, to circumvent the
++[Gatekeeper](https://support.apple.com/en-us/102445) warning._
++
++</details>
++
++<details>
++<summary>Generate a new instance secret</summary>
++
++Instance secret is the secret to the backend. Keep very safe and only accessible
++from the backend itself. Generate a new random instance secret with
++
++```sh
++cargo run -p keybroker --bin generate_secret
++```
++
++It will look like this:
++`4361726e697461732c206c69746572616c6c79206d65616e696e6720226c6974`
++
++</details>
++
++<details>
++<summary>Generate a new admin key</summary>
++
++With the instance name and instance secret, generate an admin key. Admin key is
++required to push code to the backend and take other administrator operations.
++
++```sh
++cargo run -p keybroker --bin generate_key -- convex-self-hosted 4361726e697461732c206c69746572616c6c79206d65616e696e6720226c6974
++```
++
++It will look like
++`convex-self-hosted|01c046ab1512d9306a6abda3eedec5dfe862f1fe0f66a5aee774fb9ae3fda87706facaf682b9d4f9209a05e038cbd6e9b8`
++
++</details>
++
++<details>
++<summary>Run your backend instance</summary>
++
++Adjust the path based on where you downloaded the binary to or add it to your
++`PATH`. The backend will store its database in the current-working-directory
++(not where the binary file lives).
++
++Use the instance name and instance secret to start your backend.
++
++```sh
++./convex-local-backend --instance-name convex-self-hosted --instance-secret 4361726e697461732c206c69746572616c6c79206d65616e696e6720226c6974
++```
++
++To run with Postgres, add `--db postgres-v5 <connection string>` to the command,
++being sure to strip out the database name and query parameters. See
++[Postgres instructions](#connecting-to-postgres-on-neon). To run with MySQL, add
++`--db mysql-v5 <connection string>` to the command and similarly strip out the
++database name and query parameters.
++
++You can run `./convex-local-backend --help` to see other options for things like
++changing ports, convex origin url, convex site url, local storage directories
++and other configuration.
++
++</details>
++
++## Backend hosting on Fly.io
++
++You can run the Convex backend on a hosting provider of your choice. We include
++`fly.toml` files to make it easy to deploy your backend to
++[Fly.io](https://fly.io/). See our dedicated [Fly instructions](./fly/README.md)
++to get started.
++
++## Backend hosting on Railway.com [Community maintained]
++
++You can run the Convex backend on a hosting provider of your choice. We include
++ready made template to make it easy to deploy your backend to
++[Railway.com](https://railway.com/). See our dedicated
++[Railway instructions](./railway/README.md) to get started.
++
++## Backend hosting on your own infrastructure
++
++It's possible to run Convex on your own servers, with your own routing.
++
++Download the
++[`docker-compose.yml` file](https://github.com/get-convex/convex-backend/tree/main/self-hosted/docker/docker-compose.yml)
++onto the server you want to run Convex on.
++
++```sh
++curl -O https://raw.githubusercontent.com/get-convex/convex-backend/main/self-hosted/docker/docker-compose.yml
++```
++
++Your Convex backend will be running on this server at port 3210, with HTTP
++actions exposed at port 3211, and the dashboard running on port 6791.
++
++Set up routing to forward requests from your domain to these ports. For example:
++
++- `https://api.my-domain.com` forwards to `http://localhost:3210`
++- `https://my-domain.com` forwards to `http://localhost:3211`
++- `https://dashboard.my-domain.com` forwards to `http://localhost:6791`
++
++In a `.env` file beside the `docker-compose.yml` file, set the following
++environment variables:
++
++```sh
++# URL of the Convex API as accessed by the client/frontend.
++CONVEX_CLOUD_ORIGIN='https://api.my-domain.com'
++# URL of Convex HTTP actions as accessed by the client/frontend.
++CONVEX_SITE_ORIGIN='https://my-domain.com'
++# URL of the Convex API as accessed by the dashboard (browser).
++NEXT_PUBLIC_DEPLOYMENT_URL='https://api.my-domain.com'
++```
++
++On the server, start the backend with:
++
++```sh
++docker compose up
++```
++
++Get an admin key with:
++
++```sh
++docker compose exec backend ./generate_admin_key.sh
++```
++
++Go to the dashboard at `https://dashboard.my-domain.com` and use the admin key
++to authenticate.
++
++In your Convex project (on your local machine, probably not on the hosting
++server), add the url and admin key to a `.env.local` file (which should not be
++committed to source control):
++
++```sh
++CONVEX_SELF_HOSTED_URL='https://api.my-domain.com'
++CONVEX_SELF_HOSTED_ADMIN_KEY='<your admin key>'
++```
++
++Now you can run commands in your Convex project, to push code, run queries,
++import data, etc.
++
++```sh
++npx convex dev
++```
++
++## Running the database on Postgres or MySQL
++
++The Convex backend is designed to work well with SQLite, Postgres, or MySQL. By
++default, the docker image uses SQLite. If you're running a production workload
++that requires guaranteed uptime it's likely you want to use a managed Postgres
++or MySQL service. We've included instructions below for connecting to a Postgres
++database hosted on [Neon](https://neon.tech) or a MySQL (Vitess) database hosted
++on [PlanetScale](https://planetscale.com). We've tested that the Convex backend
++works with Postgres v17 and MySQL v8, but it's possible it works with other
++versions.
++
++Use `npx convex export` to export your data before moving from one database
++provider to another.
++
++**It's very important your backend is hosted in the same region and as close as
++possible to your database!** Any additional latency between backend and database
++will negatively impact query performance.
++
++### Connecting to Postgres on Neon
++
++Copy the connection string from the Neon dashboard and create the database.
++
++```sh
++export DATABASE_CONNECTION='<connection string>'
++psql $DATABASE_CONNECTION -c "CREATE DATABASE convex_self_hosted"
++```
++
++You can use the `POSTGRES_URL` environment variable to instruct the backend to
++connect to a certain database. This URL is the connection string without the db
++name and query params. e.g., for Neon it should end in `neon.tech`:
++
++```sh
++export POSTGRES_URL=$(echo $DATABASE_CONNECTION | sed -E 's/\/[^/]+(\?.*)?$//')
++```
++
++If you're running the backend on a platform like [Fly](https://fly.io), register
++this environment variable in the hosting environment, e.g.,:
++
++```sh
++fly secrets set POSTGRES_URL=$POSTGRES_URL
++```
++
++otherwise if you're running the backend locally you can restart it to pick up
++this environment variable.
++
++Check that the database is connected to your self-hosted convex backend. There
++should be a line like `Connected to Postgres` in the logs. Note that you'll have
++to redeploy any existing Convex functions to the new database with
++`npx convex deploy`.
++
++### Connecting to Postgres locally
++
++Create a database called `convex_self_hosted` in your Postgres instance.
++
++```sh
++psql postgres -c "CREATE DATABASE convex_self_hosted"
++```
++
++Set the `POSTGRES_URL` environment variable to your Postgres connection string
++and disable SSL. Do not include the database name in `POSTGRES_URL`.
++
++```sh
++export POSTGRES_URL='postgresql://<your-username>@host.docker.internal:5432'
++export DO_NOT_REQUIRE_SSL=1
++docker compose up
++```
++
++### Running MySQL locally
++
++```sh
++mysql -e "CREATE DATABASE convex_self_hosted;"
++export MYSQL_URL=mysql://<your-username>@host.docker.internal:3306
++export DO_NOT_REQUIRE_SSL=1
++docker compose up
++```
++
++### Running MySQL on PlanetScale
++
++Set up a database on [PlanetScale](https://planetscale.com/). Be sure to name it
++`convex_self_hosted`! Do not include the database name in `MYSQL_URL`.
++
++```sh
++export MYSQL_URL=mysql://<your-username>:<your-password>@aws.connect.psdb.cloud
++docker compose up
++```
++
++## Using S3 Storage
++
++By default, the backend stores file data on the filesystem within the docker
++container. To instead run the backend with S3 storage, set up the following
++buckets and environment variables.
++
++```sh
++export AWS_REGION="your-region"
++export AWS_ACCESS_KEY_ID="your-access-key-id"
++export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
++export S3_STORAGE_EXPORTS_BUCKET="convex-snapshot-exports"
++export S3_STORAGE_SNAPSHOT_IMPORTS_BUCKET="convex-snapshot-imports"
++export S3_STORAGE_MODULES_BUCKET="convex-modules"
++export S3_STORAGE_FILES_BUCKET="convex-user-files"
++export S3_STORAGE_SEARCH_BUCKET="convex-search-indexes"
++```
++
++Optionally set the `S3_ENDPOINT_URL` environment variable. This is required for
++using [R2](https://www.cloudflare.com/developer-platform/products/r2/) or some
++other drop-in replacement compatible with the AWS S3 API.
++
++Then run the backend!
++
++## Migrating storage providers
++
++If you are switching between local storage and S3 storage (or vice versa),
++you'll need to run a snapshot export and import to migrate your data.
++
++Run:
++
++```sh
++npx convex export --path <path-to-export-file>
++```
++
++Then set up a fresh backend with the new storage provider and import the data:
++
++```sh
++npx convex import --replace-all <path-to-export-file>
++```
++
++## Optional configurations
++
++- The cloud-hosted product automatically redacts logs to prevent any leaking of
++  PII. If you would like to also redact log information in your self-hosted
++  deployment, set the `REDACT_LOGS_TO_CLIENT` environment variable to `true`.
++- Self-hosted builds contain a beacon to help Convex understand usage of the
++  product. The information collected is anonymous and minimal, containing a
++  random identifier plus the version of the backend in use. You may opt out of
++  the beacon by setting the environment variable `DISABLE_BEACON` to `true`.
++
++## Running the dashboard locally
++
++From the `npm-packages/dashboard-self-hosted` directory, run:
++
++```sh
++just rush install
++npm run build
++NEXT_PUBLIC_DEPLOYMENT_URL="<your-backend-url>" npm run start
++```
++
++# Deploying your frontend app
++
++The Convex backend runs all database and compute functions but it doesn't host
++your actual web app. If you're hosting your website on a provider like Netlify
++or Vercel using our
++[production hosting instructions](https://docs.convex.dev/production/hosting/)
++be sure to swap out the environment variables in those instructions for the
++`SELF_HOSTED` equivalents.
++
++e.g., instead of setting `CONVEX_DEPLOY_KEY`, you'll need to set
++`CONVEX_SELF_HOSTED_URL` to the url where your Convex backend is hosted and
++`CONVEX_SELF_HOSTED_ADMIN_KEY` to the admin key you generated with the
++`generate_admin_key.sh` script.
++
++## Convex Auth
++
++If you're using Convex Auth, follow the
++[manual instructions](https://labs.convex.dev/auth/setup/manual) to set up. The
++CLI does not support self-hosted deployments yet.
++
++# Software upgrades
++
++In order to safely migrate to a new version of self-hosted, there are two
++options.
++
++## Option 1: Export/Import your database
++
++The easiest migration path is just to export your database state and reimport it
++after upgrading the backend code.
++
++1. Take down external traffic to your backend.
++2. Export your database with `npx convex export`.
++3. Save your environment variables with `npx convex env list` (or via
++   dashboard).
++4. Upgrade the backend docker image.
++5. Import from your backup with `npx convex import --replace-all`.
++6. Bring back your environment variables with `npx convex env set` (or via
++   dashboard)
++7. Bring back external traffic to your backend.
++
++Given that exports/imports can be expensive if you have a lot of data, this can
++incur downtime. You can get a sense of how much downtime by running a test
++export while your self-hosted instance is up. For smaller instances, this may be
++quick and easy.
++
++However to safely avoid losing data, it's important that the final export is
++done after load is stopped from your instance, since exports are taken at a
++snapshot in time.
++
++## Option 2: Upgrade in-place
++
++If you want to avoid downtime, you can upgrade in-place. This is a more manual
++process so proceed careful and feel free to reach out for guidance.
++
++You will need to upgrade through each intermediate binary revision specified via
++`git log crates/model/src/migrations.rs`.
++
++Each upgrade will incur a small amount of downtime, but the underlying database
++will be upgraded in-place while your app still functions. You need to allow the
++backend to run at each intermediate revision until it is ready.
++
++Look for loglines like this - and follow those instructions to complete the
++in-place upgrade. Each migration will let you know which logline to wait for to
++determine that the in-place upgrade is complete.
++
++```
++Executing Migration 114/115. MigrationComplete(115)
++```
++
++# Limitations
++
++Self-hosted Convex supports all the free-tier features of the cloud-hosted
++product. The cloud-hosted product is optimized for scale.
++
++# Benchmarking
++
++Check out our open-source benchmarking tool,
++[LoadGenerator](../crates/load_generator/README.md), for more information on how
++to benchmark and load test your Convex instance.
++
++# Questions and contributions
++
++- Join our [Discord community](https://discord.gg/convex) for help and
++  discussions. The `#self-hosted` channel is the best place to go for questions
++  about self-hosting.
++
++- Report issues when building and using the open source Convex backend through
++  [GitHub Issues](https://github.com/get-convex/convex-backend/issues)
++
++- We
++  [welcome bug fixes](https://github.com/get-convex/convex-backend/blob/main/crates/convex/CONTRIBUTING.md)
++  and love receiving feedback. We keep this repository synced with any internal
++  development work within a handful of days.
+diff --git a/synced/convex/libs/self-hosted/devcontainer/README.md b/synced/convex/libs/self-hosted/devcontainer/README.md
+new file mode 100644
+index 0000000..9920ab5
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/devcontainer/README.md
+@@ -0,0 +1,137 @@
++# Running Convex in a DevContainer for Local Development [Community maintained]
++
++If you're working with Convex and want to use a consistent, container-based
++development environment, this guide provides a minimal setup using
++[DevContainers](https://containers.dev/) and Docker.
++
++> [!IMPORTANT]  
++> This approach is meant for **local development** and is not intended for
++> self-hosting Convex in production.
++
++## What is a DevContainer?
++
++A DevContainer is a development environment defined as code and backed by a
++Docker container. It integrates tightly with Visual Studio Code through the
++[Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
++
++When you open a project with a `.devcontainer/devcontainer.json` file, VS Code
++automatically builds the container, installs dependencies, and mounts your
++project directory inside it.
++
++This setup is especially useful for teams, open source contributors, or anyone
++who wants to avoid dependency drift between local machines.
++
++## Why use a DevContainer?
++
++- Reproducible local environment with no host machine setup required
++- Isolated from other projects and host system
++- Preconfigured runtimes, dependencies, tools and extensions (e.g., Node.js,
++  pnpm, Convex CLI)
++- Easy onboarding for new team members or contributors
++
++## Requirements
++
++To use a DevContainer, you need to have the following installed:
++
++- [Docker](https://www.docker.com/products/docker-desktop)
++- [Visual Studio Code](https://code.visualstudio.com/)
++- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
++
++## Minimal DevContainer Example for Convex
++
++The following is a minimal example of a working
++`.devcontainer/devcontainer.json` setup using a Node.js/TypeScript base image.
++It binds the necessary Convex and pnpm directories, and explicitly forwards the
++required ports:
++
++```jsonc
++{
++  "name": "convex-dev",
++  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
++  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
++
++  "postCreateCommand": "npm install -g convex && npx convex dev --once",
++  "postAttachCommand": "git config --global diff.ool ...",
++  "postStartCommand": "git config --global --add safe.directory /workspaces/${localWorkspaceFolderBasename}",
++
++  "mounts": [
++    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached",
++    "source=${localEnv:HOME}/.convex,target=/home/node/.convex,type=bind,consistency=cached",
++    "source=${localEnv:HOME}/.cache/convex,target=/home/node/.cache,type=bind,consistency=cached",
++  ],
++
++  "remoteUser": "node",
++  "forwardPorts": [3210, 6790, 6791],
++}
++```
++
++You can adapt the image, remote user, or mounted paths depending on your project
++needs or base OS image.
++
++### Explanation of the Configuration
++
++This minimal setup includes just a few customizations that are important for
++Convex to run reliably inside a containerized environment.
++
++#### `.convex` mount
++
++```json
++"mounts": [
++  "source=${localEnv:HOME}/.convex,target=/home/node/.convex,type=bind"
++]
++```
++
++Convex stores some local state in the `.convex` directory (such as deployment
++metadata and generated admin keys). Mounting it from your host machine into the
++container ensures that:
++
++- The state is preserved across container rebuilds.
++- You can reuse the same identity and credentials inside and outside the
++  container.
++
++Without this mount, Convex might behave as if it's being run for the first time
++every time you restart the container.
++
++#### `.cache/convex` mount
++
++```json
++"source=${localEnv:HOME}/.cache/convex,target=/home/node/.cache,type=bind,consistency=cached"
++```
++
++During `pnpm convex dev`, the Convex CLI downloads necessary artifacts such as
++backend binaries and the dashboard frontend into the `.cache/convex` directory.
++By mounting this directory from the host into the container, those files are
++persisted between container rebuilds and restarts.
++
++This avoids re-downloading the same artifacts every time the container is
++recreated, which speeds up startup and reduces bandwidth usage.
++
++#### Forwarded ports
++
++```json
++"forwardPorts": [3210, 6790, 6791]
++```
++
++Convex uses these ports during local development:
++
++- `3210` — the API server
++- `6790` — the web dashboard
++- `6791` — the internal health check used by the dashboard to determine if a
++  local deployment is available
++
++Forwarding these ports ensures that the services running inside the container
++are accessible from your host machine and from the dashboard itself.
++
++#### `postCreateCommand`
++
++```json
++"postCreateCommand": "npx convex dev --once"
++```
++
++This command ensures the Convex development server is started as soon as the
++container is ready. The `--once` flag runs the server in one-off mode, avoiding
++watch mode or automatic restarts.
++
++This is useful for initial setup to verify everything is working, but you can
++always stop it and run `pnpm convex dev` manually when actively working on your
++functions.
+diff --git a/synced/convex/libs/self-hosted/devcontainer/devcontainer.json b/synced/convex/libs/self-hosted/devcontainer/devcontainer.json
+new file mode 100644
+index 0000000..7190da8
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/devcontainer/devcontainer.json
+@@ -0,0 +1,29 @@
++// For format details, see https://aka.ms/devcontainer.json. For config options, see the
++// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
++{
++  "name": "convex-dev",
++
++  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
++  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
++  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
++
++  // Lifecycle events
++  "postCreateCommand": "npm install -g convex && npx convex dev --once",
++  "postAttachCommand": "git config --global diff.ool ...",
++  "postStartCommand": "git config --global --add safe.directory /workspaces/${localWorkspaceFolderBasename}",
++
++  "mounts": [
++    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached",
++    "source=${localEnv:HOME}/.convex,target=/home/node/.convex,type=bind,consistency=cached",
++    "source=${localEnv:HOME}/.cache/convex,target=/home/node/.cache,type=bind,consistency=cached"
++  ],
++
++  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
++  "remoteUser": "node",
++
++  // Use 'forwardPorts' to make a list of ports inside the container available locally.
++  "forwardPorts": [3210, 6790, 6791],
++
++  // Configure tool-specific properties.
++  "customizations": {}
++}
+diff --git a/synced/convex/libs/self-hosted/docker-build/Dockerfile.backend b/synced/convex/libs/self-hosted/docker-build/Dockerfile.backend
+new file mode 100644
+index 0000000..3d20e6c
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/Dockerfile.backend
+@@ -0,0 +1,128 @@
++# syntax=docker/dockerfile:1-labs
++# This Dockerfile builds the self-hosted version of the Convex backend
++# It creates a minimal runtime image that can run a local Convex instance
++
++ARG VERGEN_GIT_SHA
++ARG VERGEN_GIT_COMMIT_TIMESTAMP
++
++# cargo-chef is used to cache Rust dependencies and build artifacts
++# It creates a recipe of our dependencies first, then builds them in a separate stage
++# This helps avoid rebuilding dependencies when only first-party source code changes
++FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
++WORKDIR /tmp
++COPY rust-toolchain .
++# Dummy command to just fetch the toolchain that'll get installed by running `cargo chef`
++RUN rustup self update && rustup toolchain install
++COPY --parents crates* Cargo* ./
++RUN cargo chef prepare --recipe-path recipe.json --bin convex-local-backend
++
++# Build stage: Compiles the Rust backend with all dependencies
++# Uses cargo-chef's recipe from the previous stage for optimal caching
++FROM lukemathwalker/cargo-chef:latest-rust-1 AS build
++SHELL ["/bin/bash", "-o", "pipefail", "-c"]
++
++# Update APT configuration for Docker builds
++# Sets retry attempts, assumes yes for prompts, and configures dpkg timeout
++# Also installs a few libraries needed for building the backend
++RUN <<EOF
++printf 'APT::Acquire::Retries \"10\";\n' > /etc/apt/apt.conf.d/80retries
++printf 'APT::Get::Assume-Yes \"true\";\n' > /etc/apt/apt.conf.d/90forceyes
++printf 'DPkg::Lock::Timeout \"30\";\n' > /etc/apt/apt.conf.d/85timeout
++echo 'DEBIAN_FRONTEND=noninteractive' > /etc/environment
++apt-get update
++apt-get install -y --no-install-recommends cmake libclang-dev libstdc++6 libc6
++EOF
++
++# Install Just (for build scripts)
++RUN cargo install just
++
++WORKDIR /
++
++# Install Node.js from NodeSource repository
++# We extract the version from .nvmrc
++COPY .nvmrc /nvmrc
++RUN <<EOF
++# Extract major version (e.g., "18" from "18.x.x")
++NODE_MAJOR=$(cat /nvmrc | cut -d. -f1 | tr -d 'v\n')
++# Add NodeSource repository and its signing key
++curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash -
++# Install the specific version listed in the nvmrc file
++NODE_VERSION=$(cat /nvmrc | tr -d 'v\n')
++apt-get install -y --no-install-recommends nodejs=${NODE_VERSION}-1nodesource1
++EOF
++
++# Ensure this file is copied so we'll restart here if the file changes
++COPY rust-toolchain /rust-toolchain
++# Dummy command to just fetch the toolchain and cargo index
++RUN rustup self update && rustup toolchain install && cargo search -q convex
++
++WORKDIR /convex
++COPY scripts ./scripts
++RUN npm ci --prefix scripts/
++
++# Disable build cache as it's not usable without a real git repo present
++ENV RUSH_BUILD_CACHE_ENABLED=0
++COPY npm-packages ./npm-packages
++COPY Justfile ./
++RUN --mount=type=cache,target=/convex/npm-packages/common/temp/,sharing=locked just rush install
++
++COPY --from=chef /tmp/recipe.json recipe.json
++# Use cargo-chef to build dependencies from the recipe created in the first stage
++# This step will be cached unless dependencies change
++RUN --mount=type=cache,target=/convex/target/ --mount=type=cache,target=/usr/local/cargo/git/db --mount=type=cache,target=/usr/local/cargo/registry/ cargo chef cook --release --recipe-path recipe.json
++# Now copy everything else over -- we've minimized the set of files that cause a full `rush install` or `cargo build` to run.
++COPY . .
++
++# Build the convex-local-backend binary
++# Must redeclare these as environment variables so that they are available
++ARG VERGEN_GIT_SHA
++ARG VERGEN_GIT_COMMIT_TIMESTAMP
++ENV VERGEN_GIT_SHA=${VERGEN_GIT_SHA}
++ENV VERGEN_GIT_COMMIT_TIMESTAMP=${VERGEN_GIT_COMMIT_TIMESTAMP}
++RUN --mount=type=cache,target=/convex/npm-packages/common/temp/,sharing=locked --mount=type=cache,target=/convex/target/ --mount=type=cache,target=/usr/local/cargo/git/db --mount=type=cache,target=/usr/local/cargo/registry/ <<EOF
++cargo build --release -p local_backend --bin convex-local-backend
++cp target/release/convex-local-backend .
++cargo build --release -p keybroker --bin generate_key
++cp target/release/generate_key .
++EOF
++ARG debug
++RUN if [[ -z "$debug" ]]; then strip ./convex-local-backend; strip ./generate_key; fi
++
++# Final stage: Creates minimal runtime image with only necessary components
++# Uses Ubuntu Noble (24.04) as the base image
++FROM ubuntu:noble
++ARG VERGEN_GIT_SHA
++LABEL org.opencontainers.repository=https://github.com/get-convex/convex-backend
++LABEL org.opencontainers.image.revision=${VERGEN_GIT_SHA}
++
++WORKDIR /convex
++
++# Install libraries needed for running the backend
++RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
++apt-get update
++apt-get install -y --no-install-recommends libclang1 curl ca-certificates
++EOF
++
++# Install Node.js and npm, required for running Node.js actions in the backend
++COPY --from=build /usr/bin/node /usr/bin/node
++COPY --from=build /usr/bin/npm /usr/bin/npm
++COPY --from=build /usr/lib/node_modules/npm /usr/lib/node_modules/npm
++# Set up npm and npx commands
++RUN ln -sf /usr/lib/node_modules/npm/bin/npm-cli.js /usr/bin/npm && \
++    chmod +x /usr/bin/npm
++RUN ln -sf /usr/lib/node_modules/npm/bin/npx-cli.js /usr/bin/npx && \
++    chmod +x /usr/bin/npx
++COPY --from=build --chmod=744 /convex/convex-local-backend .
++COPY --from=build --chmod=744 /convex/generate_key .
++COPY --chmod=744 self-hosted/docker-build/read_credentials.sh .
++COPY --chmod=744 self-hosted/docker-build/run_backend.sh .
++COPY --chmod=744 self-hosted/docker-build/generate_admin_key.sh .
++
++VOLUME /convex/data
++
++# Set the backend as the executable
++ENTRYPOINT ["./run_backend.sh"]
++
++# Expose the required ports
++EXPOSE 3210
++EXPOSE 3211
+diff --git a/synced/convex/libs/self-hosted/docker-build/Dockerfile.dashboard b/synced/convex/libs/self-hosted/docker-build/Dockerfile.dashboard
+new file mode 100644
+index 0000000..5b1af95
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/Dockerfile.dashboard
+@@ -0,0 +1,23 @@
++# syntax=docker/dockerfile:1-labs
++FROM node:18 AS build
++RUN --mount=type=cache,target=/root/.npm npm install -g @microsoft/rush@5
++WORKDIR /app
++COPY ./npm-packages ./npm-packages
++# Install dependencies and build
++WORKDIR /app/npm-packages/dashboard-self-hosted
++RUN rush install
++ENV NODE_ENV=production
++RUN rush build -t dashboard-self-hosted
++RUN rush-pnpm deploy --legacy --filter=dashboard-self-hosted --prod /tmp/deploy
++
++FROM node:18-alpine
++RUN addgroup --system --gid 1001 nodejs
++RUN adduser --system --uid 1001 nextjs
++COPY --from=build --chown=nextjs:nodejs /tmp/deploy/ /app/
++WORKDIR /app
++RUN cp /app/.next/standalone/server.js .
++USER nextjs
++EXPOSE 6791
++ENV PORT=6791
++ENV HOSTNAME=0.0.0.0
++CMD ["node", "./server.js"]
+diff --git a/synced/convex/libs/self-hosted/docker-build/README.md b/synced/convex/libs/self-hosted/docker-build/README.md
+new file mode 100644
+index 0000000..13a4904
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/README.md
+@@ -0,0 +1,18 @@
++# Building docker images
++
++The contents of this directory are used to build the docker images for the
++self-hosted backend and dashboard. If you're looking for ways to run self-hosted
++Convex, see the [these instructions](../README.md). You may build the images
++locally from here, but we recommend using the images we provide on GHCR.
++
++Build the backend from scratch by running:
++
++```sh
++docker build -t convex-backend -f self-hosted/docker-build/Dockerfile.backend .
++```
++
++Build the dashboard from scratch by running:
++
++```sh
++docker build -t convex-dashboard -f self-hosted/docker-build/Dockerfile.dashboard .
++```
+diff --git a/synced/convex/libs/self-hosted/docker-build/generate_admin_key.sh b/synced/convex/libs/self-hosted/docker-build/generate_admin_key.sh
+new file mode 100644
+index 0000000..7f09f3c
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/generate_admin_key.sh
+@@ -0,0 +1,10 @@
++#!/bin/bash
++
++set -e
++
++source ./read_credentials.sh
++
++ADMIN_KEY=$(./generate_key "$INSTANCE_NAME" "$INSTANCE_SECRET")
++
++echo "$ADMIN_KEY"
++
+diff --git a/synced/convex/libs/self-hosted/docker-build/read_credentials.sh b/synced/convex/libs/self-hosted/docker-build/read_credentials.sh
+new file mode 100644
+index 0000000..2d184dd
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/read_credentials.sh
+@@ -0,0 +1,23 @@
++#!/bin/bash
++
++DATA_DIR=${DATA_DIR:-/convex/data}
++CREDENTIALS_DIR=${CREDENTIALS_DIR:-"$DATA_DIR/credentials"}
++
++set -e
++mkdir -p "$CREDENTIALS_DIR"
++
++# Set INSTANCE_SECRET by checking in order:
++# 1. Use existing INSTANCE_SECRET env var if set
++# 2. Read from CREDENTIALS_DIR/instance_secret if file exists
++# 3. Generate new random secret if neither exists
++# Finally, save the secret to disk for persistence
++export INSTANCE_SECRET=${INSTANCE_SECRET:-$(cat "$CREDENTIALS_DIR/instance_secret" 2>/dev/null || openssl rand -hex 32)}
++echo "$INSTANCE_SECRET" > "$CREDENTIALS_DIR/instance_secret"
++
++# Set INSTANCE_NAME by checking in order:
++# 1. Use existing INSTANCE_NAME env var if set
++# 2. Read from CREDENTIALS_DIR/instance_name if file exists
++# 3. Use default name "convex-self-hosted" if neither exists
++# Finally, save the name to disk for persistence
++export INSTANCE_NAME=${INSTANCE_NAME:-$(cat "$CREDENTIALS_DIR/instance_name" 2>/dev/null || echo "convex-self-hosted")}
++echo "$INSTANCE_NAME" > "$CREDENTIALS_DIR/instance_name"
+diff --git a/synced/convex/libs/self-hosted/docker-build/run_backend.sh b/synced/convex/libs/self-hosted/docker-build/run_backend.sh
+new file mode 100644
+index 0000000..942d56c
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker-build/run_backend.sh
+@@ -0,0 +1,73 @@
++#! /bin/bash
++
++export DATA_DIR=${DATA_DIR:-/convex/data}
++export TMPDIR=${TMPDIR:-"$DATA_DIR/tmp"}
++export STORAGE_DIR=${STORAGE_DIR:-"$DATA_DIR/storage"}
++export SQLITE_DB=${SQLITE_DB:-"$DATA_DIR/db.sqlite3"}
++
++# Database driver flags matching DbDriverTag values
++POSTGRES_DB_FLAGS=(--db postgres-v5)
++MYSQL_DB_FLAGS=(--db mysql-v5)
++
++set -e
++mkdir -p "$TMPDIR" "$STORAGE_DIR"
++
++source ./read_credentials.sh
++
++# Determine database configuration
++if [ -n "$POSTGRES_URL" ]; then
++    DB_SPEC="$POSTGRES_URL"
++    DB_FLAGS=("${POSTGRES_DB_FLAGS[@]}")
++elif [ -n "$MYSQL_URL" ]; then
++    DB_SPEC="$MYSQL_URL"
++    DB_FLAGS=("${MYSQL_DB_FLAGS[@]}")
++elif [ -n "$DATABASE_URL" ]; then
++    echo "Warning: DATABASE_URL is deprecated. Please use POSTGRES_URL for PostgreSQL or MYSQL_URL for MySQL connections instead."
++    DB_SPEC="$DATABASE_URL"
++    DB_FLAGS=("${POSTGRES_DB_FLAGS[@]}")  # Maintain backwards compatibility with existing DATABASE_URL behavior
++else
++    # Otherwise fallback to SQLite
++    DB_SPEC="$SQLITE_DB"
++    DB_FLAGS=()
++fi
++
++# Check if all required S3 environment variables are present
++MISSING_VARS=()
++[ -z "$AWS_REGION" ] && MISSING_VARS+=("AWS_REGION")
++[ -z "$AWS_ACCESS_KEY_ID" ] && MISSING_VARS+=("AWS_ACCESS_KEY_ID")
++[ -z "$AWS_SECRET_ACCESS_KEY" ] && MISSING_VARS+=("AWS_SECRET_ACCESS_KEY")
++[ -z "$S3_STORAGE_EXPORTS_BUCKET" ] && MISSING_VARS+=("S3_STORAGE_EXPORTS_BUCKET")
++[ -z "$S3_STORAGE_SNAPSHOT_IMPORTS_BUCKET" ] && MISSING_VARS+=("S3_STORAGE_SNAPSHOT_IMPORTS_BUCKET")
++[ -z "$S3_STORAGE_MODULES_BUCKET" ] && MISSING_VARS+=("S3_STORAGE_MODULES_BUCKET")
++[ -z "$S3_STORAGE_FILES_BUCKET" ] && MISSING_VARS+=("S3_STORAGE_FILES_BUCKET")
++[ -z "$S3_STORAGE_SEARCH_BUCKET" ] && MISSING_VARS+=("S3_STORAGE_SEARCH_BUCKET")
++
++if [ ${#MISSING_VARS[@]} -eq 0 ]; then
++    STORAGE_FLAGS=(--s3-storage)
++else
++    if [ ${#MISSING_VARS[@]} -lt 8 ]; then
++        echo "Warning: Some AWS/S3 environment variables are missing. Falling back to local storage."
++        echo "Missing variables: ${MISSING_VARS[*]}"
++    fi
++    STORAGE_FLAGS=(--local-storage "$STORAGE_DIR")
++fi
++
++# --port and --site-proxy-port are internal to the container, so we pick them to
++# avoid conflicts in the container.
++# --convex-origin and --convex-site are how the backend can be contacted from
++# the outside world. They show up in storage urls, action callbacks, etc.
++
++exec ./convex-local-backend "$@" \
++    --instance-name "$INSTANCE_NAME" \
++    --instance-secret "$INSTANCE_SECRET" \
++    --port 3210 \
++    --site-proxy-port 3211 \
++    --convex-origin "$CONVEX_CLOUD_ORIGIN" \
++    --convex-site "$CONVEX_SITE_ORIGIN" \
++    --beacon-tag "self-hosted-docker" \
++    ${DISABLE_BEACON:+--disable-beacon} \
++    ${REDACT_LOGS_TO_CLIENT:+--redact-logs-to-client} \
++    ${DO_NOT_REQUIRE_SSL:+--do-not-require-ssl} \
++    "${DB_FLAGS[@]}" \
++    "${STORAGE_FLAGS[@]}" \
++    "$DB_SPEC"
+diff --git a/synced/convex/libs/self-hosted/docker/docker-compose.yml b/synced/convex/libs/self-hosted/docker/docker-compose.yml
+new file mode 100644
+index 0000000..6335688
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/docker/docker-compose.yml
+@@ -0,0 +1,55 @@
++services:
++  backend:
++    image: ghcr.io/get-convex/convex-backend:c1a7ac393888d743e704de56cf569a154b4526d4
++    stop_grace_period: 10s
++    stop_signal: SIGINT
++    ports:
++      - "${PORT:-3210}:3210"
++      - "${SITE_PROXY_PORT:-3211}:3211"
++    volumes:
++      - data:/convex/data
++    environment:
++      - INSTANCE_NAME=${INSTANCE_NAME:-}
++      - INSTANCE_SECRET=${INSTANCE_SECRET:-}
++      - CONVEX_RELEASE_VERSION_DEV=${CONVEX_RELEASE_VERSION_DEV:-}
++      - ACTIONS_USER_TIMEOUT_SECS=${ACTIONS_USER_TIMEOUT_SECS:-}
++      - CONVEX_CLOUD_ORIGIN=${CONVEX_CLOUD_ORIGIN:-http://127.0.0.1:${PORT:-3210}}
++      - CONVEX_SITE_ORIGIN=${CONVEX_SITE_ORIGIN:-http://127.0.0.1:${SITE_PROXY_PORT:-3211}}
++      - DATABASE_URL=${DATABASE_URL:-}
++      - DISABLE_BEACON=${DISABLE_BEACON:-}
++      - REDACT_LOGS_TO_CLIENT=${REDACT_LOGS_TO_CLIENT:-}
++      - DO_NOT_REQUIRE_SSL=${DO_NOT_REQUIRE_SSL:-}
++      - POSTGRES_URL=${POSTGRES_URL:-}
++      - MYSQL_URL=${MYSQL_URL:-}
++      - RUST_LOG=${RUST_LOG:-info}
++      - RUST_BACKTRACE=${RUST_BACKTRACE:-}
++      - AWS_REGION=${AWS_REGION:-}
++      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
++      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
++      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
++      - S3_STORAGE_EXPORTS_BUCKET=${S3_STORAGE_EXPORTS_BUCKET:-}
++      - S3_STORAGE_SNAPSHOT_IMPORTS_BUCKET=${S3_STORAGE_SNAPSHOT_IMPORTS_BUCKET:-}
++      - S3_STORAGE_MODULES_BUCKET=${S3_STORAGE_MODULES_BUCKET:-}
++      - S3_STORAGE_FILES_BUCKET=${S3_STORAGE_FILES_BUCKET:-}
++      - S3_STORAGE_SEARCH_BUCKET=${S3_STORAGE_SEARCH_BUCKET:-}
++      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL:-}
++
++    healthcheck:
++      test: curl -f http://localhost:3210/version
++      interval: 5s
++      start_period: 10s
++
++  dashboard:
++    image: ghcr.io/get-convex/convex-dashboard:c1a7ac393888d743e704de56cf569a154b4526d4
++    stop_grace_period: 10s
++    stop_signal: SIGINT
++    ports:
++      - "${DASHBOARD_PORT:-6791}:6791"
++    environment:
++      - NEXT_PUBLIC_DEPLOYMENT_URL=${NEXT_PUBLIC_DEPLOYMENT_URL:-http://127.0.0.1:${PORT:-3210}}
++    depends_on:
++      backend:
++        condition: service_healthy
++
++volumes:
++  data:
+diff --git a/synced/convex/libs/self-hosted/fly/README.md b/synced/convex/libs/self-hosted/fly/README.md
+new file mode 100644
+index 0000000..53f57b3
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/fly/README.md
+@@ -0,0 +1,222 @@
++# Self-hosting Convex with [Fly.io](https://fly.io/)
++
++## Setup
++
++Copy the
++[`fly` files](https://github.com/get-convex/convex-backend/tree/main/self-hosted/fly)
++to your local machine. You don't need to copy it into your project directory,
++but you can. `degit` is a tool for copying files from git repositories.
++
++```sh
++npx degit get-convex/convex-backend/self-hosted/fly fly
++cd fly
++```
++
++Install the `fly` CLI by following
++[these instructions](https://fly.io/docs/flyctl/install/)
++
++## Deploying the backend to Fly.io
++
++The backend "deploy" can mean two things:
++
++1. Deploying the Convex backend docker image to Fly.io.
++2. Deploying your app's Convex functions to the fly machine running Convex.
++
++Steps:
++
++1. Deploy the backend to Fly.io.
++
++   ```sh
++   cd backend
++   fly launch
++   ```
++
++   When prompted, hit 'y' to copy the configuration to your new app. Edit the
++   location to be in the same region as your database (if you're using
++   [Postgres or MySQL](https://github.com/get-convex/convex-backend/tree/main/self-hosted/README.md#running-the-database-on-postgres-or-mysql)).
++   Now you have a fly app that is running the Convex backend, where you can
++   deploy your app's Convex functions.
++
++   Note the URL of the app that gets printed out, which will be of the form
++   `https://<app-name>.fly.dev`. We'll call this the `fly-backend-url`.
++
++2. Set the environment variables `CONVEX_CLOUD_ORIGIN` and `CONVEX_SITE_ORIGIN`
++   for your backend.
++
++   These environment variables are used by the backend so it knows where it is
++   hosted. Inside your Convex backend functions, you can access the backend's
++   URL with `process.env.CONVEX_CLOUD_URL` for the Convex client API and
++   `process.env.CONVEX_SITE_URL` for the HTTP API.
++
++   **Using the fly.toml file:**
++
++   To save them in the fly.toml file, set them in the `[env]` section.
++
++   ```toml
++   [env]
++   TMPDIR = '/convex/data/tmp'
++   CONVEX_CLOUD_ORIGIN = '<fly-backend-url>'
++   CONVEX_SITE_ORIGIN = '<fly-backend-url>/http'
++   ```
++
++   Then re-deploy to pick up the changes.
++
++   ```sh
++   fly deploy
++   ```
++
++   **Storing them as secrets:**
++
++   If you'd rather not save the env variables in the fly.toml file, you can set
++   them as secrets with `fly secrets set`. This can be useful if multiple
++   developers are working on the same repo where the fly.toml file is already
++   checked in, and they each have their own fly.io-hosted backend.
++
++   ```sh
++   fly secrets set CONVEX_CLOUD_ORIGIN="<fly-backend-url>" CONVEX_SITE_ORIGIN="<fly-backend-url>/http"
++   ```
++
++   Now your backend knows its base URL so it can generate URLs that point back
++   to itself. This is especially useful for libraries registering webhooks and
++   [Convex Auth](https://labs.convex.dev/auth) for generating auth callbacks.
++
++3. Check that the backend is running. Visit the `<fly-backend-url>` and you
++   should see a message saying your backend is running! Check the logs with
++   `fly logs` if it's not working.
++
++4. Generate an admin key.
++
++   ```sh
++   fly ssh console --command "./generate_admin_key.sh"
++   ```
++
++   This admin key will be used to authorize the CLI and access the dashboard.
++
++5. Inside your app that uses Convex, create a `.env.local` file with the
++   following variables:
++
++   ```sh
++   CONVEX_SELF_HOSTED_URL='<fly-backend-url>'
++   CONVEX_SELF_HOSTED_ADMIN_KEY='<your-admin-key>'
++   ```
++
++6. To deploy your Convex functions to the backend, you'll use the `convex` CLI.
++
++   If you don't already have Convex installed for your app, install it.
++
++   ```sh
++   cd <your-frontend-app-directory>
++   npm install convex@latest
++   ```
++
++   To continuously deploy code for development:
++
++   ```sh
++   npx convex dev
++   ```
++
++   This will continuously deploy your Convex functions as you edit them. It will
++   also set environment variables in `.env.local` for your frontend, like
++   `VITE_CONVEX_URL`.
++
++   To deploy code once:
++
++   ```sh
++   npx convex deploy --env-file <path to env file>
++   ```
++
++   To deploy code to a different backend, you can pass the `--env-file` flag or
++   set the self-hosted environment variables before calling `npx convex deploy`.
++
++   **Note:** It's up to you whether a backend is for development or production.
++   There is no distinction within the instance. If you only have one backend,
++   you can run `npx convex dev` or `npx convex deploy` depending on whether you
++   want it to live-update or not.
++
++   An extension of this is that you can have many backends for staging or
++   previews. The difference will be in the environment variables.
++
++### HTTP Actions
++
++Note that HTTP actions run on your fly app url under the `/http` path. For
++example:
++
++- If your fly app is deployed at `https://self-hosted-backend.fly.dev`
++- And you have an HTTP action routed to `/sendEmail`
++- You would call it at `https://self-hosted-backend.fly.dev/http/sendEmail`
++
++### Database
++
++At this point, your data is stored in SQLite and your files are stored in the
++filesystem in your Fly volume. You can see them in the `data` folder if you run:
++
++```
++fly ssh console
++ls
++```
++
++To store your data in a SQL database of your choice, see
++[these instructions](https://github.com/get-convex/convex-backend/tree/main/self-hosted/README.md#running-the-database-on-postgres--or-mysql).
++
++## Deploying the dashboard
++
++The dashboard allows you to see logs, read/write data, run functions, and more.
++You can run the dashboard locally with Docker, or deploy it to Fly.io.
++
++### Running the dashboard locally
++
++```sh
++docker run -e 'NEXT_PUBLIC_DEPLOYMENT_URL=<fly-backend-url>' -p '6791:6791' 'ghcr.io/get-convex/convex-dashboard:latest'
++```
++
++### Fly.io deployment
++
++1. Go into the dashboard directory where you copied the self-hosted files.
++
++   ```sh
++   cd dashboard
++   ```
++
++2. Deploy the dashboard to Fly.io with the url to your fly-hosted backend.
++
++   **Saving the url in the fly.toml file:**
++
++   ```sh
++   fly launch -e NEXT_PUBLIC_DEPLOYMENT_URL="<fly-backend-url>"
++   ```
++
++   **Saving the url as a secret:**
++
++   If you'd rather not have the url in the fly.toml file, you can set it as a
++   secret. This can be useful if multiple developers are working on the same
++   repo where the fly.toml file is already checked in, and they each have their
++   own fly.io-hosted dashboard.
++
++   ```sh
++   fly launch
++   fly secrets set NEXT_PUBLIC_DEPLOYMENT_URL="<fly-backend-url>"
++   ```
++
++   You should now be able to visit the dashboard at the url output by fly.
++
++3. Visit the dashboard and enter the admin key. To log in, it will need the
++   admin key you generated earlier. We recommend saving it in your password
++   manager for ease, but you can always regenerate it with
++   `fly ssh console --command "./generate_admin_key.sh"`.
++
++   You should see your tables, functions, logs, etc.
++
++## Deploying your frontend app
++
++See
++[these instructions](https://github.com/get-convex/convex-backend/tree/main/self-hosted/README.md#deploying-your-frontend-app).
++
++## Troubleshooting
++
++- **Performance issues**: The default fly configuration allocates the minimum
++  possible resources to get up and running. If your app has high load, you may
++  see ratelimiting from Fly and poor performance. We recommend increasing your
++  memory and CPU.
++- **Running out of disk space**: The default fly configuration allocates 1GB to
++  the `convex_data` volume where your SQLite database and storage lives. If you
++  run out of space, you can increase the volume size with `fly volume extend`.
+diff --git a/synced/convex/libs/self-hosted/fly/backend/fly.toml b/synced/convex/libs/self-hosted/fly/backend/fly.toml
+new file mode 100644
+index 0000000..033e3f5
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/fly/backend/fly.toml
+@@ -0,0 +1,38 @@
++# fly.toml app configuration file generated for convex-backend on 2025-02-12T15:17:28-08:00
++#
++# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
++#
++
++app = 'convex-backend'
++primary_region = 'iad'
++
++[build]
++image = 'ghcr.io/get-convex/convex-backend:c1a7ac393888d743e704de56cf569a154b4526d4'
++
++[env]
++TMPDIR = '/convex/data/tmp'
++
++[[mounts]]
++source = 'convex_data'
++destination = '/convex/data'
++
++[http_service]
++internal_port = 3210
++force_https = true
++auto_stop_machines = 'stop'
++auto_start_machines = true
++min_machines_running = 1
++processes = ['app']
++
++[[http_service.checks]]
++interval = '5s'
++timeout = '30s'
++grace_period = '5s'
++method = 'GET'
++path = '/version'
++protocol = 'http'
++
++[[vm]]
++memory = '1gb'
++cpu_kind = 'shared'
++cpus = 4
+diff --git a/synced/convex/libs/self-hosted/fly/dashboard/fly.toml b/synced/convex/libs/self-hosted/fly/dashboard/fly.toml
+new file mode 100644
+index 0000000..97c7613
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/fly/dashboard/fly.toml
+@@ -0,0 +1,28 @@
++# fly.toml app configuration file generated for convex-dashboard on 2025-02-12T15:24:01-08:00
++#
++# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
++#
++
++app = 'convex-dashboard'
++primary_region = 'iad'
++
++[build]
++image = 'ghcr.io/get-convex/convex-dashboard:c1a7ac393888d743e704de56cf569a154b4526d4'
++
++[[services]]
++protocol = 'tcp'
++internal_port = 6791
++
++[[services.ports]]
++port = 80
++handlers = ['http']
++force_https = true
++
++[[services.ports]]
++port = 443
++handlers = ['tls', 'http']
++
++[[vm]]
++memory = '1gb'
++cpu_kind = 'shared'
++cpus = 1
+diff --git a/synced/convex/libs/self-hosted/railway/README.md b/synced/convex/libs/self-hosted/railway/README.md
+new file mode 100644
+index 0000000..2a3f483
+--- /dev/null
++++ b/synced/convex/libs/self-hosted/railway/README.md
+@@ -0,0 +1,104 @@
++# Self-hosting Convex with [Railway.com](https://railway.com/)
++
++Instructions for railway self-hosting is community maintained. For help, please
++join the [community discord](https://convex.dev/community). Thanks to
++[orenaksakal](https://github.com/orenaksakal) for the work in putting the
++instructions together.
++
++## Deploying to Railway.com
++
++You can view the ready to deploy
++[template here](https://railway.com/template/OKpPqB)
++
++or use one click deploy button below:
++
++[![Deploy on Railway.com](https://railway.com/button.svg)](https://railway.com/template/OKpPqB)
++
++## Setup
++
++The template comes with pre-configured env-variables and you need to follow some
++setup steps to make it fully work.
++
++1. Setting up ports for the deployment
++2. Generating admin key with railway ssh
++
++Steps:
++
++1. Setting up ports for the deployment
++
++   Go to your railway deployment
++
++   - Select `convex-backend` service
++   - Select Settings tab and scroll to `Public Networking` section
++   - Hover on the domain and delete auto assigned domain
++   - Click on `Generate Domain` for auto generated one or `Custom Domain` if you
++     want to setup custom domain
++   - Make sure to select port `3210` and add your domain
++   - Re-deploy both `convex-dashboard` and `convex-backend` services
++
++2. Generating admin key with railway ssh
++
++   Follow [these](https://blog.railway.com/p/ssh#how-to-ssh-on-railway)
++   instructions to setup railway SSH on your machine
++
++   - Link your convex deployment project
++   - Run `railway ssh` and select `convex-backend` when prompted
++   - Run `ls` and then `./generate_admin_key.sh`
++   - Copy the whole admin key logged on the screen
++   - This is your admin key keep it secret
++
++### HTTP Actions
++
++Note that HTTP actions run on your railway app url under the `/http` path. For
++example:
++
++- If your railway app is deployed at `https://self-hosted-backend.railway.app`
++- And you have an HTTP action routed to `/sendEmail`
++- You would call it at `https://self-hosted-backend.railway.app/http/sendEmail`
++
++### Database
++
++At this point, your data is stored in SQLite and your files are stored in the
++Railway volume. You can see them in the `data` folder if you run:
++
++```
++railway ssh
++ls
++```
++
++To store your data in a SQL database of your choice, see
++[these instructions](https://github.com/get-convex/convex-backend/tree/main/self-hosted/README.md#running-the-database-on-postgres--or-mysql).
++
++## Accessing the deployed dashboard
++
++The dashboard allows you to see logs, read/write data, run functions, and more.
++You can run the dashboard locally with Docker, or deploy it to Railway.
++
++- Head over to your railway app
++- Select `convex-dashboard`
++- Visit its public url
++- Paste the admin key when prompted
++- Enjoy
++
++### Running the dashboard locally
++
++```sh
++docker run -e 'NEXT_PUBLIC_DEPLOYMENT_URL=<backend-url>' -p '6791:6791' 'ghcr.io/get-convex/convex-dashboard:latest'
++```
++
++## Deploying your frontend app
++
++See
++[these instructions](https://github.com/get-convex/convex-backend/tree/main/self-hosted/README.md#deploying-your-frontend-app).
++
++## Troubleshooting
++
++- **Performance issues**: The default railway configuration allocates the
++  minimum possible resources to get up and running. If your app has high load,
++  you may see ratelimiting from railway and poor performance. We recommend
++  increasing your memory and CPU.
++- **Running out of disk space**: The hobby railway configuration allocates 5GB
++  to the `convex_data` volume where your SQLite database and storage lives. If
++  you run out of space, you can increase the volume to 50GB by upgrading plan.
++- If you need more help feel free to join our discord
++  [community discord](https://convex.dev/community)

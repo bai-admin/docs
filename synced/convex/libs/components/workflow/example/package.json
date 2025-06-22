@@ -1,0 +1,20 @@
+{
+  "name": "uses-component",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "convex dev --live-component-sources --typecheck-components",
+    "logs": "convex logs",
+    "lint": "tsc -p convex && eslint convex"
+  },
+  "dependencies": {
+    "@convex-dev/workflow": "file:..",
+    "convex": "^1.16.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "convex-test": "^0.0.36",
+    "eslint": "^8.55.0",
+    "typescript": "^5.2.2"
+  }
+}

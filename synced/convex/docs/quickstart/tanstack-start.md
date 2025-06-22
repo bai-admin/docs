@@ -1,0 +1,304 @@
+---
+title: TanStack Start Quickstart
+sidebar_label: TanStack Start
+description: "Add Convex to a TanStack Start project"
+hide_table_of_contents: true
+sidebar_position: 200
+---
+
+
+
+
+
+
+<Admonition type="caution" title="TanStack Start is in Beta">
+
+[TanStack Start](https://tanstack.com/start/latest) is a new React framework
+currently in beta. You can try it today but there are likely to be breaking
+changes before a stable release.
+
+</Admonition>
+
+To get setup quickly with Convex and TanStack Start run
+
+<p>
+  <b>
+    <CodeWithCopyButton text="npm create convex@latest -- -t tanstack-start" />
+  </b>
+</p>
+
+or follow the guide below.
+
+To use Clerk with Convex and TanStack Start, see the
+[TanStack Start + Clerk guide](/client/react/tanstack-start/clerk.mdx)
+
+---
+
+Learn how to query data from Convex in a TanStack Start site.
+
+<StepByStep>
+  <Step title="Create a TanStack Start site">
+
+The TanStack team intends to release a CLI template starter soon, but until the
+official way to create a new TanStack Start site is to follow the TanStack Start
+[getting started](https://tanstack.com/router/latest/docs/framework/react/start/getting-started)
+guide.
+
+Once you've finished you'll have a directory called myApp with a minimal
+TanStack Start app in it.
+
+      ```sh
+      .
+      ├── app/
+      │   ├── routes/
+      │   │   ├── `index.tsx`
+      │   │   └── `__root.tsx`
+      │   ├── `client.tsx`
+      │   ├── `router.tsx`
+      │   ├── `routeTree.gen.ts`
+      │   └── `ssr.tsx`
+      ├── `.gitignore`
+      ├── `app.config.ts`
+      ├── `package.json`
+      └── `tsconfig.json`
+      ```
+
+</Step>
+  <Step title="Install the Convex client and server library">
+    To get started with Convex install the `convex` package and a few React Query-related packages.
+
+    ```sh
+    npm install convex @convex-dev/react-query @tanstack/react-router-with-query @tanstack/react-query
+    ```
+
+  </Step>
+
+  <Step title="Update app/routes/__root.tsx">
+    Add a `QueryClient` to the router context to make React Query usable anywhere in the TanStack Start site.
+
+    
+```tsx
+import { QueryClient } from "@tanstack/react-query";
+import { createRootRouteWithContext } from "@tanstack/react-router";
+import { Outlet, ScrollRestoration } from "@tanstack/react-router";
+import { Meta, Scripts } from "@tanstack/start";
+import * as React from "react";
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "TanStack Start Starter",
+      },
+    ],
+  }),
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <head>
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+```
+
+
+  </Step>
+
+  <Step title="Update app/router.tsx">
+    Replace the file `app/router.tsx` with these contents.
+
+    This creates a `ConvexClient` and a `ConvexQueryClient` and wires in a `ConvexProvider`.
+
+    
+```tsx
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
+import { routerWithQueryClient } from "@tanstack/react-router-with-query";
+import { ConvexQueryClient } from "@convex-dev/react-query";
+import { ConvexProvider } from "convex/react";
+import { routeTree } from "./routeTree.gen";
+
+export function createRouter() {
+  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!;
+  if (!CONVEX_URL) {
+    console.error("missing envar VITE_CONVEX_URL");
+  }
+  const convexQueryClient = new ConvexQueryClient(CONVEX_URL);
+
+  const queryClient: QueryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        queryKeyHashFn: convexQueryClient.hashFn(),
+        queryFn: convexQueryClient.queryFn(),
+      },
+    },
+  });
+  convexQueryClient.connect(queryClient);
+
+  const router = routerWithQueryClient(
+    createTanStackRouter({
+      routeTree,
+      defaultPreload: "intent",
+      context: { queryClient },
+      Wrap: ({ children }) => (
+        <ConvexProvider client={convexQueryClient.convexClient}>
+          {children}
+        </ConvexProvider>
+      ),
+    }),
+    queryClient,
+  );
+
+  return router;
+}
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: ReturnType<typeof createRouter>;
+  }
+}
+```
+
+
+  </Step>
+
+  <Step title="Set up a Convex dev deployment">
+    Next, run `npx convex dev`. This
+    will prompt you to log in with GitHub,
+    create a project, and save your production and deployment URLs.
+
+    It will also create a `convex/` folder for you
+    to write your backend API functions in. The `dev` command
+    will then continue running to sync your functions
+    with your dev deployment in the cloud.
+
+
+    ```sh
+    npx convex dev
+    ```
+
+  </Step>
+
+  <Step title="Create sample data for your database">
+    In a new terminal window, create a `sampleData.jsonl`
+    file with some sample data.
+
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
+
+  </Step>
+
+  <Step title="Add the sample data to your database">
+    Now that your project is ready, add a `tasks` table
+    with the sample data into your Convex database with
+    the `import` command.
+
+    ```
+    npx convex import --table tasks sampleData.jsonl
+    ```
+
+  </Step>
+
+  <Step title="Expose a database query">
+    Add a new file <JSDialectFileName name="tasks.ts" /> in the `convex/` folder
+    with a query function that loads the data.
+
+    Exporting a query function from this file
+    declares an API function named after the file
+    and the export name, `api.tasks.get`.
+
+    
+```ts
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+```
+
+
+  </Step>
+
+  <Step title="Display the data in your app">
+    Replace the file `app/routes/index.tsx` with these contents.
+
+    The `useSuspenseQuery` hook renders the API function `api.tasks.get`
+    query result on the server initially, then it updates live in the browser.
+
+    
+```tsx
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { api } from "../../convex/_generated/api";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});
+
+function Home() {
+  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
+
+  return (
+    <div>
+      {data.map(({ _id, text }) => (
+        <div key={_id}>{text}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+
+  </Step>
+
+  <Step title="Start the app">
+    Start the app, open [http://localhost:3000](http://localhost:3000) in a browser,
+    and see the list of tasks.
+
+    ```sh
+    npm run dev
+    ```
+
+  </Step>
+
+</StepByStep>
+
+For more see the
+[TanStack Start with Convex](/client/react/tanstack-start/tanstack-start.mdx)
+client documentation page.

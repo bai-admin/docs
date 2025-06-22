@@ -1,0 +1,63 @@
+{
+  "name": "@convex-dev/action-retrier",
+  "version": "0.2.0",
+  "description": "Convex component for retrying idempotent actions.",
+  "keywords": [
+    "convex",
+    "retry",
+    "idempotency"
+  ],
+  "homepage": "https://github.com/get-convex/action-retrier",
+  "repository": "github:get-convex/action-retrier",
+  "bugs": "https://github.com/get-convex/action-retrier/issues",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc --project ./esm.json && echo '{\\n  \"type\": \"module\"\\n}' > dist/esm/package.json",
+    "build:cjs": "tsc --project ./commonjs.json && echo '{\\n  \"type\": \"commonjs\"\\n}' > dist/commonjs/package.json",
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@convex-dev/component-source": "./src/client/index.ts",
+        "types": "./dist/esm/client/index.d.ts",
+        "default": "./dist/esm/client/index.js"
+      },
+      "require": {
+        "@convex-dev/component-source": "./src/client/index.ts",
+        "types": "./dist/commonjs/client/index.d.ts",
+        "default": "./dist/commonjs/client/index.js"
+      }
+    },
+    "./convex.config": {
+      "import": {
+        "@convex-dev/component-source": "./src/component/convex.config.ts",
+        "types": "./dist/esm/component/convex.config.d.ts",
+        "default": "./dist/esm/component/convex.config.js"
+      }
+    }
+  },
+  "peerDependencies": {
+    "convex": "~1.16.5 || >=1.17.0 <1.25.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/node": "^18.17.0",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "prettier": "3.2.5",
+    "typescript": "~5.0.3",
+    "typescript-eslint": "^8.4.0"
+  },
+  "main": "./dist/commonjs/client/index.js",
+  "types": "./dist/commonjs/client/index.d.ts",
+  "module": "./dist/esm/client/index.js"
+}

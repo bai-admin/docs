@@ -1,0 +1,82 @@
+---
+title: "Custom JWT Provider"
+sidebar_label: "Custom JWT Provider"
+sidebar_position: 4
+---
+
+**Note: This is an advanced feature!** We recommend sticking with the
+[supported third-party authentication providers](/auth.mdx).
+
+If your custom auth provider implements the OIDC protocol it's easiest to
+configure a [Custom OIDC Provider](/auth/advanced/custom-auth). However some
+auth providers only issue JWTs and don't participate in the full OIDC protocol.
+For example, [OpenAuth](https://openauth.js.org/) implements the OAuth 2.0 spec
+but not OIDC, so to use it with Convex you'll need to set it up as a Custom JWT
+provider.
+
+## Server-side integration
+
+Use `type: "customJwt"` to configure a Custom JWT auth provider:
+
+```js noDialect title="convex/auth.config.js"
+export default {
+  providers: [
+    {
+      type: "customJwt",
+      applicationID: "your-application-id",
+      issuer: "https://your.issuer.url.com",
+      jwks: "https://your.issuer.url.com/.well-known/jwks.json",
+      algorithm: "RS256",
+    },
+  ],
+};
+```
+
+- `applicationID` (optional): If provided, Convex will verify that JWTs have
+  this value in the `aud` claim.
+- `issuer`: The issuer URL of the JWT.
+- `jwks`: The URL for fetching the JWKS (JSON Web Key Set) from the auth
+  provider.
+- `algorithm`: The algorithm used to sign the JWT. Only RS256 and ES256 are
+  currently supported. See
+  [RFC 7518](https://datatracker.ietf.org/doc/html/rfc7518#section-3.1) for more
+  details.
+
+The `issuer` property must exactly match the `iss` field of the JWT used and if
+specified the `applicationID` property must exactly match the `aud` field. If
+your JWT doesn't match, use a tool like [jwt.io](https://jwt.io/) to view an JWT
+and confirm these fields match exactly.
+
+When adding a custom JWT provider it is your responsibility to ensure the fields
+uniquely identify a user; for example, if the `iss` field and `issuer` property
+do not uniquely identify your app, it's important to use the `applicationID`
+field as well to require the `aud` field to match.
+
+### Custom claims
+
+In addition to top-level fields like `subject`, `issuer`, and `tokenIdentifier`,
+subfields of the nested fields of the JWT will be accessible in the auth data
+returned from `const authInfo = await ctx.auth.getUserIdentity()` like
+`authInfo["properties.id"]` and `authInfo["properties.favoriteColor"]` for a JWT
+structured like this:
+
+```json
+{
+  "properties": {
+    "id": "123",
+    "favoriteColor": "red"
+  },
+  "iss": "http://localhost:3000",
+  "sub": "user:8fa2be73c2229e85",
+  "exp": 1750968478
+}
+```
+
+## Client-side integration
+
+Your user's browser needs a way to obtain an initial JWT and to request updated
+JWTs, ideally before the previous one expires.
+
+See the instructions for
+[Custom OIDC Providers](/auth/advanced/custom-auth#client-side-integration) for
+how to do this.
