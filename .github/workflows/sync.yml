@@ -111,6 +111,12 @@ jobs:
             exit 1
           fi
 
+          # Remove submodule entry if it exists (safeguard against accidental submodules)
+          if git ls-files --stage "$DEST_DIR" 2>/dev/null | grep -qE '^160000'; then
+            echo "::warning::Removing submodule entry for $DEST_DIR"
+            git rm -rf "$DEST_DIR" || true
+          fi
+
           # ---------- COPY-ONLY MODE ----------------------------------------
           if [[ -n "$SRC_DIR" ]]; then
             # Check if this is an initial sync (destination doesn't exist or is empty)
