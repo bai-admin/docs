@@ -160,12 +160,12 @@ jobs:
 
           rm -rf "$TMP_CLONE"
 
-      - name: Stage changes
-        run: |
-          git add -A "${DEST_DIR}"
-
       - name: Create patch
         run: |
+          # Stage all changes in the destination directory
+          git add -A "${{ matrix.destDir }}"
+          
+          # Create patch if there are staged changes
           if ! git diff --cached --quiet; then
             git diff --cached --patch --binary > changes.patch
             tar -czf "patch-${{ strategy.job-index }}.tar.gz" changes.patch
