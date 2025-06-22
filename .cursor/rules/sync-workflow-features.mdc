@@ -1,5 +1,85 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# Sync Workflow Features
+
+## Overview
+The [.github/workflows/sync.yml](mdc:.github/workflows/sync.yml) workflow synchronizes documentation from external repositories based on [.github/sync-config.json](mdc:.github/sync-config.json).
+
+## Key Features
+
+### 1. Initial Sync Detection (Bootstrap Mode)
+The workflow automatically detects when a destination directory doesn't exist or is empty and performs a full initial sync without the `--delete` flag. This prevents errors on first run.
+
+```bash
+# Detects initial sync when:
+- Destination directory doesn't exist: [ ! -d "$DEST_DIR" ]
+- Destination directory is empty: [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]
+```
+
+### 2. Delta Sync for Existing Directories
+After initial sync, subsequent runs use `rsync -a --delete` to:
+- Add new files
+- Update changed files
+- Remove deleted files
+- Maintain exact mirror of source
+
+### 3. Two Sync Modes
+
+#### Copy-Only Mode
+For simple directory copying:
+```json
+{
+  "repoUrl": "https://github.com/ollama/ollama.git",
+  "branch": "main",
+  "srcDir": "docs",
+  "destDir": "ollama/docs"
+}
+```
+
+#### Pre-Process Mode
+For repositories requiring transformation:
+```json
+{
+  "repoUrl": "https://github.com/get-convex/convex-backend.git",
+  "branch": "main",
+  "srcScriptInputDir": "npm-packages",
+  "srcScriptOutputDir": "npm-packages/docs/docs",
+  "destDir": "convex/docs",
+  "preprocessScript": "node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js"
+}
+```
+
+### 4. Sparse Checkout
+Only clones the necessary directories from source repositories for efficiency.
+
+### 5. Error Handling
+- File existence checks in preprocessing scripts
+- Graceful handling of missing artifacts
+- Debug output for troubleshooting
+
+## Workflow Behavior
+
+### First Run (Empty Repository)
+1. Detects empty/missing destination directories
+2. Performs full copy without `--delete`
+3. Creates initial documentation structure
+4. Commits as "chore: auto-sync external sources"
+
+### Subsequent Runs
+1. Detects existing directories
+2. Performs delta sync with `--delete`
+3. Only creates patches if changes detected
+4. Skips commit if no changes
+
+## Manual Triggering
+```bash
+# Trigger sync manually
+gh workflow run sync.yml
+
+# View sync status
+gh workflow view sync.yml
+```
+

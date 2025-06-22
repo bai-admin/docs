@@ -1,0 +1,70 @@
+name: Bootstrap Directories
+on:
+  push:
+    paths:
+      - '.github/sync-config.json'
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bootstrap directories from sync-config
+        run: |
+          echo "::group::Parsing sync-config.json"
+          # Extract all destDir values from the config
+          DEST_DIRS=$(jq -r '.[].destDir' .github/sync-config.json | sort -u)
+          echo "Found destination directories:"
+          echo "$DEST_DIRS"
+          echo "::endgroup::"
+          
+          CREATED_DIRS=()
+          
+          echo "::group::Checking and creating directories"
+          while IFS= read -r dir; do
+            if [ -n "$dir" ]; then
+              if [ ! -d "$dir" ]; then
+                echo "Creating directory: $dir"
+                mkdir -p "$dir"
+                echo "# This directory will be populated by the sync workflow" > "$dir/.gitkeep"
+                CREATED_DIRS+=("$dir")
+              else
+                echo "Directory already exists: $dir"
+              fi
+            fi
+          done <<< "$DEST_DIRS"
+          echo "::endgroup::"
+          
+          # Check if any directories were created
+          if [ ${#CREATED_DIRS[@]} -gt 0 ]; then
+            echo "::notice::Created ${#CREATED_DIRS[@]} new directories"
+            git add -A
+            
+            # Check if there are actual changes to commit
+            if ! git diff --staged --quiet; then
+              # Create commit message with list of created directories
+              COMMIT_MSG="chore: bootstrap directories for sync workflow"$'\n\n'"Created directories:"
+              for dir in "${CREATED_DIRS[@]}"; do
+                COMMIT_MSG="$COMMIT_MSG"$'\n'"- $dir"
+              done
+              
+              git commit -m "$COMMIT_MSG"
+              git push
+              echo "::notice::Successfully pushed bootstrap changes"
+            else
+              echo "::notice::No changes to commit"
+            fi
+          else
+            echo "::notice::All directories already exist"
+          fi 

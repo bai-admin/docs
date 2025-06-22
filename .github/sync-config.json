@@ -4,61 +4,61 @@
       "repoUrl": "https://github.com/ollama/ollama.git",
       "branch":  "main",
       "srcDir":  "docs",
-      "destDir": "ollama/docs"
+      "destDir": "synced/ollama/docs"
     },
     {
       "repoUrl": "https://github.com/get-convex/convex-backend.git",
       "branch":  "main",
       "srcDir":  "self-hosted",
-      "destDir": "convex/libs/self-hosted"
+      "destDir": "synced/convex/libs/self-hosted"
     },
     {
       "repoUrl": "https://github.com/get-convex/convex-backend.git",
       "branch":  "main",
       "srcDir":  "npm-packages/convex/src/cli",
-      "destDir": "convex/libs/cli"
+      "destDir": "synced/convex/libs/cli"
     },
     {
       "repoUrl": "https://github.com/get-convex/convex-backend.git",
       "branch":  "main",
       "srcDir":  "npm-packages/convex/src/browser",
-      "destDir": "convex/libs/browser"
+      "destDir": "synced/convex/libs/browser"
     },
     {
       "repoUrl": "https://github.com/get-convex/workflow.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/workflow"
+      "destDir": "synced/convex/libs/components/workflow"
     },
     {
       "repoUrl": "https://github.com/get-convex/action-retrier.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/action-retrier"
+      "destDir": "synced/convex/libs/components/action-retrier"
     },
     {
       "repoUrl": "https://github.com/get-convex/workpool.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/workpool"
+      "destDir": "synced/convex/libs/components/workpool"
     },
     {
       "repoUrl": "https://github.com/get-convex/rate-limiter.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/rate-limiter"
+      "destDir": "synced/convex/libs/components/rate-limiter"
     },
     {
       "repoUrl": "https://github.com/get-convex/action-cache.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/action-cache"
+      "destDir": "synced/convex/libs/components/action-cache"
     },
     {
       "repoUrl": "https://github.com/get-convex/crons.git",
       "branch":  "main",
       "srcDir":  ".",
-      "destDir": "convex/libs/components/crons"
+      "destDir": "synced/convex/libs/components/crons"
     },    
 
     {
@@ -67,7 +67,7 @@
   
       "srcScriptInputDir":  "npm-packages",
       "srcScriptOutputDir": "npm-packages/docs/docs",
-      "destDir":            "convex/docs",
+      "destDir":            "synced/convex/docs",
   
       "preprocessScript":   "node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js"
     }

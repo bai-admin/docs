@@ -1,0 +1,60 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# GitHub CLI Workflow Commands
+
+## Running Workflows with `gh workflow run`
+
+The `gh workflow run` command creates a `workflow_dispatch` event for GitHub Actions workflows that support the `on.workflow_dispatch` trigger.
+
+### Basic Usage
+```bash
+gh workflow run [<workflow-id> | <workflow-name>] [flags]
+```
+
+### Key Flags
+- `-F, --field key=value` - Add string parameters (supports @ syntax)
+- `-f, --raw-field key=value` - Add raw string parameters
+- `--json` - Read workflow inputs as JSON via STDIN
+- `-r, --ref string` - Specify branch/tag for workflow version
+- `-R, --repo [HOST/]OWNER/REPO` - Target different repository
+
+### Common Usage Patterns
+
+#### Interactive Mode
+```bash
+# Prompt for workflow selection and inputs
+gh workflow run
+```
+
+#### Direct Workflow Execution
+```bash
+# Run specific workflow file
+gh workflow run sync.yml
+
+# Run with specific branch/tag
+gh workflow run sync.yml --ref main
+```
+
+#### With Parameters
+```bash
+# Single parameters
+gh workflow run deploy.yml -f environment=staging -f version=1.2.3
+
+# JSON input via stdin
+echo '{"environment":"production", "version":"2.0.0"}' | gh workflow run deploy.yml --json
+```
+
+### For This Project
+Our main sync workflow can be triggered with:
+```bash
+gh workflow run sync.yml
+```
+
+This is useful for:
+- Testing workflow changes immediately
+- Manual synchronization outside the hourly schedule
+- Debugging workflow issues with specific parameters
+
