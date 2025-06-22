@@ -173,8 +173,10 @@ jobs:
           
           # Create patch if there are staged changes
           if ! git diff --cached --quiet; then
-            git diff --cached --patch --binary > changes.patch
-            tar -czf "patch-${{ strategy.job-index }}.tar.gz" changes.patch
+            # Create a unique, filesystem-safe name from destDir
+            SAFE_NAME="$(echo "${{ matrix.destDir }}" | tr '/[:upper:]' '-[:lower:]')"
+            git diff --cached --patch --binary > "${SAFE_NAME}.patch"
+            tar -czf "patch-${{ strategy.job-index }}.tar.gz" "${SAFE_NAME}.patch"
           fi
 
       - uses: actions/upload-artifact@v4
@@ -213,11 +215,18 @@ jobs:
       - name: Apply patches
         run: |
           shopt -s nullglob
-          for f in patches/*.tar.gz; do tar -xzf "$f"; done
+          for f in patches/*.tar.gz; do
+            tar -xzf "$f"
+          done
           shopt -u nullglob
-          if ls *.patch 1>/dev/null 2>&1; then
-            git apply --3way --ignore-space-change --whitespace=nowarn *.patch
-          fi
+          
+          # Apply each extracted patch file
+          for p in *.patch; do
+            if [ -f "$p" ]; then
+              echo "Applying patch: $p"
+              git apply --3way --ignore-space-change --whitespace=nowarn "$p"
+            fi
+          done
 
       - name: Commit & push
         run: |
