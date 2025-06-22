@@ -180,6 +180,7 @@ jobs:
         with:
           name: patches
           path: patches
+        continue-on-error: true
 
       - name: Apply patches
         run: |
