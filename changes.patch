@@ -1,7 +1,0 @@
-diff --git a/synced/convex/libs/components/crons/.gitkeep b/synced/convex/libs/components/crons/.gitkeep
-deleted file mode 100644
-index 15403d8..0000000
---- a/synced/convex/libs/components/crons/.gitkeep
-+++ /dev/null
-@@ -1 +0,0 @@
--# This directory will be populated by the sync workflow

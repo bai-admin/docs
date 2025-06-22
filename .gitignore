@@ -1,3 +1,8 @@
+# Patch files from sync workflow
+patches/
+changes.patch
+
+# Node modules
 node_modules/
 *.log
 .DS_Store
@@ -11,3 +16,4 @@ build/
 *.swp
 *.swo
 *~ 
+Thumbs.db 

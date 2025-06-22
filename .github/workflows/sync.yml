@@ -160,10 +160,14 @@ jobs:
 
           rm -rf "$TMP_CLONE"
 
+      - name: Stage changes
+        run: |
+          git add -A "${DEST_DIR}"
+
       - name: Create patch
         run: |
-          if ! git diff --quiet; then
-            git diff --patch > changes.patch
+          if ! git diff --cached --quiet; then
+            git diff --cached --patch --binary > changes.patch
             tar -czf "patch-${{ strategy.job-index }}.tar.gz" changes.patch
           fi
 
