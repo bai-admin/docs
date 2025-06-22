@@ -214,19 +214,22 @@ jobs:
 
       - name: Apply patches
         run: |
+          # --- extract all patch tarballs into a throw-away dir -------------
+          WORKDIR=$(mktemp -d)
+
           shopt -s nullglob
           for f in patches/*.tar.gz; do
-            tar -xzf "$f"
+            tar -xzf "$f" -C "$WORKDIR"
           done
           shopt -u nullglob
-          
-          # Apply each extracted patch file
-          for p in *.patch; do
-            if [ -f "$p" ]; then
-              echo "Applying patch: $p"
-              git apply --3way --ignore-space-change --whitespace=nowarn "$p"
-            fi
-          done
+
+          # --- apply each patch --------------------------------------------
+          if ls "$WORKDIR"/*.patch 1>/dev/null 2>&1; then
+            git apply --3way --ignore-space-change --whitespace=nowarn "$WORKDIR"/*.patch
+          fi
+
+          # --- tidy up ------------------------------------------------------
+          rm -rf "$WORKDIR"
 
       - name: Commit & push
         run: |

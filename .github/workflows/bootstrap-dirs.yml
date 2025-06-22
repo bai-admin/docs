@@ -37,7 +37,6 @@ jobs:
               if [ ! -d "$dir" ]; then
                 echo "Creating directory: $dir"
                 mkdir -p "$dir"
-                echo "# This directory will be populated by the sync workflow" > "$dir/.gitkeep"
                 CREATED_DIRS+=("$dir")
               else
                 echo "Directory already exists: $dir"
