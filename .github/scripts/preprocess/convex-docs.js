@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Convert Convex MDX docs → plain Markdown by in-lining live snippets.
- * Works no matter what the workflow’s CWD is – relies on $SYNC_INPUT_DIR.
+ * Works no matter what the workflow's CWD is – relies on $SYNC_INPUT_DIR.
  */
 import { readFile, writeFile, rename } from "node:fs/promises";
 import { readFileSync as readSync, existsSync, statSync } from "node:fs";
@@ -17,11 +17,16 @@ const DOCS_DIR  = r(ROOT, "docs/docs");          // MDX sources
 const SNIP_DIR  = ROOT;                          // any *.tsx?* file
 
 /* ────────────── helpers ────────────── */
+const SNIPPET_IMPORT_RE =
+  /^import\s+(\w+).*?['"]([^'"]+\?(?:.*&)?snippet=([\w-]+).*?)['"];?\s*$/;
+const RAW_LOADER_RE    =
+  /^import\s+(\w+).*?['"](?:!!raw-loader!)([^'"]+)['"];?\s*$/;
+
 const EXT_TO_LANG = { tsx:"tsx", ts:"ts", jsx:"jsx", js:"js",
                       jsonl:"json", json:"json", sh:"bash" };
 const langOf  = (ext) => EXT_TO_LANG[ext] ?? ext ?? "text";
 const fence   = ({code,lang}) => `\n\`\`\`${lang}\n${code}\n\`\`\`\n`;
-const warn    = (id) => `> **⚠ snippet “${id}” not found**`;
+const warn    = (id) => `> **⚠ snippet " ${id} " not found**`;
 
 /* ────────────── 1. Harvest @snippet blocks ────────────── */
 const BLOCK_SNIPPETS = Object.create(null);       // name → {code,lang}
@@ -42,13 +47,13 @@ for (const file of await globby(`${SNIP_DIR}/**/*.{ts,tsx,js,jsx}`)) {
 
 /* helper – resolve an identifier to **one** snippet */
 function lookupSnippet(id) {
+  // ① exact match
   if (BLOCK_SNIPPETS[id]) return BLOCK_SNIPPETS[id];
 
-  const matches = Object.entries(BLOCK_SNIPPETS)
-    .filter(([name]) => name.endsWith(id))
-    .map(([, snip]) => snip);
-
-  return matches.length === 1 ? matches[0] : undefined;
+  // ② single "ends-with" match
+  const hits = Object.entries(BLOCK_SNIPPETS)
+    .filter(([name]) => name.endsWith(id));
+  return hits.length === 1 ? hits[0][1] : undefined;
 }
 
 /* ────────────── 2. Walk every .mdx file ────────────── */
@@ -60,22 +65,36 @@ for (const mdxFile of await globby(`${DOCS_DIR}/**/*.mdx`)) {
   body = body.replace(
     /^import\s+(\w+).*?['"]([^'"]+)['"];?\s*$/gm,
     (_, ident, rawPath) => {
-      // normalise → absPath (handles ./  ../  @site/../../ )
-      const cleaned = rawPath.split("!").pop().replace(/^@site\/\.\.\//, "");
-      const absPath = cleaned.startsWith("../")
-        ? r(ROOT, cleaned.replace(/^(\.\.\/)+/, ""))
-        : cleaned.startsWith("./")
-        ? r(dirname(mdxFile), cleaned)
-        : r(ROOT, cleaned);
+      const reconstructedImport = `import ${ident} from "${rawPath}"`;
+      const mRaw = RAW_LOADER_RE.exec(reconstructedImport);
+      const mQ   = SNIPPET_IMPORT_RE.exec(reconstructedImport);
 
-      const snip = lookupSnippet(ident);
-      if (snip) {
-        IMPORT_SNIPS[ident] = snip;
-      } else {
-        console.warn(`⚠ no unique snippet for “${ident}” (import ${rawPath})`);
+      if (!mRaw && !mQ) return ""; // strip & ignore
+
+      // 1. explicit ?snippet=…
+      if (mQ) {
+        const snippetId = mQ[3];
+        const snippet = lookupSnippet(snippetId);
+        if (snippet) {
+          IMPORT_SNIPS[ident] = snippet;
+        } else {
+          console.warn(`⚠ no snippet found for id " ${snippetId} " specified in import of ${rawPath}`);
+        }
+        return "";
       }
-      return "";                       // remove the import line
-    });
+
+      // 2. raw-loader path
+      if (mRaw) {
+        const snippet = lookupSnippet(ident);
+        if (snippet) {
+          IMPORT_SNIPS[ident] = snippet;
+        } else {
+          console.warn(`⚠ no unique snippet for " ${ident} " (raw-loader import of ${rawPath})`);
+        }
+        return "";
+      }
+    }
+  );
 
   const lookup = (id) => IMPORT_SNIPS[id] ?? BLOCK_SNIPPETS[id];
 
