@@ -76,58 +76,7 @@ TanStack Start app in it.
   <Step title="Update app/routes/__root.tsx">
     Add a `QueryClient` to the router context to make React Query usable anywhere in the TanStack Start site.
 
-    
-```tsx
-import { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext } from "@tanstack/react-router";
-import { Outlet, ScrollRestoration } from "@tanstack/react-router";
-import { Meta, Scripts } from "@tanstack/start";
-import * as React from "react";
-
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient;
-}>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "TanStack Start Starter",
-      },
-    ],
-  }),
-  component: RootComponent,
-});
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
-}
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <head>
-        <Meta />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-```
-
+    > **⚠ snippet “appRoutesRoot” not found**
 
   </Step>
 
@@ -137,53 +86,35 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     This creates a `ConvexClient` and a `ConvexQueryClient` and wires in a `ConvexProvider`.
 
     
-```tsx
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { QueryClient } from "@tanstack/react-query";
-import { routerWithQueryClient } from "@tanstack/react-router-with-query";
-import { ConvexQueryClient } from "@convex-dev/react-query";
-import { ConvexProvider } from "convex/react";
-import { routeTree } from "./routeTree.gen";
+```ts
+import { httpRouter } from "convex/server";
+import { postMessage, getByAuthor, getByAuthorPathSuffix } from "./messages";
 
-export function createRouter() {
-  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!;
-  if (!CONVEX_URL) {
-    console.error("missing envar VITE_CONVEX_URL");
-  }
-  const convexQueryClient = new ConvexQueryClient(CONVEX_URL);
+const http = httpRouter();
 
-  const queryClient: QueryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        queryKeyHashFn: convexQueryClient.hashFn(),
-        queryFn: convexQueryClient.queryFn(),
-      },
-    },
-  });
-  convexQueryClient.connect(queryClient);
+http.route({
+  path: "/postMessage",
+  method: "POST",
+  handler: postMessage,
+});
 
-  const router = routerWithQueryClient(
-    createTanStackRouter({
-      routeTree,
-      defaultPreload: "intent",
-      context: { queryClient },
-      Wrap: ({ children }) => (
-        <ConvexProvider client={convexQueryClient.convexClient}>
-          {children}
-        </ConvexProvider>
-      ),
-    }),
-    queryClient,
-  );
+// Define additional routes
+http.route({
+  path: "/getMessagesByAuthor",
+  method: "GET",
+  handler: getByAuthor,
+});
 
-  return router;
-}
+// Define a route using a path prefix
+http.route({
+  // Will match /getAuthorMessages/User+123 and /getAuthorMessages/User+234 etc.
+  pathPrefix: "/getAuthorMessages/",
+  method: "GET",
+  handler: getByAuthorPathSuffix,
+});
 
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: ReturnType<typeof createRouter>;
-  }
-}
+// Convex expects the router to be the default export of `convex/http.js`.
+export default http;
 ```
 
 
@@ -210,13 +141,7 @@ declare module "@tanstack/react-router" {
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -239,18 +164,7 @@ declare module "@tanstack/react-router" {
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```ts
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
+    > **⚠ snippet “tasks” not found**
 
   </Step>
 
@@ -260,30 +174,7 @@ export const get = query({
     The `useSuspenseQuery` hook renders the API function `api.tasks.get`
     query result on the server initially, then it updates live in the browser.
 
-    
-```tsx
-import { convexQuery } from "@convex-dev/react-query";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { api } from "../../convex/_generated/api";
-
-export const Route = createFileRoute("/")({
-  component: Home,
-});
-
-function Home() {
-  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
-
-  return (
-    <div>
-      {data.map(({ _id, text }) => (
-        <div key={_id}>{text}</div>
-      ))}
-    </div>
-  );
-}
-```
-
+    > **⚠ snippet “index” not found**
 
   </Step>
 

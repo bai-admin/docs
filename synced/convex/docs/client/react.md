@@ -129,76 +129,12 @@ See
 With React it can be tricky to dynamically invoke a hook, because hooks cannot
 be placed inside conditionals or after early returns:
 
-
-```tsx
-/* eslint-disable react-hooks/rules-of-hooks */
-
-// @snippet start example
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function App() {
-  // the URL `param` might be null
-  const param = new URLSearchParams(window.location.search).get("param");
-  // ERROR! React Hook "useQuery" is called conditionally. React Hooks must
-  // be called in the exact same order in every component render.
-  const data = param !== null ? useQuery(api.functions.read, { param }) : null;
-  //...
-}
-// @snippet end example
-```
-
-```tsx
-/* eslint-disable react-hooks/rules-of-hooks */
-
-// @snippet start example
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function App() {
-  // the URL `param` might be null
-  const param = new URLSearchParams(window.location.search).get("param");
-  // ERROR! React Hook "useQuery" is called conditionally. React Hooks must
-  // be called in the exact same order in every component render.
-  const data = param !== null ? useQuery(api.functions.read, { param }) : null;
-  //...
-}
-// @snippet end example
-```
-
+> **⚠ snippet “SkipBad, SkipBad” not found**
 
 For this reason `useQuery` can be "disabled" by passing in `"skip"` instead of
 its arguments:
 
-
-```tsx
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function App() {
-  const param = new URLSearchParams(window.location.search).get("param");
-  const data = useQuery(
-    api.functions.read,
-    param !== null ? { param } : "skip",
-  );
-  //...
-}
-```
-
-```tsx
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function App() {
-  const param = new URLSearchParams(window.location.search).get("param");
-  const data = useQuery(
-    api.functions.read,
-    param !== null ? { param } : "skip",
-  );
-  //...
-}
-```
-
+> **⚠ snippet “SkipGood, SkipGood” not found**
 
 When `"skip"` is used the `useQuery` doesn't talk to your backend at all and
 returns `undefined`.

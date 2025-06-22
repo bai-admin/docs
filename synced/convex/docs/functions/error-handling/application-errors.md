@@ -42,55 +42,7 @@ Convex provides an error subclass,
 [`ConvexError`](/api/classes/values.ConvexError), which can be used to carry
 information from the backend to the client:
 
-
-```ts
-// @snippet start example
-import { ConvexError } from "convex/values";
-import { mutation } from "./_generated/server";
-
-export const assignRole = mutation({
-  args: {
-    // ...
-  },
-  handler: (ctx, args) => {
-    const isTaken = isRoleTaken(/* ... */);
-    if (isTaken) {
-      throw new ConvexError("Role is already taken");
-    }
-    // ...
-  },
-});
-// @snippet end example
-
-function isRoleTaken() {
-  return false;
-}
-```
-
-```ts
-// @snippet start example
-import { ConvexError } from "convex/values";
-import { mutation } from "./_generated/server";
-
-export const assignRole = mutation({
-  args: {
-    // ...
-  },
-  handler: (ctx, args) => {
-    const isTaken = isRoleTaken(/* ... */);
-    if (isTaken) {
-      throw new ConvexError("Role is already taken");
-    }
-    // ...
-  },
-});
-// @snippet end example
-
-function isRoleTaken() {
-  return false;
-}
-```
-
+> **⚠ snippet “Server, Server” not found**
 
 ### Application error `data` payload
 
@@ -125,60 +77,4 @@ client.
 On the client, application errors also use the `ConvexError` class, and the data
 they carry can be accessed via the `data` property:
 
-
-```tsx
-import { ConvexError } from "convex/values";
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function MyApp() {
-  const doSomething = useMutation(api.myFunctions.mutateSomething);
-  const handleSomething = async () => {
-    try {
-      await doSomething({ a: 1, b: 2 });
-    } catch (error) {
-      const errorMessage =
-        // Check whether the error is an application error
-        error instanceof ConvexError
-          ? // Access data and cast it to the type we expect
-            (error.data as { message: string }).message
-          : // Must be some developer error,
-            // and prod deployments will not
-            // reveal any more information about it
-            // to the client
-            "Unexpected error occurred";
-      // do something with `errorMessage`
-    }
-  };
-  // ...
-}
-```
-
-```jsx
-import { ConvexError } from "convex/values";
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function MyApp() {
-  const doSomething = useMutation(api.myFunctions.mutateSomething);
-  const handleSomething = async () => {
-    try {
-      await doSomething({ a: 1, b: 2 });
-    } catch (error) {
-      const errorMessage =
-        // Check whether the error is an application error
-        error instanceof ConvexError
-          ? // Access data
-            error.data.message
-          : // Must be some developer error,
-            // and prod deployments will not
-            // reveal any more information about it
-            // to the client
-            "Unexpected error occurred";
-      // do something with `errorMessage`
-    }
-  };
-  // ...
-}
-```
-
+> **⚠ snippet “ClientTS, ClientJS” not found**

@@ -98,55 +98,13 @@ You can pass an ID string from an external source (like a URL) into a Convex
 function and get the corresponding object. If you're using TypeScript on the
 client you can cast a string to the `Id` type:
 
-
-```tsx
-import { useQuery } from "convex/react";
-import { Id } from "../convex/_generated/dataModel";
-import { api } from "../convex/_generated/api";
-
-export function App() {
-  const id = localStorage.getItem("myIDStorage");
-  const task = useQuery(api.tasks.getTask, { taskId: id as Id<"tasks"> });
-  // ...
-}
-```
-
+> **⚠ snippet “SerializeCall” not found**
 
 Since this ID is coming from an external source, use an argument validator or
 [`ctx.db.normalizeId`](/api/interfaces/server.GenericDatabaseReader#normalizeid)
 to confirm that the ID belongs to the expected table before returning the
 object.
 
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const getTask = query({
-  args: {
-    taskId: v.id("tasks"),
-  },
-  handler: async (ctx, args) => {
-    const task = await ctx.db.get(args.taskId);
-    // ...
-  },
-});
-```
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const getTask = query({
-  args: {
-    taskId: v.id("tasks"),
-  },
-  handler: async (ctx, args) => {
-    const task = await ctx.db.get(args.taskId);
-    // ...
-  },
-});
-```
-
+> **⚠ snippet “SerializeExample, SerializeExample” not found**
 
 <StackPosts query="document IDs" />

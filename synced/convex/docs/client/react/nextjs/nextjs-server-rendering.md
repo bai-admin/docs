@@ -43,66 +43,13 @@ In a
 [Server Component](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
 call `preloadQuery`:
 
-
-```tsx
-import { preloadQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-import { Tasks } from "./Tasks";
-
-export async function TasksWrapper() {
-  const preloadedTasks = await preloadQuery(api.tasks.list, {
-    list: "default",
-  });
-  return <Tasks preloadedTasks={preloadedTasks} />;
-}
-```
-
-```tsx
-import { preloadQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-import { Tasks } from "./Tasks";
-
-export async function TasksWrapper() {
-  const preloadedTasks = await preloadQuery(api.tasks.list, {
-    list: "default",
-  });
-  return <Tasks preloadedTasks={preloadedTasks} />;
-}
-```
-
+> **⚠ snippet “PreloadQuery, PreloadQuery” not found**
 
 In a
 [Client Component](https://nextjs.org/docs/app/building-your-application/rendering/client-components)
 call [`usePreloadedQuery`](/api/modules/react#usepreloadedquery):
 
-
-```tsx
-"use client";
-
-import { Preloaded, usePreloadedQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-
-export function Tasks(props: {
-  preloadedTasks: Preloaded<typeof api.tasks.list>;
-}) {
-  const tasks = usePreloadedQuery(props.preloadedTasks);
-  // render `tasks`...
-  return <div>...</div>;
-}
-```
-
-```jsx
-"use client";
-
-import { usePreloadedQuery } from "convex/react";
-
-export function Tasks(props) {
-  const tasks = usePreloadedQuery(props.preloadedTasks);
-  // render `tasks`...
-  return tasks.map((task) => <div key={task._id}>{task.text}</div>);
-}
-```
-
+> **⚠ snippet “UsePreloadedQueryTS, UsePreloadedQueryJS” not found**
 
 [`preloadQuery`](/api/modules/nextjs#preloadquery) takes three arguments:
 
@@ -130,29 +77,7 @@ If you need Convex data on the server, you can load data from Convex in your
 but it will be non-reactive. To do this, use the
 [`fetchQuery`](/api/modules/nextjs#fetchquery) function from `convex/nextjs`:
 
-
-```tsx
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-
-export async function StaticTasks() {
-  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
-  // render `tasks`...
-  return <div>...</div>;
-}
-```
-
-```tsx
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-
-export async function StaticTasks() {
-  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
-  // render `tasks`...
-  return <div>...</div>;
-}
-```
-
+> **⚠ snippet “FetchQuery, FetchQuery” not found**
 
 ## Server Actions and Route Handlers
 
@@ -168,79 +93,11 @@ the `fetchQuery`, `fetchMutation` and `fetchAction` functions.
 
 Here's an example inline Server Action calling a Convex mutation:
 
-
-```tsx
-import { api } from "@/convex/_generated/api";
-import { fetchMutation, fetchQuery } from "convex/nextjs";
-import { revalidatePath } from "next/cache";
-
-export default async function PureServerPage() {
-  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
-  async function createTask(formData: FormData) {
-    "use server";
-
-    await fetchMutation(api.tasks.create, {
-      text: formData.get("text") as string,
-    });
-    revalidatePath("/example");
-  }
-  // render tasks and task creation form
-  return <form action={createTask}>...</form>;
-}
-```
-
-```jsx
-import { api } from "@/convex/_generated/api";
-import { fetchMutation, fetchQuery } from "convex/nextjs";
-import { revalidatePath } from "next/cache";
-
-export default async function PureServerPage() {
-  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
-  async function createTask(formData) {
-    "use server";
-
-    await fetchMutation(api.tasks.create, {
-      text: formData.get("text"),
-    });
-    revalidatePath("/example");
-  }
-  // render tasks and task creation form
-  return <form action={createTask}>...</form>;
-}
-```
-
+> **⚠ snippet “ServerActionTS, ServerActionJS” not found**
 
 Here's an example Route Handler calling a Convex mutation:
 
-
-```ts
-import { NextResponse } from "next/server";
-// Hack for TypeScript before 5.2
-const Response = NextResponse;
-
-// @snippet start example
-import { api } from "@/convex/_generated/api";
-import { fetchMutation } from "convex/nextjs";
-
-export async function POST(request: Request) {
-  const args = await request.json();
-  await fetchMutation(api.tasks.create, { text: args.text });
-  return Response.json({ success: true });
-}
-// @snippet end example
-```
-
-```js
-import { api } from "@/convex/_generated/api";
-import { fetchMutation } from "convex/nextjs";
-
-export async function POST(request) {
-  const args = await request.json();
-  await fetchMutation(api.tasks.create, { text: args.text });
-  return Response.json({ success: true });
-}
-```
-
+> **⚠ snippet “RouteHandlerTS, RouteHandlerJS” not found**
 
 ## Server-side authentication
 
@@ -248,51 +105,7 @@ To make authenticated requests to Convex during server rendering, pass a JWT
 token to [`preloadQuery`](/api/modules/nextjs#preloadquery) or
 [`fetchQuery`](/api/modules/nextjs#fetchquery) in the third options argument:
 
-
-```tsx
-// @snippet start example
-import { preloadQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-import { Tasks } from "./Tasks";
-
-export async function TasksWrapper() {
-  const token = await getAuthToken();
-  const preloadedTasks = await preloadQuery(
-    api.tasks.list,
-    { list: "default" },
-    { token },
-  );
-  return <Tasks preloadedTasks={preloadedTasks} />;
-}
-// @snippet end example
-
-function getAuthToken() {
-  return "foo";
-}
-```
-
-```tsx
-// @snippet start example
-import { preloadQuery } from "convex/nextjs";
-import { api } from "@/convex/_generated/api";
-import { Tasks } from "./Tasks";
-
-export async function TasksWrapper() {
-  const token = await getAuthToken();
-  const preloadedTasks = await preloadQuery(
-    api.tasks.list,
-    { list: "default" },
-    { token },
-  );
-  return <Tasks preloadedTasks={preloadedTasks} />;
-}
-// @snippet end example
-
-function getAuthToken() {
-  return "foo";
-}
-```
-
+> **⚠ snippet “AuthedPreloadQuery, AuthedPreloadQuery” not found**
 
 The implementation of `getAuthToken` depends on your authentication provider.
 

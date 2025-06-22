@@ -44,13 +44,7 @@ Learn how to query data from Convex in a Svelte app.
     SvelteKit doesn't like referencing code outside of source, so customize
     the convex functionsDir to be under `src/`.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -73,38 +67,14 @@ Learn how to query data from Convex in a Svelte app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```ts
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    const tasks = await ctx.db.query("tasks").collect();
-    return tasks.map((task) => ({ ...task, assigner: "tom" }));
-  },
-});
-```
-
+    > **⚠ snippet “tasks” not found**
 
   </Step>
 
   <Step title="Set up Convex">
     Create a new file `src/routes/+layout.svelte` and set up the Convex client there to make it available on every page of your app.
 
-    
-```svelte
-<script lang="ts">
-	import { PUBLIC_CONVEX_URL } from '$env/static/public';
-	import { setupConvex } from 'convex-svelte';
-
-	const { children } = $props();
-	setupConvex(PUBLIC_CONVEX_URL);
-</script>
-
-{@render children()}
-```
-
+    > **⚠ snippet “layout” not found**
 
   </Step>
 
@@ -112,32 +82,7 @@ export const get = query({
     In `src/routes/+page.svelte` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    
-```svelte
-<script lang="ts">
-	import { useQuery } from 'convex-svelte';
-	import { api } from '../convex/_generated/api.js';
-
-	const query = useQuery(api.tasks.get, {});
-</script>
-
-{#if query.isLoading}
-	Loading...
-{:else if query.error}
-	failed to load: {query.error.toString()}
-{:else}
-	<ul>
-		{#each query.data as task}
-			<li>
-				{task.isCompleted ? '☑' : '☐'}
-				<span>{task.text}</span>
-				<span>assigned by {task.assigner}</span>
-			</li>
-		{/each}
-	</ul>
-{/if}
-```
-
+    > **⚠ snippet “page” not found**
 
   </Step>
 

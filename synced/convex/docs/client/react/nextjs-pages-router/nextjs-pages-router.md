@@ -33,42 +33,7 @@ logged in.
 If you're using Auth0, the helper component `ConvexProviderWithAuth0` can be
 imported from `convex/react-auth0`.
 
-
-```tsx
-// This file is not used in the demo app.
-// Replace the contents of _auth.tsx with the contents of this file
-// to use the default loading and logged out views instead of the custom
-// components.
-
-// @snippet start simpleAuthedApp
-import { ConvexReactClient } from "convex/react";
-import { ConvexProviderWithAuth0 } from "convex/react-auth0";
-import { Auth0Provider } from "@auth0/auth0-react";
-import { AppProps } from "next/app";
-
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-export default function MyApp({ Component, pageProps }: AppProps) {
-  return (
-    <Auth0Provider
-      domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN!}
-      clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!}
-      authorizationParams={{
-        redirect_uri:
-          typeof window === "undefined" ? undefined : window.location.origin,
-      }}
-      useRefreshTokens={true}
-      cacheLocation="localstorage"
-    >
-      <ConvexProviderWithAuth0 client={convex}>
-        <Component {...pageProps} />
-      </ConvexProviderWithAuth0>
-    </Auth0Provider>
-  );
-}
-// @snippet end simpleAuthedApp
-```
-
+> **⚠ snippet “simpleAuthedAppTSX” not found**
 
 Custom loading and logged out views can be built with the helper
 `Authenticated`, `Unauthenticated` and `AuthLoading` components from
@@ -97,21 +62,7 @@ file to the `pages/api` directory.
 To load and edit Convex data in your endpoints, use the
 [`fetchQuery`](/api/modules/nextjs#fetchquery) function from `convex/nextjs`:
 
-
-```ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "../../convex/_generated/api";
-
-export const count = async function handler(
-  _req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const clicks = await fetchQuery(api.counter.get, { counterName: "clicks" });
-  res.status(200).json({ clicks });
-};
-```
-
+> **⚠ snippet “apiTS” not found**
 
 ## Server-side rendering
 

@@ -29,57 +29,7 @@ To add argument validation to your functions, pass an object with `args` and
 `handler` properties to the `query`, `mutation` or `action` constructor. To add
 return value validation, use the `returns` property in this object:
 
-
-```ts
-// @snippet start mutation
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const send = mutation({
-  args: {
-    body: v.string(),
-    author: v.string(),
-  },
-  returns: v.null(),
-  handler: async (ctx, args) => {
-    const { body, author } = args;
-    await ctx.db.insert("messages", { body, author });
-  },
-});
-// @snippet end mutation
-
-export const list = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("messages").collect();
-  },
-});
-```
-
-```ts
-// @snippet start mutation
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const send = mutation({
-  args: {
-    body: v.string(),
-    author: v.string(),
-  },
-  returns: v.null(),
-  handler: async (ctx, args) => {
-    const { body, author } = args;
-    await ctx.db.insert("messages", { body, author });
-  },
-});
-// @snippet end mutation
-
-export const list = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("messages").collect();
-  },
-});
-```
-
+> **⚠ snippet “messagesTS, messagesTS” not found**
 
 If you define your function with an argument validator, there is no need to
 include [TypeScript](/understanding/best-practices/typescript.mdx) type

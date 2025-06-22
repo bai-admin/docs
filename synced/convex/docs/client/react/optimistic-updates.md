@@ -27,53 +27,7 @@ query results change, and rolled back when a mutation completes.
 Here is how an optimistic update could be added to an `increment` mutation in a
 simple counter app:
 
-
-```tsx
-import { api } from "../convex/_generated/api";
-import { useMutation } from "convex/react";
-
-export function IncrementCounter() {
-  const increment = useMutation(api.counter.increment).withOptimisticUpdate(
-    (localStore, args) => {
-      const { increment } = args;
-      const currentValue = localStore.getQuery(api.counter.get);
-      if (currentValue !== undefined) {
-        localStore.setQuery(api.counter.get, {}, currentValue + increment);
-      }
-    },
-  );
-
-  const incrementCounter = () => {
-    increment({ increment: 1 });
-  };
-
-  return <button onClick={incrementCounter}>+1</button>;
-}
-```
-
-```tsx
-import { api } from "../convex/_generated/api";
-import { useMutation } from "convex/react";
-
-export function IncrementCounter() {
-  const increment = useMutation(api.counter.increment).withOptimisticUpdate(
-    (localStore, args) => {
-      const { increment } = args;
-      const currentValue = localStore.getQuery(api.counter.get);
-      if (currentValue !== undefined) {
-        localStore.setQuery(api.counter.get, {}, currentValue + increment);
-      }
-    },
-  );
-
-  const incrementCounter = () => {
-    increment({ increment: 1 });
-  };
-
-  return <button onClick={incrementCounter}>+1</button>;
-}
-```
-
+> **⚠ snippet “Simple, Simple” not found**
 
 Optimistic updates receive a
 [`localStore`](/api/interfaces/browser.OptimisticLocalStore), a view of the
@@ -87,93 +41,7 @@ higher if it's loaded.
 If we want to add an optimistic update to a multi-channel chat app, that might
 look like:
 
-
-```tsx
-import { api } from "../convex/_generated/api";
-import { useMutation } from "convex/react";
-import { Id } from "../convex/_generated/dataModel";
-
-export function MessageSender(props: { channel: Id<"channels"> }) {
-  const sendMessage = useMutation(api.messages.send).withOptimisticUpdate(
-    (localStore, args) => {
-      const { channel, body } = args;
-      const existingMessages = localStore.getQuery(api.messages.list, {
-        channel,
-      });
-      // If we've loaded the api.messages.list query, push an optimistic message
-      // onto the list.
-      if (existingMessages !== undefined) {
-        const now = Date.now();
-        const newMessage = {
-          _id: crypto.randomUUID() as Id<"messages">,
-          _creationTime: now,
-          channel,
-          body,
-        };
-        localStore.setQuery(api.messages.list, { channel }, [
-          ...existingMessages,
-          newMessage,
-        ]);
-      }
-    },
-  );
-
-  async function handleSendMessage(
-    channelId: Id<"channels">,
-    newMessageText: string,
-  ) {
-    await sendMessage({ channel: channelId, body: newMessageText });
-  }
-
-  return (
-    <button onClick={() => handleSendMessage(props.channel, "Hello world!")}>
-      Send message
-    </button>
-  );
-}
-```
-
-```jsx
-import { api } from "../convex/_generated/api";
-import { useMutation } from "convex/react";
-
-export function MessageSender(props) {
-  const sendMessage = useMutation(api.messages.send).withOptimisticUpdate(
-    (localStore, args) => {
-      const { channel, body } = args;
-      const existingMessages = localStore.getQuery(api.messages.list, {
-        channel,
-      });
-      // If we've loaded the api.messages.list query, push an optimistic message
-      // onto the list.
-      if (existingMessages !== undefined) {
-        const now = Date.now();
-        const newMessage = {
-          _id: crypto.randomUUID(),
-          _creationTime: now,
-          channel,
-          body,
-        };
-        localStore.setQuery(api.messages.list, { channel }, [
-          ...existingMessages,
-          newMessage,
-        ]);
-      }
-    },
-  );
-
-  async function handleSendMessage(channelId, newMessageText) {
-    await sendMessage({ channel: channelId, body: newMessageText });
-  }
-
-  return (
-    <button onClick={() => handleSendMessage(props.channel, "Hello world!")}>
-      Send message
-    </button>
-  );
-}
-```
-
+> **⚠ snippet “ComplexTS, ComplexJS” not found**
 
 This optimistic update changes the `api.messages.list` query for the current
 channel to include a new message. The newly created message object should match

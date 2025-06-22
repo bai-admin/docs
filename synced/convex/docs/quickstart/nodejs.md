@@ -57,13 +57,7 @@ project configurations (TypeScript, bundlers, CJS vs ESM) see
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -86,18 +80,7 @@ project configurations (TypeScript, bundlers, CJS vs ESM) see
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```js
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
+    > **⚠ snippet “tasks” not found**
 
   </Step>
 
@@ -105,18 +88,7 @@ export const get = query({
     In a new file `script.js`, create a `ConvexHttpClient` using
     the URL of your development environment.
 
-    
-```js
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "./convex/_generated/api.js";
-import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
-
-const client = new ConvexHttpClient(process.env["CONVEX_URL"]);
-
-client.query(api.tasks.get).then(console.log);
-```
-
+    > **⚠ snippet “script” not found**
 
   </Step>
 

@@ -61,13 +61,7 @@ for Convex.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -90,41 +84,14 @@ for Convex.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```ts
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
+    > **⚠ snippet “tasks” not found**
 
   </Step>
 
   <Step title="Wire up the ConvexProvider">
     In `src/main.ts` set up the Convex client there to make it available on every page of your app.
 
-    
-```ts
-import "./assets/main.css";
-
-import { createApp } from "vue";
-import App from "./App.vue";
-import { createConvexVue } from "@convex-vue/core";
-
-const app = createApp(App);
-
-const convexVue = createConvexVue({
-  convexUrl: import.meta.env.VITE_CONVEX_URL,
-});
-
-app.use(convexVue).mount("#app");
-```
-
+    > **⚠ snippet “main” not found**
 
   </Step>
 
@@ -132,28 +99,7 @@ app.use(convexVue).mount("#app");
     In `src/App.vue` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    
-```vue
-<script setup lang="ts">
-
-import { useConvexQuery } from "@convex-vue/core";
-import { api } from "../convex/_generated/api";
-
-const { data, isLoading } = useConvexQuery(api.tasks.get, {});
-</script>
-
-<template>
-  <div class="wrapper">
-    <ul v-if="!isLoading">
-      <li v-for="todo in data">
-        {{ todo.text }} {{ todo.isCompleted ? "☑" : "☐" }}
-      </li>
-    </ul>
-    <span v-else> loading... </span>
-  </div>
-</template>
-```
-
+    > **⚠ snippet “App” not found**
 
   </Step>
 

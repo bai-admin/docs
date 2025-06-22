@@ -118,51 +118,7 @@ follow the [Convex React Quickstart](/quickstart/react.mdx) first. Then:
 
     Then, wrap it with `<ClerkProvider>`. `<ClerkProvider>` requires a `publishableKey` prop, which you can set to the `VITE_CLERK_PUBLISHABLE_KEY` environment variable.
 
-    
-```tsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import { ClerkProvider, useAuth } from "@clerk/clerk-react";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ConvexReactClient } from "convex/react";
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ClerkProvider publishableKey="pk_test_...">
-      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <App />
-      </ConvexProviderWithClerk>
-    </ClerkProvider>
-  </React.StrictMode>,
-);
-```
-
-```jsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import { ClerkProvider, useAuth } from "@clerk/clerk-react";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ConvexReactClient } from "convex/react";
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ClerkProvider publishableKey="pk_test_...">
-      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <App />
-      </ConvexProviderWithClerk>
-    </ClerkProvider>
-  </React.StrictMode>,
-);
-```
-
+    > **⚠ snippet “ConfigTS, ConfigJS” not found**
 
   </Step>
 
@@ -219,40 +175,50 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     `convex/react`**. Otherwise, it will throw on page load.
 
     
-```ts
-import { query } from "./_generated/server";
+```jsx
+// @snippet start importHooks
+import { useMutation, useQuery } from "convex/react";
+// @snippet end importHooks
 
-export const getForCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Not authenticated");
-    }
-    return await ctx.db
-      .query("messages")
-      .filter((q) => q.eq(q.field("author"), identity.email))
-      .collect();
-  },
-});
+export default function App() {
+  const messages = useQuery("messages:list") || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  // @snippet start sendMessage
+  // @snippet start sendMessageHook
+  const sendMessage = useMutation("messages:send");
+  // @snippet end sendMessageHook
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event) {
+    event.preventDefault();
+    await sendMessage({ body: newMessageText, author: name });
+    setNewMessageText("");
+  }
+  // @snippet end sendMessage
 ```
 
-```ts
-import { query } from "./_generated/server";
+```jsx
+// @snippet start importHooks
+import { useMutation, useQuery } from "convex/react";
+// @snippet end importHooks
 
-export const getForCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Not authenticated");
-    }
-    return await ctx.db
-      .query("messages")
-      .filter((q) => q.eq(q.field("author"), identity.email))
-      .collect();
-  },
-});
+export default function App() {
+  const messages = useQuery("messages:list") || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  // @snippet start sendMessage
+  // @snippet start sendMessageHook
+  const sendMessage = useMutation("messages:send");
+  // @snippet end sendMessageHook
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event) {
+    event.preventDefault();
+    await sendMessage({ body: newMessageText, author: name });
+    setNewMessageText("");
+  }
+  // @snippet end sendMessage
 ```
 
 
@@ -494,40 +460,50 @@ follow the [Convex Next.js Quickstart](/quickstart/nextjs.mdx) first. Then:
     `convex/react`**. Otherwise, it will throw on page load.
 
     
-```ts
-import { query } from "./_generated/server";
+```jsx
+// @snippet start importHooks
+import { useMutation, useQuery } from "convex/react";
+// @snippet end importHooks
 
-export const getForCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Not authenticated");
-    }
-    return await ctx.db
-      .query("messages")
-      .filter((q) => q.eq(q.field("author"), identity.email))
-      .collect();
-  },
-});
+export default function App() {
+  const messages = useQuery("messages:list") || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  // @snippet start sendMessage
+  // @snippet start sendMessageHook
+  const sendMessage = useMutation("messages:send");
+  // @snippet end sendMessageHook
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event) {
+    event.preventDefault();
+    await sendMessage({ body: newMessageText, author: name });
+    setNewMessageText("");
+  }
+  // @snippet end sendMessage
 ```
 
-```ts
-import { query } from "./_generated/server";
+```jsx
+// @snippet start importHooks
+import { useMutation, useQuery } from "convex/react";
+// @snippet end importHooks
 
-export const getForCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Not authenticated");
-    }
-    return await ctx.db
-      .query("messages")
-      .filter((q) => q.eq(q.field("author"), identity.email))
-      .collect();
-  },
-});
+export default function App() {
+  const messages = useQuery("messages:list") || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  // @snippet start sendMessage
+  // @snippet start sendMessageHook
+  const sendMessage = useMutation("messages:send");
+  // @snippet end sendMessageHook
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event) {
+    event.preventDefault();
+    await sendMessage({ body: newMessageText, author: name });
+    setNewMessageText("");
+  }
+  // @snippet end sendMessage
 ```
 
 

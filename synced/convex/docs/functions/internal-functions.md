@@ -42,31 +42,7 @@ Leverage internal functions by:
 An internal function is defined using `internalQuery`, `internalMutation`, or
 `internalAction`. For example:
 
-
-```ts
-import { internalMutation } from "./_generated/server";
-import { v } from "convex/values";
-
-export const markPlanAsProfessional = internalMutation({
-  args: { planId: v.id("plans") },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.planId, { planType: "professional" });
-  },
-});
-```
-
-```ts
-import { internalMutation } from "./_generated/server";
-import { v } from "convex/values";
-
-export const markPlanAsProfessional = internalMutation({
-  args: { planId: v.id("plans") },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.planId, { planType: "professional" });
-  },
-});
-```
-
+> **⚠ snippet “Definition, Definition” not found**
 
 If you need to pass complicated objects to internal functions you might prefer
 to not use argument validation. Note though that if you're using `internalQuery`
@@ -76,28 +52,7 @@ of the database.
 
 <Details summary="Internal function without argument validation">
 
-
-```ts
-import { internalAction } from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
-
-export const markPlanAsProfessional = internalAction({
-  handler: async (actionCtx, args) => {
-    // perform an action, perhaps calling a third-party API
-  },
-});
-```
-
-```js
-import { internalAction } from "./_generated/server";
-
-export const markPlanAsProfessional = internalAction({
-  handler: async (actionCtx, args) => {
-    // perform an action, perhaps calling a third-party API
-  },
-});
-```
-
+> **⚠ snippet “DefinitionWithoutValidationTS, DefinitionWithoutValidationJS” not found**
 
 </Details>
 
@@ -109,51 +64,7 @@ mutation using the [`internal`](/generated-api/api#internal) object.
 For example, consider this public `upgrade` action that calls the internal
 `plans.markPlanAsProfessional` mutation we defined above:
 
-
-```ts
-import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
-import { v } from "convex/values";
-
-export const upgrade = action({
-  args: {
-    planId: v.id("plans"),
-  },
-  handler: async (ctx, args) => {
-    // Call out to payment provider (e.g. Stripe) to charge customer
-    const response = await fetch("https://...");
-    if (response.ok) {
-      // Mark the plan as "professional" in the Convex DB
-      await ctx.runMutation(internal.plans.markPlanAsProfessional, {
-        planId: args.planId,
-      });
-    }
-  },
-});
-```
-
-```ts
-import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
-import { v } from "convex/values";
-
-export const upgrade = action({
-  args: {
-    planId: v.id("plans"),
-  },
-  handler: async (ctx, args) => {
-    // Call out to payment provider (e.g. Stripe) to charge customer
-    const response = await fetch("https://...");
-    if (response.ok) {
-      // Mark the plan as "professional" in the Convex DB
-      await ctx.runMutation(internal.plans.markPlanAsProfessional, {
-        planId: args.planId,
-      });
-    }
-  },
-});
-```
-
+> **⚠ snippet “Call, Call” not found**
 
 In this example a user should not be able to directly call
 `internal.plans.markPlanAsProfessional` without going through the `upgrade`

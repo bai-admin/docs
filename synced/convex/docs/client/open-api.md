@@ -63,94 +63,9 @@ snippets include two different files:
   running the command
   `npx openapi-generator-cli generate -i convex-spec.yaml -g go -o convex_client`
 
+> **⚠ snippet “Load, Load” not found**
 
-```ts
-import { v } from "convex/values";
-import { query } from "./_generated/server";
-import { LinkTable } from "./schema";
-
-export const loadOne = query({
-  args: { normalizedId: v.string(), token: v.string() },
-  returns: v.union(
-    v.object({
-      ...LinkTable.validator.fields,
-      _creationTime: v.number(),
-      _id: v.id("links"),
-    }),
-    v.null(),
-  ),
-  handler: async (ctx, { normalizedId, token }) => {
-    if (token === "" || token !== process.env.CONVEX_AUTH_TOKEN) {
-      throw new Error("Invalid authorization token");
-    }
-    return await ctx.db
-      .query("links")
-      .withIndex("by_normalizedId", (q) => q.eq("normalizedId", normalizedId))
-      .first();
-  },
-});
-```
-
-```ts
-import { v } from "convex/values";
-import { query } from "./_generated/server";
-import { LinkTable } from "./schema";
-
-export const loadOne = query({
-  args: { normalizedId: v.string(), token: v.string() },
-  returns: v.union(
-    v.object({
-      ...LinkTable.validator.fields,
-      _creationTime: v.number(),
-      _id: v.id("links"),
-    }),
-    v.null(),
-  ),
-  handler: async (ctx, { normalizedId, token }) => {
-    if (token === "" || token !== process.env.CONVEX_AUTH_TOKEN) {
-      throw new Error("Invalid authorization token");
-    }
-    return await ctx.db
-      .query("links")
-      .withIndex("by_normalizedId", (q) => q.eq("normalizedId", normalizedId))
-      .first();
-  },
-});
-```
-
-
-
-```txt
-type Link struct {
-	Short    string // the "foo" part of http://go/foo
-	Long     string // the target URL or text/template pattern to run
-	Created  time.Time
-	LastEdit time.Time // when the link was last edited
-	Owner    string    // user@domain
-}
-
-func (c *ConvexDB) Load(short string) (*Link, error) { 
-  request := *convex.NewRequestLoadLoadOne(*convex.NewRequestLoadLoadOneArgs(short, c.token))
-  resp, httpRes, err := c.client.QueryAPI.ApiRunLoadLoadOnePost(context.Background()).RequestLoadLoadOne(request).Execute()
-  validationErr := validateResponse(httpRes.StatusCode, err, resp.Status) if
-  validationErr != nil { return nil, validationErr }
-
-  linkDoc := resp.Value.Get()
-  if linkDoc == nil {
-    err := fs.ErrNotExist
-    return nil, err
-  }
-  link := Link{
-    Short:    linkDoc.Short,
-    Long:     linkDoc.Long,
-    Created:  time.Unix(int64(linkDoc.Created), 0),
-    LastEdit: time.Unix(int64(linkDoc.LastEdit), 0),
-    Owner:    linkDoc.Owner,
-  }
-
-  return &link, nil
-```
-
+> **⚠ snippet “Go” not found**
 
 ## Limits
 

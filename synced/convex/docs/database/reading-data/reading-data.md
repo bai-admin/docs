@@ -18,33 +18,7 @@ database tables using _document ids_ and _document queries_.
 Given a single document's id you can read its data with the
 [`db.get`](/api/interfaces/server.GenericDatabaseReader#get) method:
 
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const getTask = query({
-  args: { taskId: v.id("tasks") },
-  handler: async (ctx, args) => {
-    const task = await ctx.db.get(args.taskId);
-    // do something with `task`
-  },
-});
-```
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const getTask = query({
-  args: { taskId: v.id("tasks") },
-  handler: async (ctx, args) => {
-    const task = await ctx.db.get(args.taskId);
-    // do something with `task`
-  },
-});
-```
-
+> **⚠ snippet “getExample, getExample” not found**
 
 **Note**: You should use the `v.id` validator like in the example above to make
 sure you are not exposing data from tables other than the ones you intended.
@@ -54,29 +28,7 @@ sure you are not exposing data from tables other than the ones you intended.
 Document queries always begin by choosing the table to query with the
 [`db.query`](/api/interfaces/server.GenericDatabaseReader#query) method:
 
-
-```ts
-import { query } from "./_generated/server";
-
-export const listTasks = query({
-  handler: async (ctx) => {
-    const tasks = await ctx.db.query("tasks").collect();
-    // do something with `tasks`
-  },
-});
-```
-
-```ts
-import { query } from "./_generated/server";
-
-export const listTasks = query({
-  handler: async (ctx) => {
-    const tasks = await ctx.db.query("tasks").collect();
-    // do something with `tasks`
-  },
-});
-```
-
+> **⚠ snippet “queryExample, queryExample” not found**
 
 Then you can:
 
@@ -271,85 +223,13 @@ the results will be consistent.
 
 Table join might look like:
 
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const eventAttendees = query({
-  args: { eventId: v.id("events") },
-  handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId);
-    // highlight-start
-    return Promise.all(
-      (event?.attendeeIds ?? []).map((userId) => ctx.db.get(userId)),
-    );
-    // highlight-end
-  },
-});
-```
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const eventAttendees = query({
-  args: { eventId: v.id("events") },
-  handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId);
-    // highlight-start
-    return Promise.all(
-      (event?.attendeeIds ?? []).map((userId) => ctx.db.get(userId)),
-    );
-    // highlight-end
-  },
-});
-```
-
+> **⚠ snippet “joinExample, joinExample” not found**
 
 ### Aggregation
 
 Here's an example of computing an average:
 
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const averagePurchasePrice = query({
-  args: { email: v.string() },
-  handler: async (ctx, args) => {
-    const userPurchases = await ctx.db
-      .query("purchases")
-      .withIndex("by_buyer", (q) => q.eq("buyer", args.email))
-      .collect();
-    // highlight-start
-    const sum = userPurchases.reduce((a, { value: b }) => a + b, 0);
-    return sum / userPurchases.length;
-    // highlight-end
-  },
-});
-```
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const averagePurchasePrice = query({
-  args: { email: v.string() },
-  handler: async (ctx, args) => {
-    const userPurchases = await ctx.db
-      .query("purchases")
-      .withIndex("by_buyer", (q) => q.eq("buyer", args.email))
-      .collect();
-    // highlight-start
-    const sum = userPurchases.reduce((a, { value: b }) => a + b, 0);
-    return sum / userPurchases.length;
-    // highlight-end
-  },
-});
-```
-
+> **⚠ snippet “averageExample, averageExample” not found**
 
 > If you need more scalable aggregate options (for example to handle frequent
 > updates or large tables), consider using the
@@ -362,51 +242,7 @@ export const averagePurchasePrice = query({
 
 Here's an example of grouping and counting:
 
-
-```ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const numPurchasesPerBuyer = query({
-  args: { email: v.string() },
-  handler: async (ctx, args) => {
-    const userPurchases = await ctx.db.query("purchases").collect();
-
-    // highlight-start
-    return userPurchases.reduce(
-      (counts, { buyer }) => ({
-        ...counts,
-        [buyer]: counts[buyer] ?? 0 + 1,
-      }),
-      {} as Record<string, number>,
-    );
-    // highlight-end
-  },
-});
-```
-
-```js
-import { query } from "./_generated/server";
-import { v } from "convex/values";
-
-export const numPurchasesPerBuyer = query({
-  args: { email: v.string() },
-  handler: async (ctx, args) => {
-    const userPurchases = await ctx.db.query("purchases").collect();
-
-    // highlight-start
-    return userPurchases.reduce(
-      (counts, { buyer }) => ({
-        ...counts,
-        [buyer]: counts[buyer] ?? 0 + 1,
-      }),
-      {},
-    );
-    // highlight-end
-  },
-});
-```
-
+> **⚠ snippet “groupByExampleTS, groupByExampleJS” not found**
 
 ## Explore the syntax on the dashboard
 

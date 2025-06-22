@@ -12,53 +12,7 @@ File metadata of a file can be accessed from
 [mutations](/functions/mutation-functions.mdx) via `db.system.get` and
 `db.system.query`:
 
-
-```ts
-import { v } from "convex/values";
-import { query } from "./_generated/server";
-
-// @snippet start getMetadata
-export const getMetadata = query({
-  args: {
-    storageId: v.id("_storage"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.system.get(args.storageId);
-  },
-});
-
-export const listAllFiles = query({
-  handler: async (ctx) => {
-    // You can use .paginate() as well
-    return await ctx.db.system.query("_storage").collect();
-  },
-});
-// @snippet end getMetadata
-```
-
-```ts
-import { v } from "convex/values";
-import { query } from "./_generated/server";
-
-// @snippet start getMetadata
-export const getMetadata = query({
-  args: {
-    storageId: v.id("_storage"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.system.get(args.storageId);
-  },
-});
-
-export const listAllFiles = query({
-  handler: async (ctx) => {
-    // You can use .paginate() as well
-    return await ctx.db.system.query("_storage").collect();
-  },
-});
-// @snippet end getMetadata
-```
-
+> **⚠ snippet “FileMetadata, FileMetadata” not found**
 
 This is an example of the returned document:
 
@@ -89,31 +43,7 @@ function is available to access individual file metadata from
 [actions](/functions/actions.mdx) and
 [HTTP actions](/functions/http-actions.mdx):
 
-
-```ts
-import { v } from "convex/values";
-import { action } from "./_generated/server";
-
-export const getMetadata = action({
-  args: { storageId: v.id("_storage") },
-  handler: async (ctx, args) => {
-    return await ctx.storage.getMetadata(args.storageId);
-  },
-});
-```
-
-```ts
-import { v } from "convex/values";
-import { action } from "./_generated/server";
-
-export const getMetadata = action({
-  args: { storageId: v.id("_storage") },
-  handler: async (ctx, args) => {
-    return await ctx.storage.getMetadata(args.storageId);
-  },
-});
-```
-
+> **⚠ snippet “FileMetadataDeprecated, FileMetadataDeprecated” not found**
 
 Note that
 [`storage.getMetadata()`](/api/interfaces/server.StorageReader#getmetadata)

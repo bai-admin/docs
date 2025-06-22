@@ -53,13 +53,7 @@ Learn how to query data from Convex in a React Native app.
     Create a `sampleData.jsonl`
     file with some sample data.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -81,18 +75,7 @@ Learn how to query data from Convex in a React Native app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```ts
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
+    > **⚠ snippet “tasks” not found**
 
   </Step>
 
@@ -110,26 +93,7 @@ export const get = query({
     In `_layout.tsx`, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your component tree.
 
-    
-```tsx
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { Stack } from "expo-router";
-
-const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
-  unsavedChangesWarning: false,
-});
-
-export default function RootLayout() {
-  return (
-    <ConvexProvider client={convex}>
-      <Stack>
-        <Stack.Screen name="index" />
-      </Stack>
-    </ConvexProvider>
-  );
-}
-```
-
+    > **⚠ snippet “layout” not found**
 
   </Step>
 
@@ -137,28 +101,7 @@ export default function RootLayout() {
     In `index.tsx` use the `useQuery` hook to fetch
     from your `api.tasks.get` API.
 
-    
-```tsx
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { Text, View } from "react-native";
-
-export default function Index() {
-  const tasks = useQuery(api.tasks.get);
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {tasks?.map(({ _id, text }) => <Text key={_id}>{text}</Text>)}
-    </View>
-  );
-}
-```
-
+    > **⚠ snippet “index” not found**
 
   </Step>
 

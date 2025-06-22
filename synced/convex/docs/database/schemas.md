@@ -32,25 +32,7 @@ then adding a schema once you've solidified your plan. To learn more see our
 Schemas are defined in a `schema.ts` file in your `convex/` directory and look
 like:
 
-
-```ts
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
-
-export default defineSchema({
-  messages: defineTable({
-    body: v.string(),
-    user: v.id("users"),
-  }),
-  // @snippet start user
-  users: defineTable({
-    name: v.string(),
-    tokenIdentifier: v.string(),
-  }).index("by_token", ["tokenIdentifier"]),
-  // @snippet end user
-});
-```
-
+> **⚠ snippet “SchemaTS” not found**
 
 This schema (which is based on our
 [users and auth example](https://github.com/get-convex/convex-demos/tree/main/users-and-auth)),
@@ -348,31 +330,7 @@ export default defineSchema({
 This way you can create a preferences document first, then create a user
 document, then set the reference on the preferences document:
 
-
-```ts
-import { mutation } from "./_generated/server";
-
-export default mutation({
-  handler: async (ctx) => {
-    const preferencesId = await ctx.db.insert("preferences", {});
-    const userId = await ctx.db.insert("users", { preferencesId });
-    await ctx.db.patch(preferencesId, { userId });
-  },
-});
-```
-
-```ts
-import { mutation } from "./_generated/server";
-
-export default mutation({
-  handler: async (ctx) => {
-    const preferencesId = await ctx.db.insert("preferences", {});
-    const userId = await ctx.db.insert("users", { preferencesId });
-    await ctx.db.patch(preferencesId, { userId });
-  },
-});
-```
-
+> **⚠ snippet “circularExample, circularExample” not found**
 
 [Let us know](/production/contact.md) if you need better support for circular
 references.

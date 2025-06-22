@@ -77,13 +77,7 @@ and<LanguageSelector verbose />
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    
-```json
-{"text": "Buy groceries", "isCompleted": true}
-{"text": "Go for a swim", "isCompleted": true}
-{"text": "Integrate Convex", "isCompleted": false}
-```
-
+    > **⚠ snippet “sampleData” not found**
 
   </Step>
 
@@ -135,29 +129,7 @@ and<LanguageSelector verbose />
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    
-```ts
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
-```js
-import { query } from "./_generated/server";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("tasks").collect();
-  },
-});
-```
-
+    > **⚠ snippet “tasksTS, tasks” not found**
 
   </Step>
 
@@ -165,43 +137,7 @@ export const get = query({
     In <JSDialectFileName name="src/main.jsx" />, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your app.
 
-    
-```tsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ConvexProvider client={convex}>
-      <App />
-    </ConvexProvider>
-  </React.StrictMode>,
-);
-```
-
-```jsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ConvexProvider client={convex}>
-      <App />
-    </ConvexProvider>
-  </React.StrictMode>,
-);
-```
-
+    > **⚠ snippet “mainTS, main” not found**
 
   </Step>
 
@@ -209,43 +145,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     In <JSDialectFileName name="src/App.jsx" />, use the `useQuery` hook to fetch from your `api.tasks.get`
     API function and display the data.
 
-    
-```tsx
-import "./App.css";
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-function App() {
-  const tasks = useQuery(api.tasks.get);
-  return (
-    <div className="App">
-      {tasks?.map(({ _id, text }) => <div key={_id}>{text}</div>)}
-    </div>
-  );
-}
-
-export default App;
-```
-
-```jsx
-import "./App.css";
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-function App() {
-  const tasks = useQuery(api.tasks.get);
-  return (
-    <div className="App">
-      {tasks?.map(({ _id, text }) => (
-        <div key={_id}>{text}</div>
-      ))}
-    </div>
-  );
-}
-
-export default App;
-```
-
+    > **⚠ snippet “AppTS, App” not found**
 
   </Step>
 

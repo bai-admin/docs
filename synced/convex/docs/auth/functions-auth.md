@@ -17,41 +17,7 @@ property of the [`QueryCtx`](/generated-api/server#queryctx),
 [`MutationCtx`](/generated-api/server#mutationctx), or
 [`ActionCtx`](/generated-api/server#actionctx) object:
 
-
-```ts
-import { mutation } from "./_generated/server";
-
-export const myMutation = mutation({
-  args: {
-    // ...
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Unauthenticated call to mutation");
-    }
-    //...
-  },
-});
-```
-
-```ts
-import { mutation } from "./_generated/server";
-
-export const myMutation = mutation({
-  args: {
-    // ...
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Unauthenticated call to mutation");
-    }
-    //...
-  },
-});
-```
-
+> **⚠ snippet “Example, Example” not found**
 
 ## User identity fields
 
@@ -70,37 +36,7 @@ following fields will be present: `familyName`, `givenName`, `nickname`,
 standard definition in the
 [OpenID docs](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
-
-```ts
-import { mutation } from "./_generated/server";
-
-export const myMutation = mutation({
-  args: {
-    // ...
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const { tokenIdentifier, name, email } = identity!;
-    //...
-  },
-});
-```
-
-```js
-import { mutation } from "./_generated/server";
-
-export const myMutation = mutation({
-  args: {
-    // ...
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const { tokenIdentifier, name, email } = identity;
-    //...
-  },
-});
-```
-
+> **⚠ snippet “FieldsTS, FieldsJS” not found**
 
 ### Clerk claims configuration
 
@@ -120,26 +56,6 @@ You can also access the user identity from an HTTP action
 [`ctx.auth.getUserIdentity()`](/api/interfaces/server.Auth#getuseridentity), by
 calling your endpoint with an `Authorization` header including a JWT token:
 
-
-```ts
-const jwtToken = "...";
-
-fetch("https://<deployment name>.convex.site/myAction", {
-  headers: {
-    Authorization: `Bearer ${jwtToken}`,
-  },
-});
-```
-
-```ts
-const jwtToken = "...";
-
-fetch("https://<deployment name>.convex.site/myAction", {
-  headers: {
-    Authorization: `Bearer ${jwtToken}`,
-  },
-});
-```
-
+> **⚠ snippet “Fetch, Fetch” not found**
 
 <StackPosts query="authentication functions" />

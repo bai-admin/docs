@@ -34,33 +34,7 @@ Actions follow the same naming rules as queries, see
 To declare an action in Convex you use the action constructor function. Pass it
 an object with a `handler` function, which performs the action:
 
-
-```ts
-import { action } from "./_generated/server";
-
-export const doSomething = action({
-  handler: () => {
-    // implementation goes here
-
-    // optionally return a value
-    return "success";
-  },
-});
-```
-
-```ts
-import { action } from "./_generated/server";
-
-export const doSomething = action({
-  handler: () => {
-    // implementation goes here
-
-    // optionally return a value
-    return "success";
-  },
-});
-```
-
+> **⚠ snippet “Constructor, Constructor” not found**
 
 Unlike a query, an action can but does not have to return a value.
 
@@ -69,37 +43,7 @@ Unlike a query, an action can but does not have to return a value.
 Action arguments and responses follow the same rules as
 [mutations](/functions/mutation-functions.mdx#mutation-arguments):
 
-
-```ts
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args) => {
-    // do something with `args.a` and `args.b`
-
-    // optionally return a value
-    return "success";
-  },
-});
-```
-
-```ts
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args) => {
-    // do something with `args.a` and `args.b`
-
-    // optionally return a value
-    return "success";
-  },
-});
-```
-
+> **⚠ snippet “ArgsWithValidation, ArgsWithValidation” not found**
 
 The first argument to the handler function is reserved for the action context.
 
@@ -109,31 +53,7 @@ The `action` constructor enables interacting with the database, and other Convex
 features by passing an [ActionCtx](/api/interfaces/server.GenericActionCtx)
 object to the handler function as the first argument:
 
-
-```ts
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number(), b: v.number() },
-  handler: (ctx, args) => {
-    // do something with `ctx`
-  },
-});
-```
-
-```ts
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number(), b: v.number() },
-  handler: (ctx, args) => {
-    // do something with `ctx`
-  },
-});
-```
-
+> **⚠ snippet “Context, Context” not found**
 
 Which part of that action context is used depends on what your action needs to
 do:
@@ -141,143 +61,7 @@ do:
 - To read data from the database use the `runQuery` field, and call a query that
   performs the read:
 
-  
-```ts
-// @snippet start action
-import { action, internalQuery } from "./_generated/server";
-import { internal } from "./_generated/api";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    const data = await ctx.runQuery(internal.myFunctions.readData, {
-      a: args.a,
-    });
-    // do something with `data`
-  },
-});
-
-export const readData = internalQuery({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    // read from `ctx.db` here
-  },
-});
-// @snippet end action
-
-// Used by client or internal call examples
-import { mutation, query } from "./_generated/server";
-import { paginationOptsValidator } from "convex/server";
-import { internalAction } from "./_generated/server";
-
-export const sum = query({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args) => {
-    return args.a + args.b;
-  },
-});
-
-export const getSomething = query({
-  args: {},
-  handler: () => {
-    return null;
-  },
-});
-
-export const mutateSomething = mutation({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args): void => {
-    // do something with `a` and `b`
-  },
-});
-
-export const getSomethingPaginated = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: (ctx, args) => {
-    return ctx.db.query("foods").paginate(args.paginationOpts);
-  },
-});
-
-export const actionThatCallsAPI = internalAction({
-  args: { taskId: v.id("tasks"), text: v.string() },
-  handler: (_, args): void => {
-    // do something with `taskId` and `text`, like call an API
-    // then run another mutation to store the result
-  },
-});
-```
-
-```ts
-// @snippet start action
-import { action, internalQuery } from "./_generated/server";
-import { internal } from "./_generated/api";
-import { v } from "convex/values";
-
-export const doSomething = action({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    const data = await ctx.runQuery(internal.myFunctions.readData, {
-      a: args.a,
-    });
-    // do something with `data`
-  },
-});
-
-export const readData = internalQuery({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    // read from `ctx.db` here
-  },
-});
-// @snippet end action
-
-// Used by client or internal call examples
-import { mutation, query } from "./_generated/server";
-import { paginationOptsValidator } from "convex/server";
-import { internalAction } from "./_generated/server";
-
-export const sum = query({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args) => {
-    return args.a + args.b;
-  },
-});
-
-export const getSomething = query({
-  args: {},
-  handler: () => {
-    return null;
-  },
-});
-
-export const mutateSomething = mutation({
-  args: { a: v.number(), b: v.number() },
-  handler: (_, args): void => {
-    // do something with `a` and `b`
-  },
-});
-
-export const getSomethingPaginated = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: (ctx, args) => {
-    return ctx.db.query("foods").paginate(args.paginationOpts);
-  },
-});
-
-export const actionThatCallsAPI = internalAction({
-  args: { taskId: v.id("tasks"), text: v.string() },
-  handler: (_, args): void => {
-    // do something with `taskId` and `text`, like call an API
-    // then run another mutation to store the result
-  },
-});
-```
-
+  > **⚠ snippet “ContextRunQuery, ContextRunQuery” not found**
 
   Here `readData` is an [internal query](/functions/internal-functions.mdx)
   because we don't want to expose it to the client directly. Actions, mutations
@@ -286,39 +70,7 @@ export const actionThatCallsAPI = internalAction({
 - To write data to the database use the `runMutation` field, and call a mutation
   that performs the write:
 
-  
-```ts
-import { v } from "convex/values";
-import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
-
-export const doSomething = action({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    const data = await ctx.runMutation(internal.myMutations.writeData, {
-      a: args.a,
-    });
-    // do something else, optionally use `data`
-  },
-});
-```
-
-```ts
-import { v } from "convex/values";
-import { action } from "./_generated/server";
-import { internal } from "./_generated/api";
-
-export const doSomething = action({
-  args: { a: v.number() },
-  handler: async (ctx, args) => {
-    const data = await ctx.runMutation(internal.myMutations.writeData, {
-      a: args.a,
-    });
-    // do something else, optionally use `data`
-  },
-});
-```
-
+  > **⚠ snippet “ContextRunMutation, ContextRunMutation” not found**
 
   Use an [internal mutation](/functions/internal-functions.mdx) when you want to
   prevent users from calling the mutation directly.
@@ -348,68 +100,15 @@ When the return value of an action depends on the result of calling
 `ctx.runQuery` or `ctx.runMutation`, TypeScript will complain that it cannot
 infer the return type of the action. This is a minimal example of the issue:
 
-
-```ts
-import { api } from "./_generated/api";
-import { action, query } from "./_generated/server";
-
-// @ts-expect-error Circular type
-// @snippet start tsError
-// TypeScript reports an error on `myAction`
-export const myAction = action({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.runQuery(api.myFunctions.getSomething);
-  },
-});
-
-export const getSomething = query({
-  args: {},
-  handler: () => {
-    return null;
-  },
-});
-// @snippet end tsError
-```
-
+> **⚠ snippet “CircularError” not found**
 
 To work around this, there are two options:
 
 1. Type the return value of the handler function explicitly:
-   
-```ts
-import { api } from "./_generated/api";
-import { action } from "./_generated/server";
-
-// @snippet start fixed
-export const myAction = action({
-  args: {},
-  handler: async (ctx): Promise<null> => {
-    const result = await ctx.runQuery(api.myFunctions.getSomething);
-    return result;
-  },
-});
-// @snippet end fixed
-```
-
+   > **⚠ snippet “CircularErrorFixedReturn” not found**
 2. Type the the result of the `ctx.runQuery` or `ctx.runMutation` call
    explicitly:
-   
-```ts
-import { api } from "./_generated/api";
-import { action } from "./_generated/server";
-
-// @snippet start fixed
-export const myAction = action({
-  args: {},
-  handler: async (ctx) => {
-    const result: null = await ctx.runQuery(api.myFunctions.getSomething);
-    return result;
-  },
-});
-// @snippet end fixed
-```
-
+   > **⚠ snippet “CircularErrorFixedResults” not found**
 
 TypeScript will check that the type annotation matches what the called query or
 mutation returns, so you don't lose any type safety.
@@ -428,31 +127,7 @@ By default, actions run in Convex's environment. This environment supports
 `fetch`, so actions that simply want to call a third-party API using `fetch` can
 be run in this environment:
 
-
-```ts
-import { action } from "./_generated/server";
-
-export const doSomething = action({
-  args: {},
-  handler: async () => {
-    const data = await fetch("https://api.thirdpartyservice.com");
-    // do something with data
-  },
-});
-```
-
-```ts
-import { action } from "./_generated/server";
-
-export const doSomething = action({
-  args: {},
-  handler: async () => {
-    const data = await fetch("https://api.thirdpartyservice.com");
-    // do something with data
-  },
-});
-```
-
+> **⚠ snippet “NPM, NPM” not found**
 
 Actions running in Convex's environment are faster compared to Node.js, since
 they don't require extra time to start up before running your action (cold
@@ -465,35 +140,7 @@ run in Node.js by adding the `"use node"` directive at the top of the file. Note
 that other Convex functions cannot be defined in files with the `"use node";`
 directive.
 
-
-```ts
-"use node";
-
-import { action } from "./_generated/server";
-import SomeNpmPackage from "some-npm-package";
-
-export const doSomething = action({
-  args: {},
-  handler: () => {
-    // do something with SomeNpmPackage
-  },
-});
-```
-
-```ts
-"use node";
-
-import { action } from "./_generated/server";
-import SomeNpmPackage from "some-npm-package";
-
-export const doSomething = action({
-  args: {},
-  handler: () => {
-    // do something with SomeNpmPackage
-  },
-});
-```
-
+> **⚠ snippet “Node, Node” not found**
 
 Learn more about the two [Convex Runtimes](/functions/runtimes.mdx).
 
@@ -519,35 +166,7 @@ To call an action from [React](/client/react.mdx) use the
 [`useAction`](/api/modules/react#useaction) hook along with the generated
 [`api`](/generated-api/api) object.
 
-
-```tsx
-import { useAction } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function MyApp() {
-  const performMyAction = useAction(api.myFunctions.doSomething);
-  const handleClick = () => {
-    performMyAction({ a: 1 });
-  };
-  // pass `handleClick` to a button
-  // ...
-}
-```
-
-```tsx
-import { useAction } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-export function MyApp() {
-  const performMyAction = useAction(api.myFunctions.doSomething);
-  const handleClick = () => {
-    performMyAction({ a: 1 });
-  };
-  // pass `handleClick` to a button
-  // ...
-}
-```
-
+> **⚠ snippet “Call, Call” not found**
 
 Unlike
 [mutations](/functions/mutation-functions.mdx#calling-mutations-from-clients),
@@ -563,57 +182,7 @@ anti-pattern**. Instead, have the client call a
 writing into the database and then
 [schedules](/scheduling/scheduled-functions.mdx) an action:
 
-
-```ts
-import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import { internalAction, mutation } from "./_generated/server";
-
-export const mutationThatSchedulesAction = mutation({
-  args: { text: v.string() },
-  handler: async (ctx, { text }) => {
-    const taskId = await ctx.db.insert("tasks", { text });
-    await ctx.scheduler.runAfter(0, internal.myFunctions.actionThatCallsAPI, {
-      taskId,
-      text,
-    });
-  },
-});
-
-export const actionThatCallsAPI = internalAction({
-  args: { taskId: v.id("tasks"), text: v.string() },
-  handler: (_, args): void => {
-    // do something with `taskId` and `text`, like call an API
-    // then run another mutation to store the result
-  },
-});
-```
-
-```ts
-import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import { internalAction, mutation } from "./_generated/server";
-
-export const mutationThatSchedulesAction = mutation({
-  args: { text: v.string() },
-  handler: async (ctx, { text }) => {
-    const taskId = await ctx.db.insert("tasks", { text });
-    await ctx.scheduler.runAfter(0, internal.myFunctions.actionThatCallsAPI, {
-      taskId,
-      text,
-    });
-  },
-});
-
-export const actionThatCallsAPI = internalAction({
-  args: { taskId: v.id("tasks"), text: v.string() },
-  handler: (_, args): void => {
-    // do something with `taskId` and `text`, like call an API
-    // then run another mutation to store the result
-  },
-});
-```
-
+> **⚠ snippet “ScheduleFromMutation, ScheduleFromMutation” not found**
 
 This way the mutation can enforce invariants, such as preventing the user from
 executing the same action twice.
