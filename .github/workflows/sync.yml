@@ -1,0 +1,190 @@
+name: Sync
+on:
+  schedule:         # hourly
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+###############################################################################
+# 0. Common reusable bash functions (inlined for readability)
+###############################################################################
+defaults:
+  run:
+    shell: bash
+
+env:
+  # helper to strip prefix: strip_prefix PREFIX STRING  ➜  prints remainder
+  strip_prefix: |
+    function strip_prefix () {
+      local prefix="$1" path="$2"
+      echo "${path/#$prefix\/}"
+    }
+
+###############################################################################
+# 1. Build the matrix
+###############################################################################
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate matrix
+        id: set-matrix
+        run: |
+          sudo apt-get -qq update && sudo apt-get -qq install -y jq
+          MATRIX=$(jq -c '{include:.}' .github/sync-config.json)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+###############################################################################
+# 2. One “sync” job per entry
+###############################################################################
+  sync:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Perform sync
+        id: sync
+        env:
+          REPO_URL:  ${{ matrix.repoUrl }}
+          BRANCH:    ${{ matrix.branch }}
+          DEST_DIR:  ${{ matrix.destDir }}
+
+          SRC_DIR:               ${{ matrix.srcDir }}
+          SCRIPT_IN_DIR:         ${{ matrix.srcScriptInputDir }}
+          SCRIPT_OUT_DIR:        ${{ matrix.srcScriptOutputDir }}
+          PREPROCESS_SCRIPT_CMD: ${{ matrix.preprocessScript }}
+        run: |
+          set -euo pipefail
+          
+          # Guard against missing configuration
+          if [[ -z "$SRC_DIR" && -z "$SCRIPT_IN_DIR" ]]; then
+            echo "::error::No srcDir or script dirs specified"
+            exit 1
+          fi
+          
+          echo "::group::Init sparse clone"
+          TMP_CLONE=$(mktemp -d)
+          git -C "$TMP_CLONE" init -b "$BRANCH"
+          git -C "$TMP_CLONE" remote add origin "$REPO_URL"
+          git -C "$TMP_CLONE" config core.sparseCheckout true
+
+          # choose the sparse path
+          if [[ -n "$SRC_DIR" ]]; then
+            SPARSE_PATH="$SRC_DIR"
+          else
+            SPARSE_PATH="$SCRIPT_IN_DIR"
+          fi
+          
+          # Handle root directory case properly for sparse-checkout
+          if [[ "$SPARSE_PATH" == "." ]]; then
+            echo "*" >> "$TMP_CLONE/.git/info/sparse-checkout"
+          else
+            echo "/$SPARSE_PATH/*" >> "$TMP_CLONE/.git/info/sparse-checkout"
+          fi
+          git -C "$TMP_CLONE" pull --depth=1 origin "$BRANCH"
+          echo "::endgroup::"
+
+          # validate
+          if ! [ -d "$TMP_CLONE/$SPARSE_PATH" ]; then
+            echo "::error::Path '$SPARSE_PATH' not found in $REPO_URL"
+            exit 1
+          fi
+
+          # ---------- COPY-ONLY MODE ----------------------------------------
+          if [[ -n "$SRC_DIR" ]]; then
+            mkdir -p "$DEST_DIR"
+            rsync -a --delete "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+
+          # ---------- PRE-PROCESS MODE --------------------------------------
+          else
+            WORKDIR=$(mktemp -d)
+            rsync -a "$TMP_CLONE/$SCRIPT_IN_DIR/" "$WORKDIR/"
+
+            # ①  compute relative output dir
+            REL_OUT_DIR=${SCRIPT_OUT_DIR#"$SCRIPT_IN_DIR"/}
+
+            # ②  export CWD-independent paths for the script
+            export SYNC_INPUT_DIR="$WORKDIR"
+            export SYNC_OUTPUT_DIR="$WORKDIR/$REL_OUT_DIR"
+
+            # ③  run the user script with CWD set to input dir
+            pushd "$WORKDIR" >/dev/null
+            eval "$PREPROCESS_SCRIPT_CMD"
+            popd >/dev/null
+
+            # ④  copy the resulting output to DEST_DIR
+            if ! [ -d "$SYNC_OUTPUT_DIR" ]; then
+              echo "::error::Expected output '$SYNC_OUTPUT_DIR' not found"
+              exit 1
+            fi
+            mkdir -p "$DEST_DIR"
+            rsync -a --delete "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+            rm -rf "$WORKDIR"
+          fi
+
+          rm -rf "$TMP_CLONE"
+
+      - name: Create patch
+        run: |
+          if ! git diff --quiet; then
+            git diff --patch > changes.patch
+            tar -czf "patch-${{ strategy.job-index }}.tar.gz" changes.patch
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: patches
+          path: patch-*.tar.gz
+          if-no-files-found: ignore
+
+###############################################################################
+# 3. Merge patches to one commit
+###############################################################################
+  commit-changes:
+    needs: sync
+    runs-on: ubuntu-latest
+    if: success()
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set author
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: patches
+          path: patches
+
+      - name: Apply patches
+        run: |
+          shopt -s nullglob
+          for f in patches/*.tar.gz; do tar -xzf "$f"; done
+          shopt -u nullglob
+          if ls *.patch 1>/dev/null 2>&1; then
+            git apply --3way --ignore-space-change --whitespace=nowarn *.patch
+          fi
+
+      - name: Commit & push
+        run: |
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "chore: auto-sync external sources"
+            git push
+          else
+            echo "No changes."
+          fi
