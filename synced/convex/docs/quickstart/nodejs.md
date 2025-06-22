@@ -57,7 +57,7 @@ project configurations (TypeScript, bundlers, CJS vs ESM) see
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -80,7 +80,7 @@ project configurations (TypeScript, bundlers, CJS vs ESM) see
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -88,7 +88,7 @@ project configurations (TypeScript, bundlers, CJS vs ESM) see
     In a new file `script.js`, create a `ConvexHttpClient` using
     the URL of your development environment.
 
-    > **⚠ snippet “script” not found**
+    > **⚠ snippet " script " not found**
 
   </Step>
 

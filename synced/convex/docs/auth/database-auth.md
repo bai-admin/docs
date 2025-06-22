@@ -57,14 +57,14 @@ verification and you have it enabled.
 Which field you use will determine how multiple providers interact, and how hard
 it will be to migrate to a different provider.
 
-> **⚠ snippet “Schema” not found**
+> **⚠ snippet " Schema " not found**
 
 ### Mutation for storing current user
 
 This is an example of a mutation that stores the user's `name` and
 `tokenIdentifier`:
 
-> **⚠ snippet “UsersTS, UsersTS” not found**
+> **⚠ snippet " UsersTS, UsersTS " not found**
 
 ### Calling the store user mutation from React
 
@@ -74,13 +74,13 @@ been stored.
 
 This helper hook that does the job:
 
-> **⚠ snippet “useStoreUserEffectTS, useStoreUserEffectJS” not found**
+> **⚠ snippet " useStoreUserEffectTS, useStoreUserEffectJS " not found**
 
 You can use this hook in your top-level component. If your queries need the user
 document to be present, make sure that you only render the components that call
 them after the user has been stored:
 
-> **⚠ snippet “App, App” not found**
+> **⚠ snippet " App, App " not found**
 
 In this way the `useStoreUserEffect` hook replaces the `useConvexAuth` hook.
 
@@ -92,13 +92,13 @@ throw an error if the user hasn't been stored.
 Now that you have users stored as documents in your Convex database, you can use
 their IDs as foreign keys in other documents:
 
-> **⚠ snippet “MessagesTS, MessagesTS” not found**
+> **⚠ snippet " MessagesTS, MessagesTS " not found**
 
 ### Loading users by their ID
 
 The information about other users can be retrieved via their IDs:
 
-> **⚠ snippet “MessagesTS, MessagesTS” not found**
+> **⚠ snippet " MessagesTS, MessagesTS " not found**
 
 ## Set up webhooks
 
@@ -143,14 +143,14 @@ In the examples below we will use the `subject` from the
 `ctx.auth.getUserIdentity()` to identify the user, which should be set to the
 Clerk user ID.
 
-> **⚠ snippet “WebhooksSchema” not found**
+> **⚠ snippet " WebhooksSchema " not found**
 
 ### Mutations for upserting and deleting users
 
 This is an example of mutations that handle the updates received via the
 webhook:
 
-> **⚠ snippet “WebhookMutations, WebhookMutations” not found**
+> **⚠ snippet " WebhookMutations, WebhookMutations " not found**
 
 There are also a few helpers in this file:
 
@@ -170,7 +170,7 @@ There are also a few helpers in this file:
 
 This how the actual HTTP endpoint can be implemented:
 
-> **⚠ snippet “WebhookEndpoint, WebhookEndpoint” not found**
+> **⚠ snippet " WebhookEndpoint, WebhookEndpoint " not found**
 
 If you deploy your code now and sign in, you should see the user being created
 in your Convex database.
@@ -182,13 +182,13 @@ You can use the helpers defined before to retrieve the current user's document.
 Now that you have users stored as documents in your Convex database, you can use
 their IDs as foreign keys in other documents:
 
-> **⚠ snippet “WebhookMessages, WebhookMessages” not found**
+> **⚠ snippet " WebhookMessages, WebhookMessages " not found**
 
 ### Loading users by their ID
 
 The information about other users can be retrieved via their IDs:
 
-> **⚠ snippet “MessagesTS, MessagesTS” not found**
+> **⚠ snippet " MessagesTS, MessagesTS " not found**
 
 ### Waiting for current user to be stored
 
@@ -201,8 +201,8 @@ For example you can define a hook that determines the current authentication
 state of the client, taking into account whether the current user has been
 stored:
 
-> **⚠ snippet “WebhookHook, WebhookHook” not found**
+> **⚠ snippet " WebhookHook, WebhookHook " not found**
 
 And then you can use it to render the appropriate components:
 
-> **⚠ snippet “WebhookClient, WebhookClient” not found**
+> **⚠ snippet " WebhookClient, WebhookClient " not found**

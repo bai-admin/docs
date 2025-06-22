@@ -17,7 +17,7 @@ property of the [`QueryCtx`](/generated-api/server#queryctx),
 [`MutationCtx`](/generated-api/server#mutationctx), or
 [`ActionCtx`](/generated-api/server#actionctx) object:
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 ## User identity fields
 
@@ -36,7 +36,7 @@ following fields will be present: `familyName`, `givenName`, `nickname`,
 standard definition in the
 [OpenID docs](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims).
 
-> **⚠ snippet “FieldsTS, FieldsJS” not found**
+> **⚠ snippet " FieldsTS, FieldsJS " not found**
 
 ### Clerk claims configuration
 
@@ -56,6 +56,6 @@ You can also access the user identity from an HTTP action
 [`ctx.auth.getUserIdentity()`](/api/interfaces/server.Auth#getuseridentity), by
 calling your endpoint with an `Authorization` header including a JWT token:
 
-> **⚠ snippet “Fetch, Fetch” not found**
+> **⚠ snippet " Fetch, Fetch " not found**
 
 <StackPosts query="authentication functions" />

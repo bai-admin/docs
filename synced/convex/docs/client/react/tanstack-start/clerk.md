@@ -24,11 +24,11 @@ Convex in TanStack Start, you'll want to
 
 Making these changes looks like modifying `app/router.tsx` like this:
 
-> **⚠ snippet “appRouter” not found**
+> **⚠ snippet " appRouter " not found**
 
 and modifying `app/routes/__root.tsx` like this:
 
-> **⚠ snippet “appRoutesRoot” not found**
+> **⚠ snippet " appRoutesRoot " not found**
 
 Now all queries, mutations and action made with
 [TanStack Query](/client/tanstack-query.mdx) will be authenticated by a Clerk

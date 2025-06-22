@@ -54,7 +54,7 @@ table's schema. Every vector index has a unique name and a definition with:
 For example, if you want an index that can search for similar foods within a
 given cuisine, your table definition could look like:
 
-> **⚠ snippet “Schema” not found**
+> **⚠ snippet " Schema " not found**
 
 You can specify vector and filter fields on nested documents by using a
 dot-separated path like `properties.name`.
@@ -75,7 +75,7 @@ They generally involve three steps:
 Here's an example of the first two steps for searching for similar French foods
 based on a description:
 
-> **⚠ snippet “VectorSearchSnippets, VectorSearchSnippets” not found**
+> **⚠ snippet " VectorSearchSnippets, VectorSearchSnippets " not found**
 
 An example of the first step can be found
 [here](https://github.com/get-convex/convex-demos/blob/main/vector-search/convex/foods.ts#L18)
@@ -119,9 +119,9 @@ For now, let's load the documents and return them from the action. To do so,
 we'll pass the list of results to a Convex query and run it inside of our
 action, returning the result:
 
-> **⚠ snippet “Foods, Foods” not found**
+> **⚠ snippet " Foods, Foods " not found**
 
-> **⚠ snippet “VectorSearchSnippets2, VectorSearchSnippets2” not found**
+> **⚠ snippet " VectorSearchSnippets2, VectorSearchSnippets2 " not found**
 
 ### Filter expressions
 
@@ -131,19 +131,19 @@ field, or an `OR` of expressions.
 
 For example, here's a filter for foods with cuisine exactly equal to "French":
 
-> **⚠ snippet “VectorSearchSnippets” not found**
+> **⚠ snippet " VectorSearchSnippets " not found**
 
 You can also filter documents by a single field that contains several different
 values using an `or` expression. Here's a filter for French or Indonesian
 dishes:
 
-> **⚠ snippet “VectorSearchSnippets” not found**
+> **⚠ snippet " VectorSearchSnippets " not found**
 
 For indexes with multiple filter fields, you can also use `.or()` filters on
 different fields. Here's a filter for dishes whose cuisine is French or whose
 main ingredient is butter:
 
-> **⚠ snippet “VectorSearchSnippets” not found**
+> **⚠ snippet " VectorSearchSnippets " not found**
 
 **Both `cuisine` and `mainIngredient` would need to be included in the
 `filterFields` in the `.vectorIndex` definition.**
@@ -200,7 +200,7 @@ separate table.
 A table definition for movies, and a vector index supporting search for similar
 movies filtering by genre would look like this:
 
-> **⚠ snippet “Schema” not found**
+> **⚠ snippet " Schema " not found**
 
 Generating an embedding and running a vector search are the same as using a
 single table. Loading the relevant documents given the vector search result is
@@ -208,7 +208,7 @@ different since we have an ID for `movieEmbeddings` but want to load a `movies`
 document. We can do this using the `by_embedding` database index on the `movies`
 table:
 
-> **⚠ snippet “VectorSearchSnippets, VectorSearchSnippets” not found**
+> **⚠ snippet " VectorSearchSnippets, VectorSearchSnippets " not found**
 
 ### Fetching results and adding new documents
 

@@ -21,7 +21,7 @@ back to the client application.
 This is an example query, taking in named arguments, reading data from the
 database and returning a result:
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 Read on to understand how to build queries yourself.
 
@@ -71,14 +71,14 @@ instead of API objects:
 To actually declare a query in Convex you use the `query` constructor function.
 Pass it an object with a `handler` function, which returns the query result:
 
-> **⚠ snippet “Constructor, Constructor” not found**
+> **⚠ snippet " Constructor, Constructor " not found**
 
 ### Query arguments
 
 Queries accept named arguments. The argument values are accessible as fields of
 the second parameter of the handler function:
 
-> **⚠ snippet “ArgsWithoutValidationTS, ArgsWithoutValidationJS” not found**
+> **⚠ snippet " ArgsWithoutValidationTS, ArgsWithoutValidationJS " not found**
 
 Arguments and responses are automatically serialized and deserialized, and you
 can pass and return most value-like JavaScript data to and from your query.
@@ -86,7 +86,7 @@ can pass and return most value-like JavaScript data to and from your query.
 To both declare the types of arguments and to validate them, add an `args`
 object using `v` validators:
 
-> **⚠ snippet “ArgsWithValidation, ArgsWithValidation” not found**
+> **⚠ snippet " ArgsWithValidation, ArgsWithValidation " not found**
 
 See [argument validation](/functions/validation.mdx) for the full list of
 supported types and validators.
@@ -108,7 +108,7 @@ The `query` constructor enables fetching data, and other Convex features by
 passing a [QueryCtx](/generated-api/server.md#queryctx) object to the handler
 function as the first parameter:
 
-> **⚠ snippet “Context, Context” not found**
+> **⚠ snippet " Context, Context " not found**
 
 Which part of the query context is used depends on what your query needs to do:
 
@@ -116,7 +116,7 @@ Which part of the query context is used depends on what your query needs to do:
   function an `async` function so we can `await` the promise returned by
   `db.get()`:
 
-  > **⚠ snippet “ContextDB, ContextDB” not found**
+  > **⚠ snippet " ContextDB, ContextDB " not found**
 
   Read more about [Reading Data](/database/reading-data/reading-data.mdx).
 
@@ -131,7 +131,7 @@ When you want to split up the code in your query or reuse logic across multiple
 Convex functions you can define and call helper <LanguageSelector verbose />
 functions:
 
-> **⚠ snippet “Helper, HelperJS” not found**
+> **⚠ snippet " Helper, HelperJS " not found**
 
 You can `export` helpers to use them across multiple files. They will not be
 callable from outside of your Convex functions.
@@ -150,7 +150,7 @@ packages are supported, see
 npm install @faker-js/faker
 ```
 
-> **⚠ snippet “NPM, NPM” not found**
+> **⚠ snippet " NPM, NPM " not found**
 
 ## Calling queries from clients
 
@@ -158,7 +158,7 @@ To call a query from [React](/client/react.mdx) use the
 [`useQuery`](/client/react.mdx#fetching-data) hook along with the generated
 [`api`](/generated-api/api) object.
 
-> **⚠ snippet “Call, Call” not found**
+> **⚠ snippet " Call, Call " not found**
 
 See the [React](/client/react.mdx) client documentation for all the ways queries
 can be called.

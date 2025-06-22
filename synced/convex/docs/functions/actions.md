@@ -34,7 +34,7 @@ Actions follow the same naming rules as queries, see
 To declare an action in Convex you use the action constructor function. Pass it
 an object with a `handler` function, which performs the action:
 
-> **⚠ snippet “Constructor, Constructor” not found**
+> **⚠ snippet " Constructor, Constructor " not found**
 
 Unlike a query, an action can but does not have to return a value.
 
@@ -43,7 +43,7 @@ Unlike a query, an action can but does not have to return a value.
 Action arguments and responses follow the same rules as
 [mutations](/functions/mutation-functions.mdx#mutation-arguments):
 
-> **⚠ snippet “ArgsWithValidation, ArgsWithValidation” not found**
+> **⚠ snippet " ArgsWithValidation, ArgsWithValidation " not found**
 
 The first argument to the handler function is reserved for the action context.
 
@@ -53,7 +53,7 @@ The `action` constructor enables interacting with the database, and other Convex
 features by passing an [ActionCtx](/api/interfaces/server.GenericActionCtx)
 object to the handler function as the first argument:
 
-> **⚠ snippet “Context, Context” not found**
+> **⚠ snippet " Context, Context " not found**
 
 Which part of that action context is used depends on what your action needs to
 do:
@@ -61,7 +61,7 @@ do:
 - To read data from the database use the `runQuery` field, and call a query that
   performs the read:
 
-  > **⚠ snippet “ContextRunQuery, ContextRunQuery” not found**
+  > **⚠ snippet " ContextRunQuery, ContextRunQuery " not found**
 
   Here `readData` is an [internal query](/functions/internal-functions.mdx)
   because we don't want to expose it to the client directly. Actions, mutations
@@ -70,7 +70,7 @@ do:
 - To write data to the database use the `runMutation` field, and call a mutation
   that performs the write:
 
-  > **⚠ snippet “ContextRunMutation, ContextRunMutation” not found**
+  > **⚠ snippet " ContextRunMutation, ContextRunMutation " not found**
 
   Use an [internal mutation](/functions/internal-functions.mdx) when you want to
   prevent users from calling the mutation directly.
@@ -100,15 +100,15 @@ When the return value of an action depends on the result of calling
 `ctx.runQuery` or `ctx.runMutation`, TypeScript will complain that it cannot
 infer the return type of the action. This is a minimal example of the issue:
 
-> **⚠ snippet “CircularError” not found**
+> **⚠ snippet " CircularError " not found**
 
 To work around this, there are two options:
 
 1. Type the return value of the handler function explicitly:
-   > **⚠ snippet “CircularErrorFixedReturn” not found**
+   > **⚠ snippet " CircularErrorFixedReturn " not found**
 2. Type the the result of the `ctx.runQuery` or `ctx.runMutation` call
    explicitly:
-   > **⚠ snippet “CircularErrorFixedResults” not found**
+   > **⚠ snippet " CircularErrorFixedResults " not found**
 
 TypeScript will check that the type annotation matches what the called query or
 mutation returns, so you don't lose any type safety.
@@ -127,7 +127,7 @@ By default, actions run in Convex's environment. This environment supports
 `fetch`, so actions that simply want to call a third-party API using `fetch` can
 be run in this environment:
 
-> **⚠ snippet “NPM, NPM” not found**
+> **⚠ snippet " NPM, NPM " not found**
 
 Actions running in Convex's environment are faster compared to Node.js, since
 they don't require extra time to start up before running your action (cold
@@ -140,7 +140,7 @@ run in Node.js by adding the `"use node"` directive at the top of the file. Note
 that other Convex functions cannot be defined in files with the `"use node";`
 directive.
 
-> **⚠ snippet “Node, Node” not found**
+> **⚠ snippet " Node, Node " not found**
 
 Learn more about the two [Convex Runtimes](/functions/runtimes.mdx).
 
@@ -166,7 +166,7 @@ To call an action from [React](/client/react.mdx) use the
 [`useAction`](/api/modules/react#useaction) hook along with the generated
 [`api`](/generated-api/api) object.
 
-> **⚠ snippet “Call, Call” not found**
+> **⚠ snippet " Call, Call " not found**
 
 Unlike
 [mutations](/functions/mutation-functions.mdx#calling-mutations-from-clients),
@@ -182,7 +182,7 @@ anti-pattern**. Instead, have the client call a
 writing into the database and then
 [schedules](/scheduling/scheduled-functions.mdx) an action:
 
-> **⚠ snippet “ScheduleFromMutation, ScheduleFromMutation” not found**
+> **⚠ snippet " ScheduleFromMutation, ScheduleFromMutation " not found**
 
 This way the mutation can enforce invariants, such as preventing the user from
 executing the same action twice.

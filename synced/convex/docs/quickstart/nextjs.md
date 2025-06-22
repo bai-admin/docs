@@ -95,7 +95,7 @@ version of this quickstart.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -115,7 +115,7 @@ version of this quickstart.
     declares an API function named after the file
     and the export name: `api.tasks.get`.
 
-    > **⚠ snippet “tasks, tasksJs” not found**
+    > **⚠ snippet " tasks, tasksJs " not found**
 
   </Step>
 
@@ -124,14 +124,14 @@ version of this quickstart.
 
     In the `app/` folder, add a new file <JSDialectFileName name="ConvexClientProvider.tsx" /> with the following code. This creates a client component that wraps `<ConvexProvider>` and passes it the `<ConvexReactClient>`.
 
-    > **⚠ snippet “ConvexClientProvider, ConvexClientProviderJs” not found**
+    > **⚠ snippet " ConvexClientProvider, ConvexClientProviderJs " not found**
 
   </Step>
 
   <Step title="Wire up the ConvexClientProvider">
     In <JSDialectFileName name="app/layout.tsx" ext="js" />, wrap the children of the `body` element with the `<ConvexClientProvider>`.
 
-    > **⚠ snippet “layout, layoutJs” not found**
+    > **⚠ snippet " layout, layoutJs " not found**
 
   </Step>
 
@@ -139,7 +139,7 @@ version of this quickstart.
     In <JSDialectFileName name="app/page.tsx" ext="js" />, use the `useQuery()` hook to fetch from your `api.tasks.get`
     API function.
 
-    > **⚠ snippet “page, pageJs” not found**
+    > **⚠ snippet " page, pageJs " not found**
 
   </Step>
 

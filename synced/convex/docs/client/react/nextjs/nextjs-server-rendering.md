@@ -43,13 +43,13 @@ In a
 [Server Component](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
 call `preloadQuery`:
 
-> **⚠ snippet “PreloadQuery, PreloadQuery” not found**
+> **⚠ snippet " PreloadQuery, PreloadQuery " not found**
 
 In a
 [Client Component](https://nextjs.org/docs/app/building-your-application/rendering/client-components)
 call [`usePreloadedQuery`](/api/modules/react#usepreloadedquery):
 
-> **⚠ snippet “UsePreloadedQueryTS, UsePreloadedQueryJS” not found**
+> **⚠ snippet " UsePreloadedQueryTS, UsePreloadedQueryJS " not found**
 
 [`preloadQuery`](/api/modules/nextjs#preloadquery) takes three arguments:
 
@@ -77,7 +77,7 @@ If you need Convex data on the server, you can load data from Convex in your
 but it will be non-reactive. To do this, use the
 [`fetchQuery`](/api/modules/nextjs#fetchquery) function from `convex/nextjs`:
 
-> **⚠ snippet “FetchQuery, FetchQuery” not found**
+> **⚠ snippet " FetchQuery, FetchQuery " not found**
 
 ## Server Actions and Route Handlers
 
@@ -93,11 +93,11 @@ the `fetchQuery`, `fetchMutation` and `fetchAction` functions.
 
 Here's an example inline Server Action calling a Convex mutation:
 
-> **⚠ snippet “ServerActionTS, ServerActionJS” not found**
+> **⚠ snippet " ServerActionTS, ServerActionJS " not found**
 
 Here's an example Route Handler calling a Convex mutation:
 
-> **⚠ snippet “RouteHandlerTS, RouteHandlerJS” not found**
+> **⚠ snippet " RouteHandlerTS, RouteHandlerJS " not found**
 
 ## Server-side authentication
 
@@ -105,7 +105,7 @@ To make authenticated requests to Convex during server rendering, pass a JWT
 token to [`preloadQuery`](/api/modules/nextjs#preloadquery) or
 [`fetchQuery`](/api/modules/nextjs#fetchquery) in the third options argument:
 
-> **⚠ snippet “AuthedPreloadQuery, AuthedPreloadQuery” not found**
+> **⚠ snippet " AuthedPreloadQuery, AuthedPreloadQuery " not found**
 
 The implementation of `getAuthToken` depends on your authentication provider.
 

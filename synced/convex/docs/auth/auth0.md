@@ -123,7 +123,7 @@ details see
 [Add Logout to your Application](https://auth0.com/docs/quickstart/spa/react/interactive#add-logout-to-your-application)
 in the Auth0 React Quickstart.
 
-> **⚠ snippet “LogoutButtonTSX, LogoutButtonTSX” not found**
+> **⚠ snippet " LogoutButtonTSX, LogoutButtonTSX " not found**
 
 ## Logged-in and logged-out views
 
@@ -240,7 +240,7 @@ you're using.
 
 Change the props to `Auth0Provider` to take in environment variables:
 
-> **⚠ snippet “ConfigEnvTS, ConfigEnvJS” not found**
+> **⚠ snippet " ConfigEnvTS, ConfigEnvJS " not found**
 
 **Development configuration**
 

@@ -56,7 +56,7 @@ npm i @convex-dev/react-query
 
 wire up Convex to TanStack Query like this:
 
-> **⚠ snippet “Setup” not found**
+> **⚠ snippet " Setup " not found**
 
 Note that when your create your React tree you should both:
 

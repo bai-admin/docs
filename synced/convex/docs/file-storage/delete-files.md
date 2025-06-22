@@ -16,4 +16,4 @@ Storage IDs correspond to documents in the `"_storage"` system table (see
 [Metadata](/file-storage/file-metadata.mdx)), so they can be validated using the
 `v.id("_storage")`.
 
-> **⚠ snippet “DeleteImage, DeleteImage” not found**
+> **⚠ snippet " DeleteImage, DeleteImage " not found**

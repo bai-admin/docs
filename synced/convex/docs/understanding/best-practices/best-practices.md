@@ -46,7 +46,7 @@ for an overview of how to define indexes and how they work.
 
 ### Examples
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -88,15 +88,15 @@ denormalizing data, or changing the product feature.
 
 **Using an index:**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 **Using pagination:**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 **Using a limit or denormalizing:**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -122,7 +122,7 @@ Indexes like `by_foo` and `by_foo_and_bar` are usually redundant (you only need
 `by_foo_and_bar`). Reducing the number of indexes saves on database storage and
 reduces the overhead of writing to the table.
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -152,7 +152,7 @@ validators) help ensure you're getting the traffic you expect.
 
 ### Example
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -185,7 +185,7 @@ control checks.
 
 ### Example
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -232,7 +232,7 @@ your Convex functions directory.
 
 ### Examples
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ## Use helper functions to write shared code
 
@@ -259,19 +259,19 @@ discussed more in the
 [Avoid sequential `ctx.runMutation` / `ctx.runQuery` from actions](/understanding/best-practices/best-practices.mdx#avoid-sequential-ctxrunmutation--ctxrunquery-calls-from-actions)
 section.
 
-> **⚠ snippet “HelperFunctionsTS, HelperFunctionsTS” not found**
+> **⚠ snippet " HelperFunctionsTS, HelperFunctionsTS " not found**
 
-> **⚠ snippet “HelperFunctionsTS, HelperFunctionsTS” not found**
+> **⚠ snippet " HelperFunctionsTS, HelperFunctionsTS " not found**
 
 **✅** Most of the code here is now in the `convex/model` directory. The API for
 this application is in `convex/conversations.ts`, which contains very little
 code itself.
 
-> **⚠ snippet “HelperFunctionsTS, HelperFunctionsTS” not found**
+> **⚠ snippet " HelperFunctionsTS, HelperFunctionsTS " not found**
 
-> **⚠ snippet “HelperFunctionsTS, HelperFunctionsTS” not found**
+> **⚠ snippet " HelperFunctionsTS, HelperFunctionsTS " not found**
 
-> **⚠ snippet “HelperFunctionsTS, HelperFunctionsTS” not found**
+> **⚠ snippet " HelperFunctionsTS, HelperFunctionsTS " not found**
 
 ## Use `runAction` only when using a different runtime
 
@@ -287,11 +287,11 @@ then you can use `runAction` to call the Node.js code.
 
 ### Example
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### How?
 
@@ -318,15 +318,15 @@ code to use helper functions will make this easier.
 
 ### Example: Queries
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### Example: Loops
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**
 
 ### Exceptions
 
@@ -360,4 +360,4 @@ TypeScript function.
 - If you want partial rollback on an error, you will want `ctx.runMutation`
   instead of a plain TypeScript function.
 
-> **⚠ snippet “BestPracticesTS, BestPracticesTS” not found**
+> **⚠ snippet " BestPracticesTS, BestPracticesTS " not found**

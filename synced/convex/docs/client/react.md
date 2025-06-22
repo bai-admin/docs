@@ -129,12 +129,12 @@ See
 With React it can be tricky to dynamically invoke a hook, because hooks cannot
 be placed inside conditionals or after early returns:
 
-> **⚠ snippet “SkipBad, SkipBad” not found**
+> **⚠ snippet " SkipBad, SkipBad " not found**
 
 For this reason `useQuery` can be "disabled" by passing in `"skip"` instead of
 its arguments:
 
-> **⚠ snippet “SkipGood, SkipGood” not found**
+> **⚠ snippet " SkipGood, SkipGood " not found**
 
 When `"skip"` is used the `useQuery` doesn't talk to your backend at all and
 returns `undefined`.

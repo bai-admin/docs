@@ -17,7 +17,7 @@ Saturday.
 Cron jobs are defined in a `crons.ts` file in your `convex/` directory and look
 like:
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 The first argument is a unique identifier for the cron job.
 

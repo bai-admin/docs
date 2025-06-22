@@ -118,7 +118,7 @@ follow the [Convex React Quickstart](/quickstart/react.mdx) first. Then:
 
     Then, wrap it with `<ClerkProvider>`. `<ClerkProvider>` requires a `publishableKey` prop, which you can set to the `VITE_CLERK_PUBLISHABLE_KEY` environment variable.
 
-    > **⚠ snippet “ConfigTS, ConfigJS” not found**
+    > **⚠ snippet " ConfigTS, ConfigJS " not found**
 
   </Step>
 

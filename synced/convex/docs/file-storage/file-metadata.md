@@ -12,7 +12,7 @@ File metadata of a file can be accessed from
 [mutations](/functions/mutation-functions.mdx) via `db.system.get` and
 `db.system.query`:
 
-> **⚠ snippet “FileMetadata, FileMetadata” not found**
+> **⚠ snippet " FileMetadata, FileMetadata " not found**
 
 This is an example of the returned document:
 
@@ -43,7 +43,7 @@ function is available to access individual file metadata from
 [actions](/functions/actions.mdx) and
 [HTTP actions](/functions/http-actions.mdx):
 
-> **⚠ snippet “FileMetadataDeprecated, FileMetadataDeprecated” not found**
+> **⚠ snippet " FileMetadataDeprecated, FileMetadataDeprecated " not found**
 
 Note that
 [`storage.getMetadata()`](/api/interfaces/server.StorageReader#getmetadata)

@@ -60,7 +60,7 @@ quickstart.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -83,7 +83,7 @@ quickstart.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasksJs” not found**
+    > **⚠ snippet " tasksJs " not found**
 
   </Step>
 
@@ -91,7 +91,7 @@ quickstart.
     In `pages/_app.js`, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your app.
 
-    > **⚠ snippet “app” not found**
+    > **⚠ snippet " app " not found**
 
   </Step>
 
@@ -99,7 +99,7 @@ quickstart.
     In `pages/index.js`, use the `useQuery` hook to fetch from your `api.tasks.get`
     API function.
 
-    > **⚠ snippet “index” not found**
+    > **⚠ snippet " index " not found**
 
   </Step>
 

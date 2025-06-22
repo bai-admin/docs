@@ -45,11 +45,11 @@ snippets include three different files:
 - `src/App.tsx` - frontend code in a separate repository where `api.ts` is
   checked in
 
-> **⚠ snippet “Functions, Functions” not found**
+> **⚠ snippet " Functions, Functions " not found**
 
-> **⚠ snippet “API, API” not found**
+> **⚠ snippet " API, API " not found**
 
-> **⚠ snippet “Frontend, Frontend” not found**
+> **⚠ snippet " Frontend, Frontend " not found**
 
 ## Limits
 

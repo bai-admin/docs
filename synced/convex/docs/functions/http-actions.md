@@ -32,7 +32,7 @@ HTTP action handlers are defined using the
 [`httpAction`](/generated-api/server#httpaction) constructor, similar to the
 `action` constructor for normal actions:
 
-> **⚠ snippet “Constructor, Constructor” not found**
+> **⚠ snippet " Constructor, Constructor " not found**
 
 The first argument to the `handler` is an
 [`ActionCtx`](/api/interfaces/server.GenericActionCtx) object, which provides
@@ -48,7 +48,7 @@ incoming Request is left entirely to you.
 
 Here's an example:
 
-> **⚠ snippet “httpFunction, httpFunction” not found**
+> **⚠ snippet " httpFunction, httpFunction " not found**
 
 <>
   {/* Wrapped in fragment because Prettier pushes the JSDialectFileName on new line */}
@@ -59,7 +59,7 @@ Here's an example:
   `route` method:
 </>
 
-> **⚠ snippet “http, http” not found**
+> **⚠ snippet " http, http " not found**
 
 You can now call this action via HTTP and interact with data stored in the
 Convex Database. HTTP actions are exposed on
@@ -168,11 +168,11 @@ on the use case. [This site](https://httptoolkit.com/will-it-cors/) provides an
 interactive walkthrough for what CORS headers to add. Here's an example of
 adding CORS headers to a Convex HTTP action:
 
-> **⚠ snippet “httpStorage, httpStorage” not found**
+> **⚠ snippet " httpStorage, httpStorage " not found**
 
 Here's an example of handling a pre-flight `OPTIONS` request:
 
-> **⚠ snippet “httpStorage, httpStorage” not found**
+> **⚠ snippet " httpStorage, httpStorage " not found**
 
 ### Authentication
 
@@ -181,4 +181,4 @@ access a user identity from
 [`ctx.auth.getUserIdentity()`](/api/interfaces/server.Auth#getuseridentity). To
 do this call your endpoint with an `Authorization` header including a JWT token:
 
-> **⚠ snippet “Fetch, Fetch” not found**
+> **⚠ snippet " Fetch, Fetch " not found**

@@ -51,7 +51,7 @@ Learn how to query data from Convex from script tags in HTML.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -74,7 +74,7 @@ Learn how to query data from Convex from script tags in HTML.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -93,7 +93,7 @@ Learn how to query data from Convex from script tags in HTML.
     Open this file in a web browser and you'll see it run each time the `tasks`
     table is modified.
 
-    > **⚠ snippet “html” not found**
+    > **⚠ snippet " html " not found**
 
   </Step>
 

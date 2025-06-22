@@ -42,7 +42,7 @@ Convex provides an error subclass,
 [`ConvexError`](/api/classes/values.ConvexError), which can be used to carry
 information from the backend to the client:
 
-> **⚠ snippet “Server, Server” not found**
+> **⚠ snippet " Server, Server " not found**
 
 ### Application error `data` payload
 
@@ -77,4 +77,4 @@ client.
 On the client, application errors also use the `ConvexError` class, and the data
 they carry can be accessed via the `data` property:
 
-> **⚠ snippet “ClientTS, ClientJS” not found**
+> **⚠ snippet " ClientTS, ClientJS " not found**

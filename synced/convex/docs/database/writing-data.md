@@ -17,7 +17,7 @@ data from database tables.
 You can create new documents in the database with the
 [`db.insert`](/api/interfaces/server.GenericDatabaseWriter#insert) method:
 
-> **⚠ snippet “insertExample, insertExample” not found**
+> **⚠ snippet " insertExample, insertExample " not found**
 
 The second argument to `db.insert` is a JavaScript object with data for the new
 document.
@@ -40,20 +40,20 @@ methods:
    document. New fields are added. Existing fields are overwritten. Fields set
    to `undefined` are removed.
 
-> **⚠ snippet “patchExample, patchExample” not found**
+> **⚠ snippet " patchExample, patchExample " not found**
 
 2. The [`db.replace`](/api/interfaces/server.GenericDatabaseWriter#replace)
    method will replace the existing document entirely, potentially removing
    existing fields:
 
-> **⚠ snippet “replaceExample, replaceExample” not found**
+> **⚠ snippet " replaceExample, replaceExample " not found**
 
 ## Deleting documents
 
 Given an existing document ID the document can be removed from the table with
 the [`db.delete`](/api/interfaces/server.GenericDatabaseWriter#delete) method.
 
-> **⚠ snippet “deleteExample, deleteExample” not found**
+> **⚠ snippet " deleteExample, deleteExample " not found**
 
 ## Bulk inserts or updates
 

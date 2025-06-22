@@ -44,7 +44,7 @@ Learn how to query data from Convex in a Svelte app.
     SvelteKit doesn't like referencing code outside of source, so customize
     the convex functionsDir to be under `src/`.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -67,14 +67,14 @@ Learn how to query data from Convex in a Svelte app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
   <Step title="Set up Convex">
     Create a new file `src/routes/+layout.svelte` and set up the Convex client there to make it available on every page of your app.
 
-    > **⚠ snippet “layout” not found**
+    > **⚠ snippet " layout " not found**
 
   </Step>
 
@@ -82,7 +82,7 @@ Learn how to query data from Convex in a Svelte app.
     In `src/routes/+page.svelte` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    > **⚠ snippet “page” not found**
+    > **⚠ snippet " page " not found**
 
   </Step>
 

@@ -33,7 +33,7 @@ logged in.
 If you're using Auth0, the helper component `ConvexProviderWithAuth0` can be
 imported from `convex/react-auth0`.
 
-> **⚠ snippet “simpleAuthedAppTSX” not found**
+> **⚠ snippet " simpleAuthedAppTSX " not found**
 
 Custom loading and logged out views can be built with the helper
 `Authenticated`, `Unauthenticated` and `AuthLoading` components from
@@ -62,7 +62,7 @@ file to the `pages/api` directory.
 To load and edit Convex data in your endpoints, use the
 [`fetchQuery`](/api/modules/nextjs#fetchquery) function from `convex/nextjs`:
 
-> **⚠ snippet “apiTS” not found**
+> **⚠ snippet " apiTS " not found**
 
 ## Server-side rendering
 

@@ -77,7 +77,7 @@ and<LanguageSelector verbose />
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -129,7 +129,7 @@ and<LanguageSelector verbose />
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasksTS, tasks” not found**
+    > **⚠ snippet " tasksTS, tasks " not found**
 
   </Step>
 
@@ -137,7 +137,7 @@ and<LanguageSelector verbose />
     In <JSDialectFileName name="src/main.jsx" />, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your app.
 
-    > **⚠ snippet “mainTS, main” not found**
+    > **⚠ snippet " mainTS, main " not found**
 
   </Step>
 
@@ -145,7 +145,7 @@ and<LanguageSelector verbose />
     In <JSDialectFileName name="src/App.jsx" />, use the `useQuery` hook to fetch from your `api.tasks.get`
     API function and display the data.
 
-    > **⚠ snippet “AppTS, App” not found**
+    > **⚠ snippet " AppTS, App " not found**
 
   </Step>
 

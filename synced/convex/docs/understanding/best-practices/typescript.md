@@ -31,11 +31,11 @@ Convex functions in TypeScript by using the `.ts` extension.
 If you are using [argument validation](/functions/validation.mdx), Convex will
 infer the types of your functions arguments automatically:
 
-> **⚠ snippet “ArgValidation” not found**
+> **⚠ snippet " ArgValidation " not found**
 
 Otherwise you can annotate the arguments type manually:
 
-> **⚠ snippet “WithoutArgValidation” not found**
+> **⚠ snippet " WithoutArgValidation " not found**
 
 This can be useful for [internal functions](/functions/internal-functions.mdx)
 accepting complicated types.
@@ -63,7 +63,7 @@ The types of documents in tables can be described using the
 references to documents can be described with parametrized
 [Document IDs](/database/document-ids.mdx).
 
-> **⚠ snippet “WithSchema” not found**
+> **⚠ snippet " WithSchema " not found**
 
 ## Type annotating server-side helpers
 
@@ -75,7 +75,7 @@ Convex generates types corresponding to documents and IDs in your database,
 `Doc` and `Id`, as well as `QueryCtx`, `MutationCtx` and `ActionCtx` types based
 on your schema and declared Convex functions:
 
-> **⚠ snippet “ContextTypes” not found**
+> **⚠ snippet " ContextTypes " not found**
 
 ### Inferring types from validators
 
@@ -85,7 +85,7 @@ Validators can be reused between
 [`Infer`](/api/modules/values#infer) type to get a TypeScript type corresponding
 to a validator:
 
-> **⚠ snippet “ValidatorTypes” not found**
+> **⚠ snippet " ValidatorTypes " not found**
 
 ### Document types without system fields
 
@@ -95,7 +95,7 @@ might want use the type without the system fields. Convex provides
 [`WithoutSystemFields`](/api/modules/server#withoutsystemfields) for this
 purpose:
 
-> **⚠ snippet “SystemFieldsTypes” not found**
+> **⚠ snippet " SystemFieldsTypes " not found**
 
 ## Writing frontend code in TypeScript
 
@@ -115,7 +115,7 @@ When you want to pass the result of calling a function around your client
 codebase, you can use the generated types `Doc` and `Id`, just like on the
 backend:
 
-> **⚠ snippet “ClientDatabaseTypes” not found**
+> **⚠ snippet " ClientDatabaseTypes " not found**
 
 You can also declare custom types inside your backend codebase which include
 `Doc`s and `Id`s, and import them in your client-side code.
@@ -130,7 +130,7 @@ backend function returns. Beside manually declaring the type (on the backend or
 on the frontend), you can use the generic `FunctionReturnType` and
 `UsePaginatedQueryReturnType` types with a function reference:
 
-> **⚠ snippet “FunctionReturnTypes” not found**
+> **⚠ snippet " FunctionReturnTypes " not found**
 
 ## Turning `string`s into valid document IDs
 

@@ -27,7 +27,7 @@ to queries in Node.js and any JavaScript environment that supports WebSockets.
 
 
 
-> **⚠ snippet “VanillaTS, VanillaJS” not found**
+> **⚠ snippet " VanillaTS, VanillaJS " not found**
 
 The Convex client is open source and available on
 [GitHub](https://github.com/get-convex/convex-js).
@@ -42,7 +42,7 @@ browser, Node.js, and any JavaScript environment with `fetch`.
 
 See the [Node.js Quickstart](/quickstart/nodejs.mdx).
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 ## Using Convex without generated `convex/_generated/api.js`
 
@@ -51,4 +51,4 @@ in the same monorepos you can use the untyped `api` object called `anyApi`.
 
 
 
-> **⚠ snippet “StringsTS, StringsJS” not found**
+> **⚠ snippet " StringsTS, StringsJS " not found**

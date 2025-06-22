@@ -33,7 +33,7 @@ React-based authentication guides for [Clerk](/auth/clerk.mdx) or
 [Auth0](/auth/auth0.mdx), inside your `app/ConvexClientProvider.tsx` file. For
 example this is what the file would look like for Auth0:
 
-> **⚠ snippet “Config, Config” not found**
+> **⚠ snippet " Config, Config " not found**
 
 Custom loading and logged out views can be built with the helper
 `Authenticated`, `Unauthenticated` and `AuthLoading` components from

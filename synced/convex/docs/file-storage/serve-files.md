@@ -75,7 +75,7 @@ export default function App() {
 
 File URLs can be used in `img` elements to render images:
 
-> **⚠ snippet “AppTS, AppJS” not found**
+> **⚠ snippet " AppTS, AppJS " not found**
 
 In your query you can control who gets access to a file when the URL is
 generated. If you need to control access when the file is _served_, you can
@@ -99,9 +99,9 @@ can be generated from a storage ID by the
 [`ActionCtx`](/api/interfaces/server.GenericActionCtx) object, which can be
 returned in a `Response`:
 
-> **⚠ snippet “Http, Http” not found**
+> **⚠ snippet " Http, Http " not found**
 
 The URL of such an action can be used directly in `img` elements to render
 images:
 
-> **⚠ snippet “HttpAppTS, HttpAppJS” not found**
+> **⚠ snippet " HttpAppTS, HttpAppJS " not found**

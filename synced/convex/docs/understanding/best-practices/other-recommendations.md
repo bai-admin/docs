@@ -79,9 +79,9 @@ instead of using `ctx.runAction` reduces function calls and resource usage.
 See the [TypeScript page](/understanding/best-practices/typescript.mdx) for
 useful types.
 
-> **⚠ snippet “Teams, TeamsJS” not found**
+> **⚠ snippet " Teams, TeamsJS " not found**
 
-> **⚠ snippet “UserHelpers, UserHelpersJS” not found**
+> **⚠ snippet " UserHelpers, UserHelpersJS " not found**
 
 ### Prefer queries and mutations over actions
 

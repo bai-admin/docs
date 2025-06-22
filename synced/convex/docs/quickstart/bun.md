@@ -54,7 +54,7 @@ For instructions for subscriptions instead of point-in-time queries see
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -77,7 +77,7 @@ For instructions for subscriptions instead of point-in-time queries see
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -85,7 +85,7 @@ For instructions for subscriptions instead of point-in-time queries see
     In a new file `index.ts`, create a `ConvexClient` using
     the URL of your development environment.
 
-    > **⚠ snippet “script” not found**
+    > **⚠ snippet " script " not found**
 
   </Step>
 

@@ -63,9 +63,9 @@ snippets include two different files:
   running the command
   `npx openapi-generator-cli generate -i convex-spec.yaml -g go -o convex_client`
 
-> **⚠ snippet “Load, Load” not found**
+> **⚠ snippet " Load, Load " not found**
 
-> **⚠ snippet “Go” not found**
+> **⚠ snippet " Go " not found**
 
 ## Limits
 

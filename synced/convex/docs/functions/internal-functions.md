@@ -42,7 +42,7 @@ Leverage internal functions by:
 An internal function is defined using `internalQuery`, `internalMutation`, or
 `internalAction`. For example:
 
-> **⚠ snippet “Definition, Definition” not found**
+> **⚠ snippet " Definition, Definition " not found**
 
 If you need to pass complicated objects to internal functions you might prefer
 to not use argument validation. Note though that if you're using `internalQuery`
@@ -52,7 +52,7 @@ of the database.
 
 <Details summary="Internal function without argument validation">
 
-> **⚠ snippet “DefinitionWithoutValidationTS, DefinitionWithoutValidationJS” not found**
+> **⚠ snippet " DefinitionWithoutValidationTS, DefinitionWithoutValidationJS " not found**
 
 </Details>
 
@@ -64,7 +64,7 @@ mutation using the [`internal`](/generated-api/api#internal) object.
 For example, consider this public `upgrade` action that calls the internal
 `plans.markPlanAsProfessional` mutation we defined above:
 
-> **⚠ snippet “Call, Call” not found**
+> **⚠ snippet " Call, Call " not found**
 
 In this example a user should not be able to directly call
 `internal.plans.markPlanAsProfessional` without going through the `upgrade`

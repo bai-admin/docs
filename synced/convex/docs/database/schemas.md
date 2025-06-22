@@ -32,7 +32,7 @@ then adding a schema once you've solidified your plan. To learn more see our
 Schemas are defined in a `schema.ts` file in your `convex/` directory and look
 like:
 
-> **⚠ snippet “SchemaTS” not found**
+> **⚠ snippet " SchemaTS " not found**
 
 This schema (which is based on our
 [users and auth example](https://github.com/get-convex/convex-demos/tree/main/users-and-auth)),
@@ -330,7 +330,7 @@ export default defineSchema({
 This way you can create a preferences document first, then create a user
 document, then set the reference on the preferences document:
 
-> **⚠ snippet “circularExample, circularExample” not found**
+> **⚠ snippet " circularExample, circularExample " not found**
 
 [Let us know](/production/contact.md) if you need better support for circular
 references.

@@ -21,7 +21,7 @@ application.
 This is an example mutation, taking in named arguments, writing data to the
 database and returning a result:
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 Read on to understand how to build mutations yourself.
 
@@ -37,7 +37,7 @@ Queries and mutations can be defined in the same file when using named exports.
 To declare a mutation in Convex use the `mutation` constructor function. Pass it
 an object with a `handler` function, which performs the mutation:
 
-> **⚠ snippet “Constructor, Constructor” not found**
+> **⚠ snippet " Constructor, Constructor " not found**
 
 Unlike a query, a mutation can but does not have to return a value.
 
@@ -46,7 +46,7 @@ Unlike a query, a mutation can but does not have to return a value.
 Just like queries, mutations accept named arguments, and the argument values are
 accessible as fields of the second parameter of the `handler` function:
 
-> **⚠ snippet “ArgsWithoutValidationTS, ArgsWithoutValidationJS” not found**
+> **⚠ snippet " ArgsWithoutValidationTS, ArgsWithoutValidationJS " not found**
 
 Arguments and responses are automatically serialized and deserialized, and you
 can pass and return most value-like JavaScript data to and from your mutation.
@@ -54,7 +54,7 @@ can pass and return most value-like JavaScript data to and from your mutation.
 To both declare the types of arguments and to validate them, add an `args`
 object using `v` validators:
 
-> **⚠ snippet “ArgsWithValidation, ArgsWithValidation” not found**
+> **⚠ snippet " ArgsWithValidation, ArgsWithValidation " not found**
 
 See [argument validation](/functions/validation.mdx) for the full list of
 supported types and validators.
@@ -77,7 +77,7 @@ The `mutation` constructor enables writing data to the database, and other
 Convex features by passing a [MutationCtx](/generated-api/server.md#mutationctx)
 object to the handler function as the first parameter:
 
-> **⚠ snippet “Context, Context” not found**
+> **⚠ snippet " Context, Context " not found**
 
 Which part of the mutation context is used depends on what your mutation needs
 to do:
@@ -86,7 +86,7 @@ to do:
   the handler function an `async` function so we can `await` the promise
   returned by `db.insert()`:
 
-  > **⚠ snippet “ContextDB, ContextDB” not found**
+  > **⚠ snippet " ContextDB, ContextDB " not found**
 
   Read on about [Writing Data](/database/writing-data.mdx).
 
@@ -106,7 +106,7 @@ to do:
   <LanguageSelector verbose /> functions:
 </>
 
-> **⚠ snippet “Helper, HelperJS” not found**
+> **⚠ snippet " Helper, HelperJS " not found**
 
 Mutations can call helpers that take a
 [QueryCtx](/generated-api/server.md#queryctx) as argument, since the mutation
@@ -129,7 +129,7 @@ packages are supported, see
 npm install @faker-js/faker
 ```
 
-> **⚠ snippet “NPM, NPM” not found**
+> **⚠ snippet " NPM, NPM " not found**
 
 ## Calling mutations from clients
 
@@ -137,7 +137,7 @@ To call a mutation from [React](/client/react.mdx) use the
 [`useMutation`](/client/react.mdx#editing-data) hook along with the generated
 [`api`](/generated-api/api) object.
 
-> **⚠ snippet “Call, Call” not found**
+> **⚠ snippet " Call, Call " not found**
 
 See the [React](/client/react.mdx) client documentation for all the ways queries
 can be called.

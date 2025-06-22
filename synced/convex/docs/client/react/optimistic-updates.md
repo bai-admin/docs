@@ -27,7 +27,7 @@ query results change, and rolled back when a mutation completes.
 Here is how an optimistic update could be added to an `increment` mutation in a
 simple counter app:
 
-> **⚠ snippet “Simple, Simple” not found**
+> **⚠ snippet " Simple, Simple " not found**
 
 Optimistic updates receive a
 [`localStore`](/api/interfaces/browser.OptimisticLocalStore), a view of the
@@ -41,7 +41,7 @@ higher if it's loaded.
 If we want to add an optimistic update to a multi-channel chat app, that might
 look like:
 
-> **⚠ snippet “ComplexTS, ComplexJS” not found**
+> **⚠ snippet " ComplexTS, ComplexJS " not found**
 
 This optimistic update changes the `api.messages.list` query for the current
 channel to include a new message. The newly created message object should match

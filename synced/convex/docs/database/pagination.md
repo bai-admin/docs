@@ -237,12 +237,12 @@ The hook returns an object with:
 - `loadMore(n)`: A callback to fetch more results. This will only fetch more
   results if the status is `"CanLoadMore"`.
 
-> **⚠ snippet “SimpleCall, SimpleCall” not found**
+> **⚠ snippet " SimpleCall, SimpleCall " not found**
 
 You can also pass additional arguments in the arguments object if your function
 expects them:
 
-> **⚠ snippet “CallWithArgs, CallWithArgs” not found**
+> **⚠ snippet " CallWithArgs, CallWithArgs " not found**
 
 ### Reactivity
 
@@ -260,4 +260,4 @@ its initial size.
 If you're paginating outside of React, you can manually call your paginated
 function multiple times to collect the items:
 
-> **⚠ snippet “Download, Download” not found**
+> **⚠ snippet " Download, Download " not found**

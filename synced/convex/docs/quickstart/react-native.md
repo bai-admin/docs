@@ -53,7 +53,7 @@ Learn how to query data from Convex in a React Native app.
     Create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -75,7 +75,7 @@ Learn how to query data from Convex in a React Native app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -93,7 +93,7 @@ Learn how to query data from Convex in a React Native app.
     In `_layout.tsx`, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your component tree.
 
-    > **⚠ snippet “layout” not found**
+    > **⚠ snippet " layout " not found**
 
   </Step>
 
@@ -101,7 +101,7 @@ Learn how to query data from Convex in a React Native app.
     In `index.tsx` use the `useQuery` hook to fetch
     from your `api.tasks.get` API.
 
-    > **⚠ snippet “index” not found**
+    > **⚠ snippet " index " not found**
 
   </Step>
 

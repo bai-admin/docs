@@ -61,7 +61,7 @@ for Convex.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -84,14 +84,14 @@ for Convex.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
   <Step title="Wire up the ConvexProvider">
     In `src/main.ts` set up the Convex client there to make it available on every page of your app.
 
-    > **⚠ snippet “main” not found**
+    > **⚠ snippet " main " not found**
 
   </Step>
 
@@ -99,7 +99,7 @@ for Convex.
     In `src/App.vue` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    > **⚠ snippet “App” not found**
+    > **⚠ snippet " App " not found**
 
   </Step>
 

@@ -35,4 +35,4 @@ Storage IDs correspond to documents in the `"_storage"` system table (see
 [Metadata](/file-storage/file-metadata.mdx)), so they can be validated using the
 `v.id("_storage")` validator and typed as `Id<"_storage">` in TypeScript.
 
-> **⚠ snippet “StoreImageTS, StoreImageJS” not found**
+> **⚠ snippet " StoreImageTS, StoreImageJS " not found**

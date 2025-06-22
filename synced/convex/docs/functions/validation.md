@@ -29,7 +29,7 @@ To add argument validation to your functions, pass an object with `args` and
 `handler` properties to the `query`, `mutation` or `action` constructor. To add
 return value validation, use the `returns` property in this object:
 
-> **⚠ snippet “messagesTS, messagesTS” not found**
+> **⚠ snippet " messagesTS, messagesTS " not found**
 
 If you define your function with an argument validator, there is no need to
 include [TypeScript](/understanding/best-practices/typescript.mdx) type

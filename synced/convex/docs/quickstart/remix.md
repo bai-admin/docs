@@ -54,7 +54,7 @@ Learn how to query data from Convex in a Remix app.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -77,14 +77,14 @@ Learn how to query data from Convex in a Remix app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
   <Step title="Wire up the ConvexProvider">
     Modify `app/root.tsx` to set up the Convex client there to make it available on every page of your app.
 
-    > **⚠ snippet “root” not found**
+    > **⚠ snippet " root " not found**
 
   </Step>
 
@@ -92,7 +92,7 @@ Learn how to query data from Convex in a Remix app.
     In `app/routes/_index.tsx` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    > **⚠ snippet “index” not found**
+    > **⚠ snippet " index " not found**
 
   </Step>
 

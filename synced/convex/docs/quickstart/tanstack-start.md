@@ -76,7 +76,7 @@ TanStack Start app in it.
   <Step title="Update app/routes/__root.tsx">
     Add a `QueryClient` to the router context to make React Query usable anywhere in the TanStack Start site.
 
-    > **⚠ snippet “appRoutesRoot” not found**
+    > **⚠ snippet " appRoutesRoot " not found**
 
   </Step>
 
@@ -141,7 +141,7 @@ export default http;
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -164,7 +164,7 @@ export default http;
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -174,7 +174,7 @@ export default http;
     The `useSuspenseQuery` hook renders the API function `api.tasks.get`
     query result on the server initially, then it updates live in the browser.
 
-    > **⚠ snippet “index” not found**
+    > **⚠ snippet " index " not found**
 
   </Step>
 

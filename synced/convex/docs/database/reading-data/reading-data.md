@@ -18,7 +18,7 @@ database tables using _document ids_ and _document queries_.
 Given a single document's id you can read its data with the
 [`db.get`](/api/interfaces/server.GenericDatabaseReader#get) method:
 
-> **⚠ snippet “getExample, getExample” not found**
+> **⚠ snippet " getExample, getExample " not found**
 
 **Note**: You should use the `v.id` validator like in the example above to make
 sure you are not exposing data from tables other than the ones you intended.
@@ -28,7 +28,7 @@ sure you are not exposing data from tables other than the ones you intended.
 Document queries always begin by choosing the table to query with the
 [`db.query`](/api/interfaces/server.GenericDatabaseReader#query) method:
 
-> **⚠ snippet “queryExample, queryExample” not found**
+> **⚠ snippet " queryExample, queryExample " not found**
 
 Then you can:
 
@@ -223,13 +223,13 @@ the results will be consistent.
 
 Table join might look like:
 
-> **⚠ snippet “joinExample, joinExample” not found**
+> **⚠ snippet " joinExample, joinExample " not found**
 
 ### Aggregation
 
 Here's an example of computing an average:
 
-> **⚠ snippet “averageExample, averageExample” not found**
+> **⚠ snippet " averageExample, averageExample " not found**
 
 > If you need more scalable aggregate options (for example to handle frequent
 > updates or large tables), consider using the
@@ -242,7 +242,7 @@ Here's an example of computing an average:
 
 Here's an example of grouping and counting:
 
-> **⚠ snippet “groupByExampleTS, groupByExampleJS” not found**
+> **⚠ snippet " groupByExampleTS, groupByExampleJS " not found**
 
 ## Explore the syntax on the dashboard
 

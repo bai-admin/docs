@@ -55,7 +55,7 @@ Learn how to query data from Convex in a Rust app with Tokio.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet “sampleData” not found**
+    > **⚠ snippet " sampleData " not found**
 
   </Step>
 
@@ -78,7 +78,7 @@ Learn how to query data from Convex in a Rust app with Tokio.
     declares an API function named after the file
     and the export name, `"tasks:get"`.
 
-    > **⚠ snippet “tasks” not found**
+    > **⚠ snippet " tasks " not found**
 
   </Step>
 
@@ -86,7 +86,7 @@ Learn how to query data from Convex in a Rust app with Tokio.
     In the file `src/main.rs`, create a `ConvexClient` and use it
     to fetch from your `"tasks:get"` API.
     
-    > **⚠ snippet “main” not found**
+    > **⚠ snippet " main " not found**
 
   </Step>
 

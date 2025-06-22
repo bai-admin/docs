@@ -31,7 +31,7 @@ The rest of the arguments are the path to the function and its arguments,
 similar to invoking a function from the client. For example, here is how to send
 a message that self-destructs in five seconds.
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 A single function can schedule up to 1000 functions with total argument size of
 8MB.
@@ -74,7 +74,7 @@ of scheduled function. You can read data from system tables using the
 `db.system.get` and `db.system.query` methods, which work the same as the
 standard `db.get` and `db.query` methods.
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 This is an example of the returned document:
 
@@ -119,7 +119,7 @@ You can cancel a previously scheduled function with
 [scheduler](/api/interfaces/server.Scheduler) provided in the respective
 function context.
 
-> **⚠ snippet “Example, Example” not found**
+> **⚠ snippet " Example, Example " not found**
 
 What `cancel` does depends on the state of the scheduled function:
 
