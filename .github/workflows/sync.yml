@@ -211,10 +211,10 @@ jobs:
 
       - name: Commit & push
         run: |
-          if ! git diff --quiet; then
-            git add -A
+          git add -A
+          if ! git diff --staged --quiet; then
             git commit -m "chore: auto-sync external sources"
             git push
           else
-            echo "No changes."
+            echo "No changes to commit."
           fi
