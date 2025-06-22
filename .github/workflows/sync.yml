@@ -67,9 +67,17 @@ jobs:
         run: |
           set -euo pipefail
           
+          # Debug: Show what environment variables are set
+          echo "::group::Environment Variables Debug"
+          echo "SRC_DIR='$SRC_DIR'"
+          echo "SCRIPT_IN_DIR='$SCRIPT_IN_DIR'"
+          echo "SCRIPT_OUT_DIR='$SCRIPT_OUT_DIR'"
+          echo "PREPROCESS_SCRIPT_CMD='$PREPROCESS_SCRIPT_CMD'"
+          echo "::endgroup::"
+          
           # Guard against missing configuration
           if [[ -z "$SRC_DIR" && -z "$SCRIPT_IN_DIR" ]]; then
-            echo "::error::No srcDir or script dirs specified"
+            echo "::error::No srcDir or script dirs specified. SRC_DIR='$SRC_DIR', SCRIPT_IN_DIR='$SCRIPT_IN_DIR'"
             exit 1
           fi
           

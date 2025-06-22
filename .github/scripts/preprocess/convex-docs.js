@@ -5,7 +5,7 @@
  * derives paths from SYNC_INPUT_DIR (exported by the workflow).
  */
 import { readFile, writeFile, rename } from "node:fs/promises";
-import { readFileSync as readSync } from "node:fs";
+import { readFileSync as readSync, existsSync, statSync } from "node:fs";
 import { globby } from "globby";
 import * as path from "node:path";
 const { resolve: r, dirname } = path;
@@ -29,7 +29,7 @@ const EXT_TO_LANG = { tsx:"tsx", ts:"ts", jsx:"jsx", js:"js",
                       jsonl:"json", json:"json", sh:"bash" };
 const langOf = (ext) => EXT_TO_LANG[ext] ?? ext ?? "text";
 const fence  = ({code,lang}) => `\n\`\`\`${lang}\n${code}\n\`\`\`\n`;
-const warn   = (id)          => `> **⚠ snippet “${id}” not found**`;
+const warn   = (id)          => `> **⚠ snippet "${id}" not found**`;
 
 // ───────────────────────── 1. harvest @snippet blocks ───────────────────────
 const BLOCK_SNIPPETS = {};                        // { name ➜ {code,lang} }
@@ -63,6 +63,18 @@ for (const mdxFile of await globby(`${DOCS_DIR}/**/*.mdx`)) {
                            : cleaned.startsWith("./")
                            ? r(dirname(mdxFile), cleaned)
                            : r(ROOT, cleaned);
+      
+      // Check if the path exists and is a file
+      if (!existsSync(absPath)) {
+        console.warn(`Warning: Import path does not exist: ${absPath} (from ${rawPath} in ${mdxFile})`);
+        return ""; // remove the import line but don't add to snippets
+      }
+      
+      if (!statSync(absPath).isFile()) {
+        console.warn(`Warning: Import path is not a file: ${absPath} (from ${rawPath} in ${mdxFile})`);
+        return ""; // remove the import line but don't add to snippets
+      }
+      
       const code         = readSync(absPath, "utf8").trimEnd();
       const lang         = langOf(path.extname(absPath).slice(1));
       IMPORT_SNIPPETS[ident] = { code, lang };
