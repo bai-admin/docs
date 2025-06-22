@@ -111,8 +111,15 @@ jobs:
 
           # ---------- COPY-ONLY MODE ----------------------------------------
           if [[ -n "$SRC_DIR" ]]; then
-            mkdir -p "$DEST_DIR"
-            rsync -a --delete "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+            # Check if this is an initial sync (destination doesn't exist or is empty)
+            if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
+              echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
+              mkdir -p "$DEST_DIR"
+              rsync -a "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+            else
+              # Regular sync with --delete for existing directories
+              rsync -a --delete "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
+            fi
 
           # ---------- PRE-PROCESS MODE --------------------------------------
           else
@@ -136,8 +143,16 @@ jobs:
               echo "::error::Expected output '$SYNC_OUTPUT_DIR' not found"
               exit 1
             fi
-            mkdir -p "$DEST_DIR"
-            rsync -a --delete "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+            
+            # Check if this is an initial sync (destination doesn't exist or is empty)
+            if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
+              echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
+              mkdir -p "$DEST_DIR"
+              rsync -a "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+            else
+              # Regular sync with --delete for existing directories
+              rsync -a --delete "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
+            fi
             rm -rf "$WORKDIR"
           fi
 
