@@ -1,6 +1,7 @@
 ---
 title: HTTP Actions
 sidebar_position: 35
+description: "Build HTTP APIs directly in Convex"
 ---
 
 

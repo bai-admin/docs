@@ -1,6 +1,7 @@
 ---
 title: "Application Errors"
 sidebar_label: "Application Errors"
+description: "Handle expected failures in Convex functions"
 ---
 
 

@@ -2,6 +2,7 @@
 title: "Deleting Files"
 sidebar_label: "Delete"
 sidebar_position: 4
+description: "Delete files stored in Convex"
 ---
 
 

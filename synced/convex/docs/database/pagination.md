@@ -2,7 +2,7 @@
 title: "Paginated Queries"
 slug: "pagination"
 sidebar_position: 60
-description: "Load paginated queries."
+description: "Load paginated queries"
 ---
 
 

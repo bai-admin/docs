@@ -1,6 +1,7 @@
 ---
 title: Scheduled Functions
 sidebar_position: 1
+description: "Schedule functions to run in the future"
 ---
 
 

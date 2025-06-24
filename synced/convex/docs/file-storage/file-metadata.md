@@ -2,6 +2,7 @@
 title: "Accessing File Metadata"
 sidebar_label: "Metadata"
 sidebar_position: 5
+description: "Access file metadata stored in Convex"
 ---
 
 

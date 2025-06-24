@@ -2,6 +2,7 @@
 title: "Storing Generated Files"
 sidebar_label: "Store"
 sidebar_position: 2
+description: "Store files generated in Convex actions"
 ---
 
 

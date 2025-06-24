@@ -1,6 +1,7 @@
 ---
 title: Mutations
 sidebar_position: 20
+description: "Insert, update, and remove data from the database"
 ---
 
 

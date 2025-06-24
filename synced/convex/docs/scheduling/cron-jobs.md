@@ -1,6 +1,7 @@
 ---
 title: "Cron Jobs"
 sidebar_position: 2
+description: "Schedule recurring functions in Convex"
 ---
 
 

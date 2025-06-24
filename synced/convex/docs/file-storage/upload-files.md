@@ -2,6 +2,7 @@
 title: "Uploading and Storing Files"
 sidebar_label: "Upload"
 sidebar_position: 1
+description: "Upload files to Convex storage"
 ---
 
 

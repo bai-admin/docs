@@ -2,6 +2,7 @@
 title: "Convex & Clerk"
 sidebar_label: "Clerk"
 sidebar_position: 10
+description: "Integrate Clerk authentication with Convex"
 ---
 
 

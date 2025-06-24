@@ -1,7 +1,7 @@
 ---
 title: "Document IDs"
 sidebar_position: 10
-description: "Create complex, relational data models using IDs."
+description: "Create complex, relational data models using IDs"
 ---
 
 

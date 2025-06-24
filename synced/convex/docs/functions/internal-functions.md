@@ -1,6 +1,7 @@
 ---
 title: Internal Functions
 sidebar_position: 40
+description: "Functions that can only be called by other Convex functions"
 ---
 
 

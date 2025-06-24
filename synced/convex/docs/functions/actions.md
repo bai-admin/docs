@@ -1,6 +1,7 @@
 ---
 title: Actions
 sidebar_position: 30
+description: "Call third-party services and external APIs from Convex"
 ---
 
 

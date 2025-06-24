@@ -2,6 +2,7 @@
 title: "Serving Files"
 sidebar_label: "Serve"
 sidebar_position: 3
+description: "Serve files stored in Convex to users"
 ---
 
 

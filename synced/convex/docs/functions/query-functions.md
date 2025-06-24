@@ -1,6 +1,7 @@
 ---
 title: Queries
 sidebar_position: 10
+description: "Fetch data from the database with caching and reactivity"
 ---
 
 

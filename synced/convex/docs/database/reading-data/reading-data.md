@@ -1,6 +1,7 @@
 ---
 title: "Reading Data"
 sidebar_position: 3
+description: "Query and read data from Convex database tables"
 ---
 
 
