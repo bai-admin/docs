@@ -51,8 +51,8 @@ Learn how to query data from Convex in a Remix app.
   </Step>
 
   <Step title="Create sample data for your database">
-    In a new terminal window, create a `sampleData.jsonl`
-    file with some sample data.
+    Create a `sampleData.jsonl` file at the root of you app
+    and fill it with the sample data given.
 
     > **⚠ snippet " sampleData " not found**
 
@@ -60,8 +60,8 @@ Learn how to query data from Convex in a Remix app.
 
   <Step title="Add the sample data to your database">
     Now that your project is ready, add a `tasks` table
-    with the sample data into your Convex database with
-    the `import` command.
+    with the sample data you just created in `sampleData.jsonl`
+    into your Convex database with the `import` command.
 
     ```
     npx convex import --table tasks sampleData.jsonl
