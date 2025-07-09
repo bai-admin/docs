@@ -9,7 +9,6 @@ import {
   vi,
 } from "vitest";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel.js";
 import { kickMainLoop } from "./kick.js";
 import { DEFAULT_LOG_LEVEL } from "./logging.js";
 import schema from "./schema.js";
@@ -276,13 +275,18 @@ describe("kickMainLoop", () => {
       const runStatus = await ctx.db.query("runStatus").unique();
       assert(runStatus);
       const segment = getNextSegment() + 10n;
+      const scheduledId = await ctx.scheduler.runAfter(
+        10_000,
+        internal.loop.main,
+        { generation: 0n, segment }
+      );
       await ctx.db.patch(runStatus._id, {
         state: {
           generation: 0n,
           saturated: false,
           kind: "scheduled",
           segment,
-          scheduledId: "" as Id<"_scheduled_functions">,
+          scheduledId,
         },
       });
       // await all scheduled functions to run
@@ -291,6 +295,9 @@ describe("kickMainLoop", () => {
       assert(afterStatus);
       expect(afterStatus.state.kind).toBe("running");
       assert(afterStatus.state.kind === "running");
+      const scheduledJob = await ctx.db.system.get(scheduledId);
+      assert(scheduledJob);
+      expect(scheduledJob.state.kind).toBe("canceled");
     });
   });
 });

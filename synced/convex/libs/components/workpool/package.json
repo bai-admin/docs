@@ -7,7 +7,7 @@
     "email": "support@convex.dev",
     "url": "https://github.com/get-convex/workpool/issues"
   },
-  "version": "0.2.15",
+  "version": "0.2.16",
   "license": "Apache-2.0",
   "keywords": [
     "convex",
@@ -31,7 +31,7 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:coverage": "vitest run --coverage --coverage.reporter=text",
     "alpha": "rm -rf dist && npm run build && npm run test && npm version prerelease --preid alpha && npm publish --tag alpha && git push --tags",
-    "release": "rm -rf dist && npm run build && npm run test && npm version patch && npm publish && git push --tags",
+    "release": "rm -rf dist && npm run build && npm run test && npm version patch && npm publish && git push --tags && git push",
     "prepare": "npm run build",
     "prepack": "node node10stubs.mjs",
     "postpack": "node node10stubs.mjs --cleanup"
@@ -68,17 +68,18 @@
     "convex-helpers": "^0.1.94"
   },
   "devDependencies": {
-    "@edge-runtime/vm": "^4.0.4",
-    "@eslint/js": "^9.9.1",
-    "@types/node": "^18.17.0",
-    "@vitest/coverage-v8": "^2.1.9",
-    "convex-test": "^0.0.36-alpha.0",
-    "eslint": "^9.9.1",
-    "globals": "^15.9.0",
+    "@edge-runtime/vm": "4.0.4",
+    "@eslint/js": "9.29.0",
+    "@types/node": "18.19.112",
+    "@vitest/coverage-v8": "2.1.9",
+    "convex-test": "0.0.38-alpha.0",
+    "eslint": "9.29.0",
+    "globals": "15.15.0",
+    "pkg-pr-new": "0.0.54",
     "prettier": "3.2.5",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.4.0",
-    "vitest": "^2.1.9"
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.34.1",
+    "vitest": "2.1.9"
   },
   "main": "./dist/commonjs/client/index.js",
   "types": "./dist/commonjs/client/index.d.ts",
