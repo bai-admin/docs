@@ -1,6 +1,6 @@
 {
   "name": "@convex-dev/workflow",
-  "version": "0.2.5-alpha.0",
+  "version": "0.2.5",
   "description": "Convex component for durably executing workflows.",
   "keywords": [
     "convex",
@@ -39,6 +39,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "@convex-dev/component-source": "./src/client/index.ts",
       "types": "./dist/client/index.d.ts",
       "default": "./dist/client/index.js"
     },
@@ -49,30 +50,32 @@
     }
   },
   "peerDependencies": {
-    "@convex-dev/workpool": "^0.2.9",
-    "convex": ">=1.21.0 <1.35.0",
-    "convex-helpers": "^0.1.77"
+    "@convex-dev/workpool": "^0.2.16",
+    "convex": ">=1.25.0 <1.35.0",
+    "convex-helpers": "^0.1.99"
   },
   "dependencies": {
     "async-channel": "^0.2.0"
   },
   "devDependencies": {
-    "@edge-runtime/vm": "^5.0.0",
-    "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.9.1",
-    "@types/node": "^18.19.86",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "chokidar-cli": "^3.0.0",
-    "cpy-cli": "^5.0.0",
-    "eslint": "^8.57.1",
-    "globals": "^15.9.0",
-    "npm-run-all2": "^7.0.2",
-    "openai": "^4.54.0",
+    "@edge-runtime/vm": "5.0.0",
+    "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.23.0",
+    "@types/node": "18.19.86",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "chokidar-cli": "3.0.0",
+    "convex-test": "0.0.38",
+    "cpy-cli": "5.0.0",
+    "eslint": "8.57.1",
+    "globals": "15.9.0",
+    "npm-run-all2": "7.0.2",
+    "openai": "4.58.2",
+    "pkg-pr-new": "0.0.54",
     "prettier": "3.2.5",
-    "typescript": "~5.5.0",
-    "typescript-eslint": "^7.18.0",
-    "vitest": "^3.2.4"
+    "typescript": "5.5.4",
+    "typescript-eslint": "7.18.0",
+    "vitest": "3.2.4"
   },
   "main": "./dist/client/index.js",
   "types": "./dist/client/index.d.ts",

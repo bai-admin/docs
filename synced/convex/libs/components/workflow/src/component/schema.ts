@@ -42,7 +42,7 @@ const workflowObject = {
   logLevel: deprecated,
   startedAt: deprecated,
   state: deprecated,
-  // undefined
+  // undefined until it's completed
   runResult: v.optional(vResultValidator),
 
   // Internal execution status, used to totally order mutations.
@@ -80,7 +80,6 @@ function stepSize(step: Step): number {
   }
   size += step.functionType.length;
   size += step.handle.length;
-  // TODO: start time, for scheduled steps
   size += 8 + step.argsSize;
   if (step.runResult) {
     size += resultSize(step.runResult);
@@ -122,9 +121,19 @@ export default defineSchema({
   steps: defineTable(journalObject)
     .index("workflow", ["workflowId", "stepNumber"])
     .index("inProgress", ["step.inProgress", "workflowId"]),
-  onCompleteFailures: defineTable({
-    workId: workIdValidator,
-    result: resultValidator,
-    context: v.any(),
-  }),
+  onCompleteFailures: defineTable(
+    v.union(
+      v.object({
+        workId: workIdValidator,
+        result: resultValidator,
+        context: v.any(),
+      }),
+      v.object({
+        workflowId: v.id("workflows"),
+        generationNumber: v.number(),
+        runResult: vResultValidator,
+        error: v.string(),
+      }),
+    ),
+  ),
 });

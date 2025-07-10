@@ -13,11 +13,12 @@ import {
   RegisteredAction,
 } from "convex/server";
 import { Infer, v } from "convex/values";
-import { api, components, internal } from "./_generated/api.js";
+import { components, internal } from "./_generated/api.js";
 import { internalMutation, MutationCtx } from "./_generated/server.js";
 import { logLevel } from "./logging.js";
 import { getWorkflow } from "./model.js";
 import { getDefaultLogger } from "./utils.js";
+import { completeHandler } from "./workflow.js";
 
 export const workpoolOptions = v.object({
   logLevel: v.optional(logLevel),
@@ -60,6 +61,7 @@ export const onCompleteContext = v.object({
 
 export type OnCompleteContext = Infer<typeof onCompleteContext>;
 
+// For a single step
 export const onComplete = internalMutation({
   args: {
     workId: workIdValidator,
@@ -97,17 +99,8 @@ export const onComplete = internalMutation({
       return;
     }
     const { generationNumber } = args.context;
-    const workflow = await getWorkflow(ctx, workflowId, generationNumber);
     journalEntry.step.inProgress = false;
     journalEntry.step.completedAt = Date.now();
-    console.event("stepCompleted", {
-      workflowId,
-      workflowName: workflow.name,
-      status: args.result.kind,
-      stepName: journalEntry.step.name,
-      stepNumber: journalEntry.stepNumber,
-      durationMs: journalEntry.step.completedAt - journalEntry.step.startedAt,
-    });
     switch (args.result.kind) {
       case "success":
         journalEntry.step.runResult = {
@@ -129,25 +122,40 @@ export const onComplete = internalMutation({
     }
     await ctx.db.replace(journalEntry._id, journalEntry);
     console.debug(`Completed execution of ${stepId}`, journalEntry);
-    if (workflow.runResult === undefined) {
-      // TODO: Technically this doesn't obey the workpool, but...
-      // it's better than calling it directly, and enqueuing can now happen
-      // in the root component.
-      const workpool = await getWorkpool(ctx, args.context.workpoolOptions);
-      await workpool.enqueueMutation(
-        ctx,
-        workflow.workflowHandle as FunctionHandle<"mutation">,
-        { workflowId: workflow._id, generationNumber },
-        {
-          onComplete: internal.pool.handlerOnComplete,
-          context: { workflowId, generationNumber },
-        },
-      );
-    } else {
-      console.error(
-        `Workflow not running: ${workflowId} when completing ${stepId}`,
-      );
+
+    const workflow = await getWorkflow(ctx, workflowId, null);
+    console.event("stepCompleted", {
+      workflowId,
+      workflowName: workflow.name,
+      status: args.result.kind,
+      stepName: journalEntry.step.name,
+      stepNumber: journalEntry.stepNumber,
+      durationMs: journalEntry.step.completedAt - journalEntry.step.startedAt,
+    });
+    if (workflow.runResult !== undefined) {
+      if (workflow.runResult.kind !== "canceled") {
+        console.error(
+          `Workflow: ${workflowId} already ${workflow.runResult.kind} when completing ${stepId} with status ${args.result.kind}`,
+        );
+      }
+      return;
     }
+    if (workflow.generationNumber !== generationNumber) {
+      console.error(
+        `Workflow: ${workflowId} already has generation number ${workflow.generationNumber} when completing ${stepId}`,
+      );
+      return;
+    }
+    const workpool = await getWorkpool(ctx, args.context.workpoolOptions);
+    await workpool.enqueueMutation(
+      ctx,
+      workflow.workflowHandle as FunctionHandle<"mutation">,
+      { workflowId: workflow._id, generationNumber },
+      {
+        onComplete: internal.pool.handlerOnComplete,
+        context: { workflowId, generationNumber },
+      },
+    );
   },
 });
 
@@ -165,6 +173,7 @@ const handlerOnCompleteContext = v.object({
   generationNumber: v.number(),
 });
 
+// For the workflow handler
 export const handlerOnComplete = internalMutation({
   args: {
     workId: workIdValidator,
@@ -173,32 +182,37 @@ export const handlerOnComplete = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (args.result.kind !== "success") {
-      const console = await getDefaultLogger(ctx);
-      if (!validate(handlerOnCompleteContext, args.context)) {
-        console.error("Invalid handlerOnComplete context", args.context);
-        if (
-          validate(v.id("workflows"), args.context.workflowId, { db: ctx.db })
-        ) {
-          await ctx.db.patch(args.context.workflowId, {
-            runResult: {
-              kind: "failed",
-              error:
-                "Invalid handlerOnComplete context: " +
-                JSON.stringify(args.context),
-            },
-          });
-        }
-        return;
-      }
-      const { workflowId, generationNumber } = args.context;
-      await ctx.runMutation(api.workflow.complete, {
-        workflowId,
-        generationNumber,
-        runResult: args.result,
-        now: Date.now(),
-      });
+    if (args.result.kind === "success") {
+      return;
     }
+    const console = await getDefaultLogger(ctx);
+    if (!validate(handlerOnCompleteContext, args.context)) {
+      console.error("Invalid handlerOnComplete context", args.context);
+      if (
+        validate(v.id("workflows"), args.context.workflowId, { db: ctx.db })
+      ) {
+        await ctx.db.insert("onCompleteFailures", args);
+        await completeHandler(ctx, {
+          workflowId: args.context.workflowId,
+          generationNumber: args.context.generationNumber,
+          runResult: {
+            kind: "failed",
+            error:
+              "Invalid handlerOnComplete context: " +
+              JSON.stringify(args.context),
+          },
+        }).catch((error) => {
+          console.error("Error calling completeHandler", error);
+        });
+      }
+      return;
+    }
+    const { workflowId, generationNumber } = args.context;
+    await completeHandler(ctx, {
+      workflowId,
+      generationNumber,
+      runResult: args.result,
+    });
   },
 });
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

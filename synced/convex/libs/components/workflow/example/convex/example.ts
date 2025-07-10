@@ -74,6 +74,7 @@ export const startWorkflow = internalMutation({
       {
         onComplete: internal.example.flowCompleted,
         context: { location },
+        startAsync: true,
       },
     );
     await ctx.db.insert("flows", { workflowId: id, in: location, out: null });
@@ -98,6 +99,7 @@ export const flowCompleted = internalMutation({
     await ctx.db.patch(flow._id, {
       out: args.result,
     });
+    await workflow.cleanup(ctx, args.workflowId);
   },
 });
 
