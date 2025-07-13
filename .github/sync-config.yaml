@@ -1,0 +1,146 @@
+# Each list item describes one external‑source → local‑dest synchronisation task.
+# Field semantics
+# ───────────────
+# repo      : "<owner>/<repo>"                                    (required)
+# branch    : "<branch‑name>"                                      (optional, default = repo’s default branch)
+# checkout  : [ "<sparse‑path‑1>", "<sparse‑path‑2>", … ]         (optional, omit → full tree)
+# scripts   : [ "<shell command‑1>", "<shell command‑2>", … ]     (optional, run in repo root, sequential)
+# truncDir  : "<subdir to copy into dest>"                        (optional, omit → repo root)
+# destDir   : "<path/inside/this/repo>"                           (required)
+
+- repo:   ollama/ollama
+  checkout: [/docs/**/*.md]
+  truncDir: docs
+  destDir: synced/ollama/docs
+
+- repo:   get-convex/convex-backend
+  checkout: [/self-hosted/**]
+  truncDir: self-hosted
+  destDir: synced/convex/libs/self-hosted
+
+- repo:   get-convex/convex-backend
+  checkout: [/npm-packages/convex/src/cli/**]
+  truncDir: npm-packages/convex/src/cli
+  destDir: synced/convex/libs/cli
+
+- repo:   get-convex/convex-backend
+  checkout: [/npm-packages/convex/src/browser/**]
+  truncDir: npm-packages/convex/src/browser
+  destDir: synced/convex/libs/browser
+
+- repo:   get-convex/convex-backend
+  checkout: 
+    - /npm-packages/convex/src/react*/**
+    - /npm-packages/convex/src/nextjs/**
+  truncDir: npm-packages/convex/src
+  destDir: synced/convex/libs/react
+
+- repo:   get-convex/convex-backend
+  checkout: 
+    - /crates/local_backend/**
+  truncDir: crates/local_backend
+  destDir: synced/convex/libs/backend
+
+- repo: get-convex/workflow
+  destDir: synced/convex/libs/components/workflow
+
+- repo: get-convex/action-retrier
+  destDir: synced/convex/libs/components/action-retrier
+
+- repo: get-convex/workpool
+  destDir: synced/convex/libs/components/workpool
+
+- repo: get-convex/rate-limiter
+  destDir: synced/convex/libs/components/rate-limiter
+
+- repo: get-convex/action-cache
+  destDir: synced/convex/libs/components/action-cache
+
+- repo: get-convex/crons
+  destDir: synced/convex/libs/components/crons
+
+- repo: get-convex/convex-backend
+  checkout: 
+    - /npm-packages/**
+    - /crates/convex/examples/**    # Include Rust examples
+  scripts:
+    - cd $GITHUB_WORKSPACE && npm ci
+    - node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js
+  truncDir: npm-packages/docs/docs
+  destDir:  synced/convex/docs
+
+
+- repo: OfficeDev/Office-Addin-Scripts
+  checkout: 
+    - /packages/**/*.md
+    - /packages/**/src/**/*.ts
+    - /packages/**/test/**/*.ts
+    - /packages/**/package.json
+    - /README.md
+  truncDir: packages
+  destDir: synced/office-addins/libs/office-addin-scripts
+
+- repo: OfficeDev/office-js-docs-pr
+  checkout: 
+    - /docs/concepts/**
+    - /docs/design/**
+    - /docs/develop/**
+    - /docs/excel/**
+    - /docs/includes/**
+    - /docs/outlook/**
+    - /docs/overview/**
+    - /docs/quickstarts/**
+    - /docs/reference/**
+    - /docs/testing/**
+    - /docs/tutorials/**
+  truncDir: docs
+  destDir: synced/office-addins/docs
+
+- repo: caddyserver/website
+  checkout:
+    - /src/docs/markdown/**
+  truncDir: src/docs/markdown
+  destDir: synced/caddyserver/docs
+
+- repo: nrwl/nx
+  checkout:
+    - /docs/blog/2025-05*.md
+    - /docs/courses/**/*.md
+    - /docs/external-generated/**/*.md
+    - /docs/generated/**/*.md
+    - /docs/shared/**/*.md
+  truncDir: docs
+  destDir: synced/nx/docs
+
+- repo: railwayapp/nixpacks
+  checkout:
+    - /docs/pages/docs/**
+  truncDir: docs/pages/docs
+  destDir: synced/nixpacks/docs
+
+- repo: railwayapp/nixpacks
+  checkout:
+    - /examples/node-nx/**
+    - /examples/python-uv/**
+    - /examples/node-pnpm-monorepo/**
+    - /examples/node-vite-react-ts/**
+    - /examples/node-vite-vanilla-ts/**
+    - /src/providers/node/**
+    - /src/providers/python.rs
+  destDir: synced/nixpacks/libs
+
+
+- repo: railwayapp/docs
+  checkout:
+    - /src/docs/**
+  truncDir: src/docs
+  destDir: synced/railway/docs
+
+- repo: vitejs/vite
+  checkout:
+    - /docs
+    - "!/docs/*"
+    - /docs/guide/**
+    - /docs/config/**
+  truncDir: docs
+  destDir: synced/vite/docs

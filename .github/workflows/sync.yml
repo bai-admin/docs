@@ -1,45 +1,62 @@
-name: Sync
-on:
-  schedule:         # hourly
-    - cron: '0 * * * *'
-  workflow_dispatch:
+# .github/workflows/sync.yml
+#
+# Synchronises external repositories into this repo according to
+# `.github/sync-config.yaml`.
+#
+# – Config format: YAML (not JSON)
+# – Sparse-checkout: **always non-cone**
+# – One execution path: clone → (optional) sparse patterns → (optional) scripts
+#   → (optional) truncDir → rsync → patch
+#
+# Requires a companion file `.github/sync-config.yaml` (see earlier message).
 
-###############################################################################
-# 0. Common reusable bash functions (inlined for readability)
-###############################################################################
+name: Sync
+
+on:
+  schedule:
+    - cron: '0 * * * *'        # hourly
+  workflow_dispatch:            # manual trigger
+
 defaults:
   run:
     shell: bash
 
-env:
-  # helper to strip prefix: strip_prefix PREFIX STRING  ➜  prints remainder
-  strip_prefix: |
-    function strip_prefix () {
-      local prefix="$1" path="$2"
-      echo "${path/#$prefix\/}"
-    }
+concurrency:
+  group: auto-sync
+  cancel-in-progress: true
 
-###############################################################################
-# 1. Build the matrix
-###############################################################################
+##############################################################################
+# 1. Convert the YAML config to a GitHub Actions matrix
+##############################################################################
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Generate matrix
+    steps:
+      - uses: actions/checkout@v4   # checkout *this* repo so we can read the config
+
+      - name: Install helpers (jq + PyYAML)
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y jq python3-yaml
+
+      - name: Build matrix JSON
         id: set-matrix
         run: |
-          sudo apt-get -qq update && sudo apt-get -qq install -y jq
-          MATRIX=$(jq -c '{include:.}' .github/sync-config.json)
+          MATRIX=$(python3 - <<'PY'
+          import json, yaml, sys, pathlib
+          cfg_path = pathlib.Path(".github/sync-config.yaml")
+          data = yaml.safe_load(cfg_path.read_text())
+          print(json.dumps({"include": data}))
+          PY
+          )
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
-###############################################################################
-# 2. One "sync" job per entry
-###############################################################################
+##############################################################################
+# 2. One parallel “sync” job per entry
+##############################################################################
   sync:
     needs: generate-matrix
     runs-on: ubuntu-latest
@@ -47,163 +64,156 @@ jobs:
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
       fail-fast: false
 
+    env:
+      GH_HOST: github.com   # change if you mirror to another host
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history to ensure we have the latest state
+          fetch-depth: 0    # full history needed for patch generation
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install jq
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y jq
 
       - name: Perform sync
-        id: sync
         env:
-          REPO_URL:  ${{ matrix.repoUrl }}
-          BRANCH:    ${{ matrix.branch }}
-          DEST_DIR:  ${{ matrix.destDir }}
-
-          SRC_DIR:               ${{ matrix.srcDir }}
-          SCRIPT_IN_DIR:         ${{ matrix.srcScriptInputDir }}
-          SCRIPT_OUT_DIR:        ${{ matrix.srcScriptOutputDir }}
-          PREPROCESS_SCRIPT_CMD: ${{ matrix.preprocessScript }}
+          ENTRY_JSON: ${{ toJson(matrix) }}   # pass matrix row as JSON
         run: |
           set -euo pipefail
-          
-          # Debug: Show what environment variables are set
-          echo "::group::Environment Variables Debug"
-          echo "SRC_DIR='$SRC_DIR'"
-          echo "SCRIPT_IN_DIR='$SCRIPT_IN_DIR'"
-          echo "SCRIPT_OUT_DIR='$SCRIPT_OUT_DIR'"
-          echo "PREPROCESS_SCRIPT_CMD='$PREPROCESS_SCRIPT_CMD'"
-          echo "::endgroup::"
-          
-          # Guard against missing configuration
-          if [[ -z "$SRC_DIR" && -z "$SCRIPT_IN_DIR" ]]; then
-            echo "::error::No srcDir or script dirs specified. SRC_DIR='$SRC_DIR', SCRIPT_IN_DIR='$SCRIPT_IN_DIR'"
-            exit 1
-          fi
-          
-          echo "::group::Init sparse clone"
-          TMP_CLONE=$(mktemp -d)
-          git -C "$TMP_CLONE" init -b "$BRANCH"
-          git -C "$TMP_CLONE" remote add origin "$REPO_URL"
-          git -C "$TMP_CLONE" config core.sparseCheckout true
 
-          # choose the sparse path
-          if [[ -n "$SRC_DIR" ]]; then
-            SPARSE_PATH="$SRC_DIR"
+          #-------------------------------------------------------------------
+          # 0. Parse entry fields
+          #-------------------------------------------------------------------
+          repo=$(echo "$ENTRY_JSON" | jq -r '.repo')
+          branch=$(echo "$ENTRY_JSON" | jq -r '.branch // empty')
+          destDir=$(echo "$ENTRY_JSON" | jq -r '.destDir')
+          truncDir=$(echo "$ENTRY_JSON" | jq -r '.truncDir // empty')
+
+          # Arrays → Bash arrays
+          mapfile -t checkoutArr < <(echo "$ENTRY_JSON" | jq -r '.checkout // [] | .[]')
+          mapfile -t scriptsArr  < <(echo "$ENTRY_JSON" | jq -r '.scripts  // [] | .[]')
+
+          echo "▶ repo      = $repo"
+          echo "▶ branch    = ${branch:-<default>}"
+          echo "▶ destDir   = $destDir"
+          echo "▶ truncDir  = ${truncDir:-<root>}"
+          echo "▶ checkout  = ${checkoutArr[*]}"
+          echo "▶ scripts   = ${scriptsArr[*]}"
+
+          #-------------------------------------------------------------------
+          # 1. Resolve default branch if omitted
+          #-------------------------------------------------------------------
+          repoUrl="https://${GH_HOST}/${repo}.git"
+          if [[ -z "$branch" ]]; then
+            branch=$(git ls-remote --symref "$repoUrl" HEAD \
+                     | awk '/^ref:/ {sub("refs/heads/", "", $2); print $2}')
+            echo "Using default branch: $branch"
+          fi
+
+          #-------------------------------------------------------------------
+          # 2. Sparse clone (non-cone, depth-1, no checkout)
+          #-------------------------------------------------------------------
+          cloneDir=$(mktemp -d)
+          git clone --filter=blob:none --no-checkout --depth 1 \
+                    --branch "$branch" "$repoUrl" "$cloneDir"
+
+          git -C "$cloneDir" sparse-checkout init --no-cone
+          if [[ ${#checkoutArr[@]} -gt 0 ]]; then
+            echo "▶ setting sparse checkout: ${checkoutArr[*]}"
+            git -C "$cloneDir" sparse-checkout set --no-cone "${checkoutArr[@]}"
           else
-            SPARSE_PATH="$SCRIPT_IN_DIR"
+            echo "▶ disabling sparse checkout, because no `checkout` keyvalue was provided"
+            git -C "$cloneDir" sparse-checkout disable   # full tree
           fi
-          
-          # Handle root directory case properly for sparse-checkout
-          if [[ "$SPARSE_PATH" == "." ]]; then
-            echo "*" >> "$TMP_CLONE/.git/info/sparse-checkout"
-          else
-            echo "/$SPARSE_PATH/*" >> "$TMP_CLONE/.git/info/sparse-checkout"
-          fi
-          git -C "$TMP_CLONE" pull --depth=1 origin "$BRANCH"
-          echo "::endgroup::"
+          git -C "$cloneDir" checkout
 
-          # validate
-          if ! [ -d "$TMP_CLONE/$SPARSE_PATH" ]; then
-            echo "::error::Path '$SPARSE_PATH' not found in $REPO_URL"
-            exit 1
-          fi
-
-          # Remove submodule entry if it exists (safeguard against accidental submodules)
-          if git ls-files --stage "$DEST_DIR" 2>/dev/null | grep -qE '^160000'; then
-            echo "::warning::Removing submodule entry for $DEST_DIR"
-            git rm -rf "$DEST_DIR" || true
-          fi
-
-          # ---------- COPY-ONLY MODE ----------------------------------------
-          if [[ -n "$SRC_DIR" ]]; then
-            # Check if this is an initial sync (destination doesn't exist or is empty)
-            if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
-              echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
-              mkdir -p "$DEST_DIR"
-              rsync -a --exclude='.git' "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
-            else
-              # Regular sync with --delete for existing directories
-              rsync -a --delete --exclude='.git' "$TMP_CLONE/$SRC_DIR/" "$DEST_DIR/"
-            fi
-
-          # ---------- PRE-PROCESS MODE --------------------------------------
-          else
-            WORKDIR=$(mktemp -d)
-            rsync -a --exclude='.git' "$TMP_CLONE/$SCRIPT_IN_DIR/" "$WORKDIR/"
-
-            # ①  compute relative output dir
-            REL_OUT_DIR=${SCRIPT_OUT_DIR#"$SCRIPT_IN_DIR"/}
-
-            # ②  export CWD-independent paths for the script
-            export SYNC_INPUT_DIR="$WORKDIR"
-            export SYNC_OUTPUT_DIR="$WORKDIR/$REL_OUT_DIR"
-
-            # ③  run the user script with CWD set to input dir
-            pushd "$WORKDIR" >/dev/null
-            eval "$PREPROCESS_SCRIPT_CMD"
+          #-------------------------------------------------------------------
+          # 3. Run scripts, if any
+          #-------------------------------------------------------------------
+          if [[ ${#scriptsArr[@]} -gt 0 ]]; then
+            pushd "$cloneDir" >/dev/null
+            # print the current directory
+            echo "▶ current directory: $(pwd)"
+            savedir=$(pwd)
+            # print the contents of the current directory
+            ls -la
+            cd ..
+            ls -la
+            cd "$savedir"
+            for cmd in "${scriptsArr[@]}"; do
+              echo "▶ running: $cmd"
+              # Export cloneDir so the Node.js script can see it
+              CLONE_DIR="$cloneDir" bash -c "$cmd"
+            done
             popd >/dev/null
-
-            # ④  copy the resulting output to DEST_DIR
-            if ! [ -d "$SYNC_OUTPUT_DIR" ]; then
-              echo "::error::Expected output '$SYNC_OUTPUT_DIR' not found"
-              exit 1
-            fi
-            
-            # Check if this is an initial sync (destination doesn't exist or is empty)
-            if [ ! -d "$DEST_DIR" ] || [ -z "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
-              echo "::notice::Initial sync detected for $DEST_DIR - performing full copy"
-              mkdir -p "$DEST_DIR"
-              rsync -a --exclude='.git' "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
-            else
-              # Regular sync with --delete for existing directories
-              rsync -a --delete --exclude='.git' "$SYNC_OUTPUT_DIR/" "$DEST_DIR/"
-            fi
-            rm -rf "$WORKDIR"
           fi
 
-          rm -rf "$TMP_CLONE"
+          #-------------------------------------------------------------------
+          # 4. Determine rsync source
+          #-------------------------------------------------------------------
+          if [[ -z "$truncDir" || "$truncDir" == "." ]]; then
+            copySrc="$cloneDir"
+          else
+            copySrc="$cloneDir/$truncDir"
+          fi
 
+          if [[ ! -d "$copySrc" ]]; then
+            echo "::error:: truncDir '${truncDir:-<root>}' not found after scripts"
+            exit 1
+          fi
+
+          #-------------------------------------------------------------------
+          # 5. Rsync into destination
+          #-------------------------------------------------------------------
+          mkdir -p "$destDir"
+          rsyncFlags="-a --exclude=.git"
+          if [[ -n "$(ls -A "$destDir" 2>/dev/null)" ]]; then
+            rsyncFlags+=" --delete"
+          fi
+          rsync $rsyncFlags "$copySrc/" "$destDir/"
+
+          #-------------------------------------------------------------------
+          # 6. Clean up
+          #-------------------------------------------------------------------
+          rm -rf "$cloneDir"
+
+      #-----------------------------------------------------------------------
+      # 7. Stage changes and save as patch artifact
+      #-----------------------------------------------------------------------
       - name: Create patch
         run: |
-          # Stage all changes in the destination directory
-          git add -A "${{ matrix.destDir }}"
-          
-          # Create patch if there are staged changes
+          destDir=${{ matrix.destDir }}
+          git add -A "$destDir"
           if ! git diff --cached --quiet; then
-            # Create a unique, filesystem-safe name from destDir
-            SAFE_NAME="$(echo "${{ matrix.destDir }}" | tr '/[:upper:]' '-[:lower:]')"
-            git diff --cached --patch --binary > "${SAFE_NAME}.patch"
-            tar -czf "patch-${{ strategy.job-index }}.tar.gz" "${SAFE_NAME}.patch"
+            safeName=$(echo "$destDir" | tr '/[:upper:]' '-[:lower:]')
+            git diff --cached --patch --binary > "${safeName}.patch"
+            tar -czf "patch-${{ strategy.job-index }}.tar.gz" "${safeName}.patch"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: patches-${{ strategy.job-index }}
           path: patch-*.tar.gz
           if-no-files-found: ignore
 
-###############################################################################
-# 3. Merge patches to one commit
-###############################################################################
+##############################################################################
+# 3. Aggregate patches into one commit
+##############################################################################
   commit-changes:
     needs: sync
     runs-on: ubuntu-latest
     if: success()
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set author
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - uses: actions/download-artifact@v4
         with:
@@ -214,27 +224,24 @@ jobs:
 
       - name: Apply patches
         run: |
-          # --- extract all patch tarballs into a throw-away dir -------------
-          WORKDIR=$(mktemp -d)
-
+          workdir=$(mktemp -d)
           shopt -s nullglob
-          for f in patches/*.tar.gz; do
-            tar -xzf "$f" -C "$WORKDIR"
+          for tgz in patches/*.tar.gz; do
+            tar -xzf "$tgz" -C "$workdir"
           done
           shopt -u nullglob
 
-          # --- apply each patch --------------------------------------------
-          if ls "$WORKDIR"/*.patch 1>/dev/null 2>&1; then
-            git apply --3way --ignore-space-change --whitespace=nowarn "$WORKDIR"/*.patch
+          if ls "$workdir"/*.patch >/dev/null 2>&1; then
+            git apply --3way --ignore-space-change --whitespace=nowarn "$workdir"/*.patch
           fi
-
-          # --- tidy up ------------------------------------------------------
-          rm -rf "$WORKDIR"
+          rm -rf "$workdir"
 
       - name: Commit & push
         run: |
           git add -A
           if ! git diff --staged --quiet; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "chore: auto-sync external sources"
             git push
           else

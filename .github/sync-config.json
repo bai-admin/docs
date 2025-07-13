@@ -71,5 +71,5 @@
   
       "preprocessScript":   "node $GITHUB_WORKSPACE/.github/scripts/preprocess/convex-docs.js"
     }
-  ]
+]
   
