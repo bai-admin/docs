@@ -8,10 +8,6 @@
 # truncDir  : "<subdir to copy into dest>"                        (optional, omit → repo root)
 # destDir   : "<path/inside/this/repo>"                           (required)
 
-- repo:   ollama/ollama
-  checkout: [/docs/**/*.md]
-  truncDir: docs
-  destDir: synced/ollama/docs
 
 - repo:   get-convex/convex-backend
   checkout: [/self-hosted/**]
