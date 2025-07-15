@@ -76,7 +76,59 @@ TanStack Start app in it.
   <Step title="Update app/routes/__root.tsx">
     Add a `QueryClient` to the router context to make React Query usable anywhere in the TanStack Start site.
 
-    > **⚠ snippet " appRoutesRoot " not found**
+    
+```tsx
+import { QueryClient } from "@tanstack/react-query";
+import { createRootRouteWithContext } from "@tanstack/react-router";
+import { Outlet, ScrollRestoration } from "@tanstack/react-router";
+import { Meta, Scripts } from "@tanstack/start";
+import * as React from "react";
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "TanStack Start Starter",
+      },
+    ],
+  }),
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <head>
+        <Meta />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+```
+
 
   </Step>
 
@@ -141,7 +193,14 @@ export default http;
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+
+```
+
 
   </Step>
 
@@ -164,7 +223,19 @@ export default http;
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```ts
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -174,7 +245,31 @@ export default http;
     The `useSuspenseQuery` hook renders the API function `api.tasks.get`
     query result on the server initially, then it updates live in the browser.
 
-    > **⚠ snippet " index " not found**
+    
+```tsx
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { api } from "../../convex/_generated/api";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});
+
+function Home() {
+  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
+
+  return (
+    <div>
+      {data.map(({ _id, text }) => (
+        <div key={_id}>{text}</div>
+      ))}
+    </div>
+  );
+}
+
+```
+
 
   </Step>
 

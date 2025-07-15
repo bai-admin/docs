@@ -129,12 +129,46 @@ See
 With React it can be tricky to dynamically invoke a hook, because hooks cannot
 be placed inside conditionals or after early returns:
 
-> **⚠ snippet " SkipBad, SkipBad " not found**
+
+```tsx
+/* eslint-disable react-hooks/rules-of-hooks */
+
+// @snippet start example
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export function App() {
+  // the URL `param` might be null
+  const param = new URLSearchParams(window.location.search).get("param");
+  // ERROR! React Hook "useQuery" is called conditionally. React Hooks must
+  // be called in the exact same order in every component render.
+  const data = param !== null ? useQuery(api.functions.read, { param }) : null;
+  //...
+}
+// @snippet end example
+
+```
+
 
 For this reason `useQuery` can be "disabled" by passing in `"skip"` instead of
 its arguments:
 
-> **⚠ snippet " SkipGood, SkipGood " not found**
+
+```tsx
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export function App() {
+  const param = new URLSearchParams(window.location.search).get("param");
+  const data = useQuery(
+    api.functions.read,
+    param !== null ? { param } : "skip",
+  );
+  //...
+}
+
+```
+
 
 When `"skip"` is used the `useQuery` doesn't talk to your backend at all and
 returns `undefined`.

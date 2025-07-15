@@ -79,9 +79,47 @@ instead of using `ctx.runAction` reduces function calls and resource usage.
 See the [TypeScript page](/understanding/best-practices/typescript.mdx) for
 useful types.
 
-> **⚠ snippet " Teams, TeamsJS " not found**
 
-> **⚠ snippet " UserHelpers, UserHelpersJS " not found**
+```ts
+import { QueryCtx, mutation } from "./_generated/server";
+import { v } from "convex/values";
+import { getCurrentUser } from "./userHelpers";
+import { Doc, Id } from "./_generated/dataModel";
+
+export const remove = mutation({
+  args: { teamId: v.id("teams") },
+  handler: async (ctx, { teamId }) => {
+    const currentUser = await getCurrentUser(ctx);
+    await ensureTeamAdmin(ctx, currentUser, teamId);
+    await ctx.db.delete(teamId);
+  },
+});
+
+async function ensureTeamAdmin(
+  ctx: QueryCtx,
+  user: Doc<"users">,
+  teamId: Id<"teams">,
+) {
+  // use `ctx.db` to check that `user` is a team admin and throw an error otherwise
+}
+
+```
+
+
+
+```ts
+// @snippet start userHelpers
+import { Doc } from "./_generated/dataModel";
+import { QueryCtx } from "./_generated/server";
+
+export async function getCurrentUser(ctx: QueryCtx): Promise<Doc<"users">> {
+  // load user details using `ctx.auth` and `ctx.db`
+  // @snippet end userHelpers
+  return null as any;
+}
+
+```
+
 
 ### Prefer queries and mutations over actions
 

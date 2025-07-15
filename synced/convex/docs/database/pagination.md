@@ -78,58 +78,12 @@ export default function App() {
   // @snippet end sendMessage
 ```
 
-```jsx
-// @snippet start importHooks
-import { useMutation, useQuery } from "convex/react";
-// @snippet end importHooks
-
-export default function App() {
-  const messages = useQuery("messages:list") || [];
-
-  const [newMessageText, setNewMessageText] = useState("");
-  // @snippet start sendMessage
-  // @snippet start sendMessageHook
-  const sendMessage = useMutation("messages:send");
-  // @snippet end sendMessageHook
-
-  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
-  async function handleSendMessage(event) {
-    event.preventDefault();
-    await sendMessage({ body: newMessageText, author: name });
-    setNewMessageText("");
-  }
-  // @snippet end sendMessage
-```
-
 
 ### Additional arguments
 
 You can define paginated query functions that take arguments in addition to
 `paginationOpts`:
 
-
-```jsx
-// @snippet start importHooks
-import { useMutation, useQuery } from "convex/react";
-// @snippet end importHooks
-
-export default function App() {
-  const messages = useQuery("messages:list") || [];
-
-  const [newMessageText, setNewMessageText] = useState("");
-  // @snippet start sendMessage
-  // @snippet start sendMessageHook
-  const sendMessage = useMutation("messages:send");
-  // @snippet end sendMessageHook
-
-  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
-  async function handleSendMessage(event) {
-    event.preventDefault();
-    await sendMessage({ body: newMessageText, author: name });
-    setNewMessageText("");
-  }
-  // @snippet end sendMessage
-```
 
 ```jsx
 // @snippet start importHooks
@@ -186,29 +140,6 @@ export default function App() {
   // @snippet end sendMessage
 ```
 
-```jsx
-// @snippet start importHooks
-import { useMutation, useQuery } from "convex/react";
-// @snippet end importHooks
-
-export default function App() {
-  const messages = useQuery("messages:list") || [];
-
-  const [newMessageText, setNewMessageText] = useState("");
-  // @snippet start sendMessage
-  // @snippet start sendMessageHook
-  const sendMessage = useMutation("messages:send");
-  // @snippet end sendMessageHook
-
-  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
-  async function handleSendMessage(event) {
-    event.preventDefault();
-    await sendMessage({ body: newMessageText, author: name });
-    setNewMessageText("");
-  }
-  // @snippet end sendMessage
-```
-
 
 ## Paginating within React Components
 
@@ -237,12 +168,66 @@ The hook returns an object with:
 - `loadMore(n)`: A callback to fetch more results. This will only fetch more
   results if the status is `"CanLoadMore"`.
 
-> **⚠ snippet " SimpleCall, SimpleCall " not found**
+
+```tsx
+// This file is not used in the demo app.
+// It showcases only the basic pagination call.
+
+// @snippet start example
+import { usePaginatedQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export function App() {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.messages.list,
+    {},
+    { initialNumItems: 5 },
+  );
+  return (
+    <div>
+      {results?.map(({ _id, body }) => <div key={_id}>{body}</div>)}
+      <button onClick={() => loadMore(5)} disabled={status !== "CanLoadMore"}>
+        Load More
+      </button>
+    </div>
+  );
+}
+// @snippet end example
+
+```
+
 
 You can also pass additional arguments in the arguments object if your function
 expects them:
 
-> **⚠ snippet " CallWithArgs, CallWithArgs " not found**
+
+```tsx
+// This file is not used in the demo app.
+// It showcases only the basic pagination call.
+
+// @snippet start example
+import { usePaginatedQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export function App() {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.messages.listWithExtraArg,
+    { author: "Alex" },
+    { initialNumItems: 5 },
+  );
+  return (
+    <div>
+      {results?.map(({ _id, body }) => <div key={_id}>{body}</div>)}
+      <button onClick={() => loadMore(5)} disabled={status !== "CanLoadMore"}>
+        Load More
+      </button>
+    </div>
+  );
+}
+// @snippet end example
+
+```
+
 
 ### Reactivity
 
@@ -260,4 +245,38 @@ its initial size.
 If you're paginating outside of React, you can manually call your paginated
 function multiple times to collect the items:
 
-> **⚠ snippet " Download, Download " not found**
+
+```ts
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../convex/_generated/api";
+
+require("dotenv").config();
+
+const client = new ConvexHttpClient(process.env.VITE_CONVEX_URL!);
+
+/**
+ * Logs an array containing all messages from the paginated query "listMessages"
+ * by combining pages of results into a single array.
+ */
+async function getAllMessages() {
+  let continueCursor = null;
+  let isDone = false;
+  let page;
+
+  const results = [];
+
+  while (!isDone) {
+    ({ continueCursor, isDone, page } = await client.query(api.messages.list, {
+      paginationOpts: { numItems: 5, cursor: continueCursor },
+    }));
+    console.log("got", page.length);
+    results.push(...page);
+  }
+
+  console.log(results);
+}
+
+getAllMessages();
+
+```
+

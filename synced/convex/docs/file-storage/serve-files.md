@@ -50,33 +50,119 @@ export default function App() {
   // @snippet end sendMessage
 ```
 
-```jsx
-// @snippet start importHooks
-import { useMutation, useQuery } from "convex/react";
-// @snippet end importHooks
-
-export default function App() {
-  const messages = useQuery("messages:list") || [];
-
-  const [newMessageText, setNewMessageText] = useState("");
-  // @snippet start sendMessage
-  // @snippet start sendMessageHook
-  const sendMessage = useMutation("messages:send");
-  // @snippet end sendMessageHook
-
-  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
-  async function handleSendMessage(event) {
-    event.preventDefault();
-    await sendMessage({ body: newMessageText, author: name });
-    setNewMessageText("");
-  }
-  // @snippet end sendMessage
-```
-
 
 File URLs can be used in `img` elements to render images:
 
-> **⚠ snippet " AppTS, AppJS " not found**
+
+```tsx
+import { FormEvent, useRef, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export default function App() {
+  const messages = useQuery(api.messages.list) || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  const sendMessage = useMutation(api.messages.sendMessage);
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event: FormEvent) {
+    event.preventDefault();
+    if (newMessageText) {
+      await sendMessage({ body: newMessageText, author: name });
+    }
+    setNewMessageText("");
+  }
+
+  // @snippet start handlers
+  const generateUploadUrl = useMutation(api.messages.generateUploadUrl);
+  const sendImage = useMutation(api.messages.sendImage);
+
+  const imageInput = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  async function handleSendImage(event: FormEvent) {
+    event.preventDefault();
+
+    // Step 1: Get a short-lived upload URL
+    const postUrl = await generateUploadUrl();
+    // Step 2: POST the file to the URL
+    const result = await fetch(postUrl, {
+      method: "POST",
+      headers: { "Content-Type": selectedImage!.type },
+      body: selectedImage,
+    });
+    const json = await result.json();
+    if (!result.ok) {
+      throw new Error(`Upload failed: ${JSON.stringify(json)}`);
+    }
+    const { storageId } = json;
+    // Step 3: Save the newly allocated storage id to the database
+    await sendImage({ storageId, author: name });
+
+    setSelectedImage(null);
+    imageInput.current!.value = "";
+  }
+  // @snippet end handlers
+
+  return (
+    <main>
+      <h1>Convex Chat</h1>
+      <p className="badge">
+        <span>{name}</span>
+      </p>
+      <ul>
+        {messages.map((message) => (
+          <li key={message._id}>
+            <span>{message.author}:</span>
+            {/* @snippet start useImageComponent */}
+            {message.format === "image" ? (
+              <Image message={message} />
+            ) : (
+              <span>{message.body}</span>
+            )}
+            {/* @snippet end useImageComponent */}
+            <span>{new Date(message._creationTime).toLocaleTimeString()}</span>
+          </li>
+        ))}
+      </ul>
+      <form onSubmit={handleSendMessage}>
+        <input
+          value={newMessageText}
+          onChange={(event) => setNewMessageText(event.target.value)}
+          placeholder="Write a message…"
+        />
+        <input type="submit" value="Send" disabled={!newMessageText} />
+      </form>
+      {/* @snippet start formInput */}
+      <form onSubmit={handleSendImage}>
+        <input
+          type="file"
+          accept="image/*"
+          ref={imageInput}
+          onChange={(event) => setSelectedImage(event.target.files![0])}
+          className="ms-2 btn btn-primary"
+          disabled={selectedImage !== null}
+        />
+        <input
+          type="submit"
+          value="Send Image"
+          disabled={selectedImage === null}
+        />
+      </form>
+      {/* @snippet end formInput */}
+    </main>
+  );
+}
+
+// @snippet start imageComponent
+function Image({ message }: { message: { url: string } }) {
+  return <img src={message.url} height="300px" width="auto" />;
+}
+// @snippet end imageComponent
+
+```
+
 
 In your query you can control who gets access to a file when the URL is
 generated. If you need to control access when the file is _served_, you can
@@ -100,9 +186,199 @@ can be generated from a storage ID by the
 [`ActionCtx`](/api/interfaces/server.GenericActionCtx) object, which can be
 returned in a `Response`:
 
-> **⚠ snippet " Http, Http " not found**
+
+```ts
+// @snippet start sendImageStore
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+import { api } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
+
+const http = httpRouter();
+
+http.route({
+  path: "/sendImage",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // Step 1: Store the file
+    const blob = await request.blob();
+    const storageId = await ctx.storage.store(blob);
+
+    // Step 2: Save the storage ID to the database via a mutation
+    const author = new URL(request.url).searchParams.get("author");
+    await ctx.runMutation(api.messages.sendImage, { storageId, author });
+
+    // Step 3: Return a response with the correct CORS headers
+    return new Response(null, {
+      status: 200,
+      // CORS headers
+      headers: new Headers({
+        // e.g. https://mywebsite.com, configured on your Convex dashboard
+        "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+        Vary: "origin",
+      }),
+    });
+  }),
+});
+// @snippet end sendImageStore
+
+// @snippet start getImage
+http.route({
+  path: "/getImage",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const { searchParams } = new URL(request.url);
+    const storageId = searchParams.get("storageId")! as Id<"_storage">;
+    const blob = await ctx.storage.get(storageId);
+    if (blob === null) {
+      return new Response("Image not found", {
+        status: 404,
+      });
+    }
+    return new Response(blob);
+  }),
+});
+// @snippet end getImage
+
+// @snippet start preflight
+// Pre-flight request for /sendImage
+http.route({
+  path: "/sendImage",
+  method: "OPTIONS",
+  handler: httpAction(async (_, request) => {
+    // Make sure the necessary headers are present
+    // for this to be a valid pre-flight request
+    const headers = request.headers;
+    if (
+      headers.get("Origin") !== null &&
+      headers.get("Access-Control-Request-Method") !== null &&
+      headers.get("Access-Control-Request-Headers") !== null
+    ) {
+      return new Response(null, {
+        headers: new Headers({
+          // e.g. https://mywebsite.com, configured on your Convex dashboard
+          "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type, Digest",
+          "Access-Control-Max-Age": "86400",
+        }),
+      });
+    } else {
+      return new Response();
+    }
+  }),
+});
+// @snippet end preflight
+
+export default http;
+
+```
+
 
 The URL of such an action can be used directly in `img` elements to render
 images:
 
-> **⚠ snippet " HttpAppTS, HttpAppJS " not found**
+
+```tsx
+import { FormEvent, useRef, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export default function App() {
+  const messages = useQuery(api.messages.list) || [];
+
+  const [newMessageText, setNewMessageText] = useState("");
+  const sendMessage = useMutation(api.messages.send);
+
+  const [name] = useState(() => "User " + Math.floor(Math.random() * 10000));
+  async function handleSendMessage(event: FormEvent) {
+    event.preventDefault();
+    if (newMessageText) {
+      await sendMessage({ body: newMessageText, author: name });
+    }
+    setNewMessageText("");
+  }
+
+  // @snippet start sendImage
+  const imageInput = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  async function handleSendImage(event: FormEvent) {
+    event.preventDefault();
+
+    // e.g. https://happy-animal-123.convex.site/sendImage?author=User+123
+    const sendImageUrl = new URL(`${convexSiteUrl}/sendImage`);
+    sendImageUrl.searchParams.set("author", name);
+
+    await fetch(sendImageUrl, {
+      method: "POST",
+      headers: { "Content-Type": selectedImage!.type },
+      body: selectedImage,
+    });
+
+    setSelectedImage(null);
+    imageInput.current!.value = "";
+  }
+  // @snippet end sendImage
+
+  return (
+    <main>
+      <h1>Convex Chat</h1>
+      <p className="badge">
+        <span>{name}</span>
+      </p>
+      <ul>
+        {messages.map((message) => (
+          <li key={message._id}>
+            <span>{message.author}:</span>
+            {message.format === "image" ? (
+              <Image storageId={message.body} />
+            ) : (
+              <span>{message.body}</span>
+            )}
+            <span>{new Date(message._creationTime).toLocaleTimeString()}</span>
+          </li>
+        ))}
+      </ul>
+      <form onSubmit={handleSendMessage}>
+        <input
+          value={newMessageText}
+          onChange={(event) => setNewMessageText(event.target.value)}
+          placeholder="Write a message…"
+        />
+        <input type="submit" value="Send" disabled={!newMessageText} />
+      </form>
+      {/* @snippet start imageForm */}
+      <form onSubmit={handleSendImage}>
+        <input
+          type="file"
+          accept="image/*"
+          ref={imageInput}
+          onChange={(event) => setSelectedImage(event.target.files![0])}
+          disabled={selectedImage !== null}
+        />
+        <input
+          type="submit"
+          value="Send Image"
+          disabled={selectedImage === null}
+        />
+      </form>
+      {/* @snippet end imageForm */}
+    </main>
+  );
+}
+
+// @snippet start getImage
+const convexSiteUrl = import.meta.env.VITE_CONVEX_SITE_URL;
+
+function Image({ storageId }: { storageId: string }) {
+  // e.g. https://happy-animal-123.convex.site/getImage?storageId=456
+  const getImageUrl = new URL(`${convexSiteUrl}/getImage`);
+  getImageUrl.searchParams.set("storageId", storageId);
+
+  return <img src={getImageUrl.href} height="300px" width="auto" />;
+}
+// @snippet end getImage
+
+```
+

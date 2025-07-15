@@ -27,7 +27,27 @@ to queries in Node.js and any JavaScript environment that supports WebSockets.
 
 
 
-> **⚠ snippet " VanillaTS, VanillaJS " not found**
+
+```ts
+import { ConvexClient } from "convex/browser";
+import { api } from "../convex/_generated/api";
+
+const client = new ConvexClient(process.env.CONVEX_URL!);
+
+// subscribe to query results
+client.onUpdate(api.messages.listAll, {}, (messages) =>
+  console.log(messages.map((msg) => msg.body)),
+);
+
+// execute a mutation
+function hello() {
+  client.mutation(api.messages.sendAnon, {
+    body: `hello at ${new Date()}`,
+  });
+}
+
+```
+
 
 The Convex client is open source and available on
 [GitHub](https://github.com/get-convex/convex-js).
@@ -42,7 +62,20 @@ browser, Node.js, and any JavaScript environment with `fetch`.
 
 See the [Node.js Quickstart](/quickstart/nodejs.mdx).
 
-> **⚠ snippet " Example, Example " not found**
+
+```ts
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "./convex/_generated/api";
+
+const client = new ConvexHttpClient(process.env["CONVEX_URL"]);
+
+// either this
+const count = await client.query(api.counter.get);
+// or this
+client.query(api.counter.get).then((count) => console.log(count));
+
+```
+
 
 ## Using Convex without generated `convex/_generated/api.js`
 
@@ -51,4 +84,24 @@ in the same monorepos you can use the untyped `api` object called `anyApi`.
 
 
 
-> **⚠ snippet " StringsTS, StringsJS " not found**
+
+```ts
+import { ConvexClient } from "convex/browser";
+import { anyApi } from "convex/server";
+
+const CONVEX_URL = "http://happy-otter-123";
+const client = new ConvexClient(CONVEX_URL);
+client.onUpdate(anyApi.messages.list, {}, (messages) =>
+  console.log(messages.map((msg) => msg.body)),
+);
+setInterval(
+  () =>
+    client.mutation(anyApi.messages.send, {
+      body: `hello at ${new Date()}`,
+      author: "me",
+    }),
+  5000,
+);
+
+```
+

@@ -33,7 +33,17 @@ HTTP action handlers are defined using the
 [`httpAction`](/generated-api/server#httpaction) constructor, similar to the
 `action` constructor for normal actions:
 
-> **⚠ snippet " Constructor, Constructor " not found**
+
+```ts
+import { httpAction } from "./_generated/server";
+
+export const doSomething = httpAction(async () => {
+  // implementation will be here
+  return new Response();
+});
+
+```
+
 
 The first argument to the `handler` is an
 [`ActionCtx`](/api/interfaces/server.GenericActionCtx) object, which provides
@@ -49,7 +59,26 @@ incoming Request is left entirely to you.
 
 Here's an example:
 
-> **⚠ snippet " httpFunction, httpFunction " not found**
+
+```ts
+import { httpAction } from "./_generated/server";
+import { internal } from "./_generated/api";
+
+export const postMessage = httpAction(async (ctx, request) => {
+  const { author, body } = await request.json();
+
+  await ctx.runMutation(internal.messages.sendOne, {
+    body: `Sent via HTTP action: ${body}`,
+    author,
+  });
+
+  return new Response(null, {
+    status: 200,
+  });
+});
+
+```
+
 
 <>
   {/* Wrapped in fragment because Prettier pushes the JSDialectFileName on new line */}
@@ -60,7 +89,41 @@ Here's an example:
   `route` method:
 </>
 
-> **⚠ snippet " http, http " not found**
+
+```ts
+// @snippet start router
+import { httpRouter } from "convex/server";
+import { postMessage, getByAuthor, getByAuthorPathSuffix } from "./messages";
+
+const http = httpRouter();
+
+http.route({
+  path: "/postMessage",
+  method: "POST",
+  handler: postMessage,
+});
+
+// Define additional routes
+http.route({
+  path: "/getMessagesByAuthor",
+  method: "GET",
+  handler: getByAuthor,
+});
+
+// Define a route using a path prefix
+http.route({
+  // Will match /getAuthorMessages/User+123 and /getAuthorMessages/User+234 etc.
+  pathPrefix: "/getAuthorMessages/",
+  method: "GET",
+  handler: getByAuthorPathSuffix,
+});
+
+// Convex expects the router to be the default export of `convex/http.js`.
+export default http;
+// @snippet end router
+
+```
+
 
 You can now call this action via HTTP and interact with data stored in the
 Convex Database. HTTP actions are exposed on
@@ -169,11 +232,185 @@ on the use case. [This site](https://httptoolkit.com/will-it-cors/) provides an
 interactive walkthrough for what CORS headers to add. Here's an example of
 adding CORS headers to a Convex HTTP action:
 
-> **⚠ snippet " httpStorage, httpStorage " not found**
+
+```ts
+// @snippet start sendImageStore
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+import { api } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
+
+const http = httpRouter();
+
+http.route({
+  path: "/sendImage",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // Step 1: Store the file
+    const blob = await request.blob();
+    const storageId = await ctx.storage.store(blob);
+
+    // Step 2: Save the storage ID to the database via a mutation
+    const author = new URL(request.url).searchParams.get("author");
+    await ctx.runMutation(api.messages.sendImage, { storageId, author });
+
+    // Step 3: Return a response with the correct CORS headers
+    return new Response(null, {
+      status: 200,
+      // CORS headers
+      headers: new Headers({
+        // e.g. https://mywebsite.com, configured on your Convex dashboard
+        "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+        Vary: "origin",
+      }),
+    });
+  }),
+});
+// @snippet end sendImageStore
+
+// @snippet start getImage
+http.route({
+  path: "/getImage",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const { searchParams } = new URL(request.url);
+    const storageId = searchParams.get("storageId")! as Id<"_storage">;
+    const blob = await ctx.storage.get(storageId);
+    if (blob === null) {
+      return new Response("Image not found", {
+        status: 404,
+      });
+    }
+    return new Response(blob);
+  }),
+});
+// @snippet end getImage
+
+// @snippet start preflight
+// Pre-flight request for /sendImage
+http.route({
+  path: "/sendImage",
+  method: "OPTIONS",
+  handler: httpAction(async (_, request) => {
+    // Make sure the necessary headers are present
+    // for this to be a valid pre-flight request
+    const headers = request.headers;
+    if (
+      headers.get("Origin") !== null &&
+      headers.get("Access-Control-Request-Method") !== null &&
+      headers.get("Access-Control-Request-Headers") !== null
+    ) {
+      return new Response(null, {
+        headers: new Headers({
+          // e.g. https://mywebsite.com, configured on your Convex dashboard
+          "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type, Digest",
+          "Access-Control-Max-Age": "86400",
+        }),
+      });
+    } else {
+      return new Response();
+    }
+  }),
+});
+// @snippet end preflight
+
+export default http;
+
+```
+
 
 Here's an example of handling a pre-flight `OPTIONS` request:
 
-> **⚠ snippet " httpStorage, httpStorage " not found**
+
+```ts
+// @snippet start sendImageStore
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+import { api } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
+
+const http = httpRouter();
+
+http.route({
+  path: "/sendImage",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // Step 1: Store the file
+    const blob = await request.blob();
+    const storageId = await ctx.storage.store(blob);
+
+    // Step 2: Save the storage ID to the database via a mutation
+    const author = new URL(request.url).searchParams.get("author");
+    await ctx.runMutation(api.messages.sendImage, { storageId, author });
+
+    // Step 3: Return a response with the correct CORS headers
+    return new Response(null, {
+      status: 200,
+      // CORS headers
+      headers: new Headers({
+        // e.g. https://mywebsite.com, configured on your Convex dashboard
+        "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+        Vary: "origin",
+      }),
+    });
+  }),
+});
+// @snippet end sendImageStore
+
+// @snippet start getImage
+http.route({
+  path: "/getImage",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const { searchParams } = new URL(request.url);
+    const storageId = searchParams.get("storageId")! as Id<"_storage">;
+    const blob = await ctx.storage.get(storageId);
+    if (blob === null) {
+      return new Response("Image not found", {
+        status: 404,
+      });
+    }
+    return new Response(blob);
+  }),
+});
+// @snippet end getImage
+
+// @snippet start preflight
+// Pre-flight request for /sendImage
+http.route({
+  path: "/sendImage",
+  method: "OPTIONS",
+  handler: httpAction(async (_, request) => {
+    // Make sure the necessary headers are present
+    // for this to be a valid pre-flight request
+    const headers = request.headers;
+    if (
+      headers.get("Origin") !== null &&
+      headers.get("Access-Control-Request-Method") !== null &&
+      headers.get("Access-Control-Request-Headers") !== null
+    ) {
+      return new Response(null, {
+        headers: new Headers({
+          // e.g. https://mywebsite.com, configured on your Convex dashboard
+          "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+          "Access-Control-Allow-Methods": "POST",
+          "Access-Control-Allow-Headers": "Content-Type, Digest",
+          "Access-Control-Max-Age": "86400",
+        }),
+      });
+    } else {
+      return new Response();
+    }
+  }),
+});
+// @snippet end preflight
+
+export default http;
+
+```
+
 
 ### Authentication
 
@@ -182,4 +419,15 @@ access a user identity from
 [`ctx.auth.getUserIdentity()`](/api/interfaces/server.Auth#getuseridentity). To
 do this call your endpoint with an `Authorization` header including a JWT token:
 
-> **⚠ snippet " Fetch, Fetch " not found**
+
+```ts
+const jwtToken = "...";
+
+fetch("https://<deployment name>.convex.site/myAction", {
+  headers: {
+    Authorization: `Bearer ${jwtToken}`,
+  },
+});
+
+```
+

@@ -77,7 +77,13 @@ and<LanguageSelector verbose />
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -129,7 +135,19 @@ and<LanguageSelector verbose />
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasksTS, tasks " not found**
+    
+```ts
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -137,7 +155,26 @@ and<LanguageSelector verbose />
     In <JSDialectFileName name="src/main.jsx" />, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your app.
 
-    > **⚠ snippet " mainTS, main " not found**
+    
+```tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <ConvexProvider client={convex}>
+      <App />
+    </ConvexProvider>
+  </React.StrictMode>,
+);
+
+```
+
 
   </Step>
 
@@ -145,7 +182,25 @@ and<LanguageSelector verbose />
     In <JSDialectFileName name="src/App.jsx" />, use the `useQuery` hook to fetch from your `api.tasks.get`
     API function and display the data.
 
-    > **⚠ snippet " AppTS, App " not found**
+    
+```tsx
+import "./App.css";
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+function App() {
+  const tasks = useQuery(api.tasks.get);
+  return (
+    <div className="App">
+      {tasks?.map(({ _id, text }) => <div key={_id}>{text}</div>)}
+    </div>
+  );
+}
+
+export default App;
+
+```
+
 
   </Step>
 

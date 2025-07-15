@@ -1,0 +1,45 @@
+{
+    "name": "office-addin-test-helpers",
+    "version": "2.0.3",
+    "description": "Provides test helpers for automating validation of Office Add-ins.",
+    "main": "./lib/main.js",
+    "scripts": {
+        "build": "rimraf lib && concurrently \"tsc -p tsconfig.json\"",
+        "lint": "office-addin-lint check",
+        "lint:fix": "office-addin-lint fix",
+        "prettier": "office-addin-lint prettier",
+        "test": "mocha -r ts-node/register test/**/*.ts",
+        "watch": "rimraf lib && concurrently \"tsc -p tsconfig.json -w\""
+    },
+    "author": "Office Dev",
+    "license": "MIT",
+    "keywords": [
+        "Office",
+        "Office Add-in"
+    ],
+    "dependencies": {
+        "isomorphic-fetch": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/es6-collections": "^0.5.31",
+        "@types/isomorphic-fetch": "^0.0.35",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^14.17.2",
+        "concurrently": "^9.0.0",
+        "mocha": "^11.0.1",
+        "office-addin-lint": "^2.3.5",
+        "office-addin-test-server": "1.5.5",
+        "rimraf": "^6.0.1",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.7.4"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OfficeDev/Office-Addin-Scripts"
+    },
+    "bugs": {
+        "url": "https://github.com/OfficeDev/Office-Addin-Scripts/issues"
+    },
+    "prettier": "office-addin-prettier-config",
+    "gitHead": "dffbcd4d1397534105b98fb13ba0fb1c3aba2dea"
+}

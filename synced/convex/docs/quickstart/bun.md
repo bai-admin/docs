@@ -54,7 +54,13 @@ For instructions for subscriptions instead of point-in-time queries see
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -77,7 +83,19 @@ For instructions for subscriptions instead of point-in-time queries see
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```js
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -85,7 +103,23 @@ For instructions for subscriptions instead of point-in-time queries see
     In a new file `index.ts`, create a `ConvexClient` using
     the URL of your development environment.
 
-    > **⚠ snippet " script " not found**
+    
+```ts
+import { ConvexClient } from "convex/browser";
+import { api } from "./convex/_generated/api.js";
+
+const client = new ConvexClient(process.env["CONVEX_URL"]);
+
+const unsubscribe = client.onUpdate(api.tasks.get, {}, async (tasks) => {
+  console.log(tasks);
+});
+
+await Bun.sleep(1000);
+unsubscribe();
+await client.close();
+
+```
+
 
   </Step>
 

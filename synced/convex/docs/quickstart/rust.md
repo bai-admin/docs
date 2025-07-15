@@ -55,7 +55,13 @@ Learn how to query data from Convex in a Rust app with Tokio.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -78,7 +84,18 @@ Learn how to query data from Convex in a Rust app with Tokio.
     declares an API function named after the file
     and the export name, `"tasks:get"`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```js
+import { query } from "./_generated/server";
+
+export const get = query({
+  handler: async ({ db }) => {
+    return await db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -86,7 +103,29 @@ Learn how to query data from Convex in a Rust app with Tokio.
     In the file `src/main.rs`, create a `ConvexClient` and use it
     to fetch from your `"tasks:get"` API.
     
-    > **⚠ snippet " main " not found**
+    
+```rs
+use std::{
+    collections::BTreeMap,
+    env,
+};
+
+use convex::ConvexClient;
+
+#[tokio::main]
+async fn main() {
+    dotenvy::from_filename(".env.local").ok();
+    dotenvy::dotenv().ok();
+
+    let deployment_url = env::var("CONVEX_URL").unwrap();
+
+    let mut client = ConvexClient::new(&deployment_url).await.unwrap();
+    let result = client.query("tasks:get", BTreeMap::new()).await.unwrap();
+    println!("{result:#?}");
+}
+
+```
+
 
   </Step>
 

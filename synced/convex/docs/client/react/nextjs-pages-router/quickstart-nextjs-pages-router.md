@@ -60,7 +60,13 @@ quickstart.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -83,7 +89,19 @@ quickstart.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasksJs " not found**
+    
+```js
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -91,7 +109,23 @@ quickstart.
     In `pages/_app.js`, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your app.
 
-    > **⚠ snippet " app " not found**
+    
+```js
+import "@/styles/globals.css";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
+
+export default function App({ Component, pageProps }) {
+  return (
+    <ConvexProvider client={convex}>
+      <Component {...pageProps} />
+    </ConvexProvider>
+  );
+}
+
+```
+
 
   </Step>
 
@@ -99,7 +133,24 @@ quickstart.
     In `pages/index.js`, use the `useQuery` hook to fetch from your `api.tasks.get`
     API function.
 
-    > **⚠ snippet " index " not found**
+    
+```js
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export default function Home() {
+  const tasks = useQuery(api.tasks.get);
+  return (
+    <main className="flex min-h-screen flex-col items-center p-24">
+      {tasks?.map(({ _id, text }) => (
+        <div key={_id}>{text}</div>
+      ))}
+    </main>
+  );
+}
+
+```
+
 
   </Step>
 

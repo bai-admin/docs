@@ -55,7 +55,13 @@ Learn how to query data from Convex in a Python app.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -78,7 +84,18 @@ Learn how to query data from Convex in a Python app.
     declares an API function named after the file
     and the export name, `"tasks:get"`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```js
+import { query } from "./_generated/server";
+
+export const get = query({
+  handler: async ({ db }) => {
+    return await db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -86,7 +103,29 @@ Learn how to query data from Convex in a Python app.
     In a new file `main.py`, create a `ConvexClient` and use it
     to fetch from your `"tasks:get"` API.
     
-    > **⚠ snippet " main " not found**
+    
+```py
+import os
+
+from dotenv import load_dotenv
+
+from convex import ConvexClient
+
+load_dotenv(".env.local")
+CONVEX_URL = os.getenv("CONVEX_URL")
+# or you can hardcode your deployment URL instead
+# CONVEX_URL = "https://happy-otter-123.convex.cloud"
+
+client = ConvexClient(CONVEX_URL)
+
+print(client.query("tasks:get"))
+
+for tasks in client.subscribe("tasks:get"):
+    print(tasks)
+    # this loop lasts forever, ctrl-c to exit it
+
+```
+
 
   </Step>
 

@@ -33,7 +33,38 @@ React-based authentication guides for [Clerk](/auth/clerk.mdx) or
 [Auth0](/auth/auth0.mdx), inside your `app/ConvexClientProvider.tsx` file. For
 example this is what the file would look like for Auth0:
 
-> **⚠ snippet " Config, Config " not found**
+
+```tsx
+"use client";
+
+import { Auth0Provider } from "@auth0/auth0-react";
+import { ConvexReactClient } from "convex/react";
+import { ConvexProviderWithAuth0 } from "convex/react-auth0";
+import { ReactNode } from "react";
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  return (
+    <Auth0Provider
+      domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN!}
+      clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!}
+      authorizationParams={{
+        redirect_uri:
+          typeof window === "undefined" ? undefined : window.location.origin,
+      }}
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
+    >
+      <ConvexProviderWithAuth0 client={convex}>
+        {children}
+      </ConvexProviderWithAuth0>
+    </Auth0Provider>
+  );
+}
+
+```
+
 
 Custom loading and logged out views can be built with the helper
 `Authenticated`, `Unauthenticated` and `AuthLoading` components from

@@ -43,13 +43,43 @@ In a
 [Server Component](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
 call `preloadQuery`:
 
-> **⚠ snippet " PreloadQuery, PreloadQuery " not found**
+
+```tsx
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { Tasks } from "./Tasks";
+
+export async function TasksWrapper() {
+  const preloadedTasks = await preloadQuery(api.tasks.list, {
+    list: "default",
+  });
+  return <Tasks preloadedTasks={preloadedTasks} />;
+}
+
+```
+
 
 In a
 [Client Component](https://nextjs.org/docs/app/building-your-application/rendering/client-components)
 call [`usePreloadedQuery`](/api/modules/react#usepreloadedquery):
 
-> **⚠ snippet " UsePreloadedQueryTS, UsePreloadedQueryJS " not found**
+
+```tsx
+"use client";
+
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+export function Tasks(props: {
+  preloadedTasks: Preloaded<typeof api.tasks.list>;
+}) {
+  const tasks = usePreloadedQuery(props.preloadedTasks);
+  // render `tasks`...
+  return <div>...</div>;
+}
+
+```
+
 
 [`preloadQuery`](/api/modules/nextjs#preloadquery) takes three arguments:
 
@@ -77,7 +107,19 @@ If you need Convex data on the server, you can load data from Convex in your
 but it will be non-reactive. To do this, use the
 [`fetchQuery`](/api/modules/nextjs#fetchquery) function from `convex/nextjs`:
 
-> **⚠ snippet " FetchQuery, FetchQuery " not found**
+
+```tsx
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+
+export async function StaticTasks() {
+  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
+  // render `tasks`...
+  return <div>...</div>;
+}
+
+```
+
 
 ## Server Actions and Route Handlers
 
@@ -93,11 +135,50 @@ the `fetchQuery`, `fetchMutation` and `fetchAction` functions.
 
 Here's an example inline Server Action calling a Convex mutation:
 
-> **⚠ snippet " ServerActionTS, ServerActionJS " not found**
+
+```tsx
+import { api } from "@/convex/_generated/api";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { revalidatePath } from "next/cache";
+
+export default async function PureServerPage() {
+  const tasks = await fetchQuery(api.tasks.list, { list: "default" });
+  async function createTask(formData: FormData) {
+    "use server";
+
+    await fetchMutation(api.tasks.create, {
+      text: formData.get("text") as string,
+    });
+    revalidatePath("/example");
+  }
+  // render tasks and task creation form
+  return <form action={createTask}>...</form>;
+}
+
+```
+
 
 Here's an example Route Handler calling a Convex mutation:
 
-> **⚠ snippet " RouteHandlerTS, RouteHandlerJS " not found**
+
+```ts
+import { NextResponse } from "next/server";
+// Hack for TypeScript before 5.2
+const Response = NextResponse;
+
+// @snippet start example
+import { api } from "@/convex/_generated/api";
+import { fetchMutation } from "convex/nextjs";
+
+export async function POST(request: Request) {
+  const args = await request.json();
+  await fetchMutation(api.tasks.create, { text: args.text });
+  return Response.json({ success: true });
+}
+// @snippet end example
+
+```
+
 
 ## Server-side authentication
 
@@ -105,7 +186,30 @@ To make authenticated requests to Convex during server rendering, pass a JWT
 token to [`preloadQuery`](/api/modules/nextjs#preloadquery) or
 [`fetchQuery`](/api/modules/nextjs#fetchquery) in the third options argument:
 
-> **⚠ snippet " AuthedPreloadQuery, AuthedPreloadQuery " not found**
+
+```tsx
+// @snippet start example
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { Tasks } from "./Tasks";
+
+export async function TasksWrapper() {
+  const token = await getAuthToken();
+  const preloadedTasks = await preloadQuery(
+    api.tasks.list,
+    { list: "default" },
+    { token },
+  );
+  return <Tasks preloadedTasks={preloadedTasks} />;
+}
+// @snippet end example
+
+function getAuthToken() {
+  return "foo";
+}
+
+```
+
 
 The implementation of `getAuthToken` depends on your authentication provider.
 

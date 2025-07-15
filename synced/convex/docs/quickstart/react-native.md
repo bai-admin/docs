@@ -53,7 +53,13 @@ Learn how to query data from Convex in a React Native app.
     Create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -75,7 +81,19 @@ Learn how to query data from Convex in a React Native app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```ts
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -93,7 +111,27 @@ Learn how to query data from Convex in a React Native app.
     In `_layout.tsx`, create a `ConvexReactClient` and pass it to a `ConvexProvider`
     wrapping your component tree.
 
-    > **⚠ snippet " layout " not found**
+    
+```tsx
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { Stack } from "expo-router";
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
+
+export default function RootLayout() {
+  return (
+    <ConvexProvider client={convex}>
+      <Stack>
+        <Stack.Screen name="index" />
+      </Stack>
+    </ConvexProvider>
+  );
+}
+
+```
+
 
   </Step>
 
@@ -101,7 +139,29 @@ Learn how to query data from Convex in a React Native app.
     In `index.tsx` use the `useQuery` hook to fetch
     from your `api.tasks.get` API.
 
-    > **⚠ snippet " index " not found**
+    
+```tsx
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import { Text, View } from "react-native";
+
+export default function Index() {
+  const tasks = useQuery(api.tasks.get);
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {tasks?.map(({ _id, text }) => <Text key={_id}>{text}</Text>)}
+    </View>
+  );
+}
+
+```
+
 
   </Step>
 

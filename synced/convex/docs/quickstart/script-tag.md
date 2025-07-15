@@ -51,7 +51,13 @@ Learn how to query data from Convex from script tags in HTML.
     In a new terminal window, create a `sampleData.jsonl`
     file with some sample data.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+```
+
 
   </Step>
 
@@ -74,7 +80,19 @@ Learn how to query data from Convex from script tags in HTML.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```js
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
@@ -93,7 +111,20 @@ Learn how to query data from Convex from script tags in HTML.
     Open this file in a web browser and you'll see it run each time the `tasks`
     table is modified.
 
-    > **⚠ snippet " html " not found**
+    
+```html
+<!doctype html>
+<script src="https://unpkg.com/convex@1.3.1/dist/browser.bundle.js"></script>
+<script>
+  const CONVEX_URL = "http://localhost:8000";
+  const client = new convex.ConvexClient(CONVEX_URL);
+  client.onUpdate("messages:list", {}, (messages) =>
+    console.log(messages.map((msg) => msg.body)),
+  );
+</script>
+
+```
+
 
   </Step>
 

@@ -54,7 +54,14 @@ Learn how to query data from Convex in a Remix app.
     Create a `sampleData.jsonl` file at the root of you app
     and fill it with the sample data given.
 
-    > **⚠ snippet " sampleData " not found**
+    
+```json
+{"text": "Buy groceries", "isCompleted": true}
+{"text": "Go for a swim", "isCompleted": true}
+{"text": "Integrate Convex", "isCompleted": false}
+
+```
+
 
   </Step>
 
@@ -77,14 +84,70 @@ Learn how to query data from Convex in a Remix app.
     declares an API function named after the file
     and the export name, `api.tasks.get`.
 
-    > **⚠ snippet " tasks " not found**
+    
+```ts
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("tasks").collect();
+  },
+});
+
+```
+
 
   </Step>
 
   <Step title="Wire up the ConvexProvider">
     Modify `app/root.tsx` to set up the Convex client there to make it available on every page of your app.
 
-    > **⚠ snippet " root " not found**
+    
+```tsx
+import {
+  data,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+} from "@remix-run/react";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { useState } from "react";
+
+export async function loader() {
+  const CONVEX_URL = process.env["CONVEX_URL"]!;
+  return data({ ENV: { CONVEX_URL } });
+}
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  const { ENV } = useLoaderData<typeof loader>();
+  const [convex] = useState(() => new ConvexReactClient(ENV.CONVEX_URL));
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <ConvexProvider client={convex}>{children}</ConvexProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+
+```
+
 
   </Step>
 
@@ -92,7 +155,33 @@ Learn how to query data from Convex in a Remix app.
     In `app/routes/_index.tsx` use `useQuery` to subscribe your `api.tasks.get`
     API function.
 
-    > **⚠ snippet " index " not found**
+    
+```tsx
+import type { MetaFunction } from "@remix-run/node";
+import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "New Remix App" },
+    { name: "description", content: "Welcome to Remix!" },
+  ];
+};
+
+export default function Index() {
+  const tasks = useQuery(api.tasks.get);
+  return (
+    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+      <h1>Welcome to Remix</h1>
+      {tasks === undefined
+        ? "loading..."
+        : tasks.map(({ _id, text }) => <div key={_id}>{text}</div>)}
+    </div>
+  );
+}
+
+```
+
 
   </Step>
 

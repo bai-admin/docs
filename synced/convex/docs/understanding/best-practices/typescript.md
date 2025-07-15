@@ -31,11 +31,43 @@ Convex functions in TypeScript by using the `.ts` extension.
 If you are using [argument validation](/functions/validation.mdx), Convex will
 infer the types of your functions arguments automatically:
 
-> **⚠ snippet " ArgValidation " not found**
+
+```ts
+import { mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export default mutation({
+  args: {
+    body: v.string(),
+    author: v.string(),
+  },
+  // Convex knows that the argument type is `{body: string, author: string}`.
+  handler: async (ctx, args) => {
+    const { body, author } = args;
+    await ctx.db.insert("messages", { body, author });
+  },
+});
+
+```
+
 
 Otherwise you can annotate the arguments type manually:
 
-> **⚠ snippet " WithoutArgValidation " not found**
+
+```ts
+import { internalMutation } from "./_generated/server";
+
+export default internalMutation({
+  // To convert this function from JavaScript to
+  // TypeScript you annotate the type of the arguments object.
+  handler: async (ctx, args: { body: string; author: string }) => {
+    const { body, author } = args;
+    await ctx.db.insert("messages", { body, author });
+  },
+});
+
+```
+
 
 This can be useful for [internal functions](/functions/internal-functions.mdx)
 accepting complicated types.
@@ -63,7 +95,20 @@ The types of documents in tables can be described using the
 references to documents can be described with parametrized
 [Document IDs](/database/document-ids.mdx).
 
-> **⚠ snippet " WithSchema " not found**
+
+```ts
+import { query } from "./_generated/server";
+
+export const list = query({
+  args: {},
+  // The inferred return type of `handler` is now `Promise<Doc<"messages">[]>`
+  handler: (ctx) => {
+    return ctx.db.query("messages").collect();
+  },
+});
+
+```
+
 
 ## Type annotating server-side helpers
 
@@ -75,7 +120,37 @@ Convex generates types corresponding to documents and IDs in your database,
 `Doc` and `Id`, as well as `QueryCtx`, `MutationCtx` and `ActionCtx` types based
 on your schema and declared Convex functions:
 
-> **⚠ snippet " ContextTypes " not found**
+
+```ts
+// Types based on your schema
+import { Doc, Id } from "./_generated/dataModel";
+// Types based on your schema and declared functions
+import {
+  QueryCtx,
+  MutationCtx,
+  ActionCtx,
+  DatabaseReader,
+  DatabaseWriter,
+} from "./_generated/server";
+// Types that don't depend on schema or function
+import {
+  Auth,
+  StorageReader,
+  StorageWriter,
+  StorageActionWriter,
+} from "convex/server";
+
+// Note that a `MutationCtx` also satisfies the `QueryCtx` interface
+export function myReadHelper(ctx: QueryCtx, id: Id<"channels">) {
+  /* ... */
+}
+
+export function myActionHelper(ctx: ActionCtx, doc: Doc<"messages">) {
+  /* ... */
+}
+
+```
+
 
 ### Inferring types from validators
 
@@ -85,7 +160,22 @@ Validators can be reused between
 [`Infer`](/api/modules/values#infer) type to get a TypeScript type corresponding
 to a validator:
 
-> **⚠ snippet " ValidatorTypes " not found**
+
+```ts
+import { Infer, v } from "convex/values";
+
+export const courseValidator = v.union(
+  v.literal("appetizer"),
+  v.literal("main"),
+  v.literal("dessert"),
+);
+
+// The corresponding type can be used in server or client-side helpers:
+export type Course = Infer<typeof courseValidator>;
+// is inferred as `'appetizer' | 'main' | 'dessert'`
+
+```
+
 
 ### Document types without system fields
 
@@ -95,7 +185,23 @@ might want use the type without the system fields. Convex provides
 [`WithoutSystemFields`](/api/modules/server#withoutsystemfields) for this
 purpose:
 
-> **⚠ snippet " SystemFieldsTypes " not found**
+
+```ts
+import { MutationCtx } from "./_generated/server";
+import { WithoutSystemFields } from "convex/server";
+import { Doc } from "./_generated/dataModel";
+
+export async function insertMessageHelper(
+  ctx: MutationCtx,
+  values: WithoutSystemFields<Doc<"messages">>,
+) {
+  // ...
+  await ctx.db.insert("messages", values);
+  // ...
+}
+
+```
+
 
 ## Writing frontend code in TypeScript
 
@@ -115,7 +221,20 @@ When you want to pass the result of calling a function around your client
 codebase, you can use the generated types `Doc` and `Id`, just like on the
 backend:
 
-> **⚠ snippet " ClientDatabaseTypes " not found**
+
+```tsx
+import { Doc, Id } from "../convex/_generated/dataModel";
+
+function Channel(props: { channelId: Id<"channels"> }) {
+  // ...
+}
+
+function MessagesView(props: { message: Doc<"messages"> }) {
+  // ...
+}
+
+```
+
 
 You can also declare custom types inside your backend codebase which include
 `Doc`s and `Id`s, and import them in your client-side code.
@@ -130,7 +249,28 @@ backend function returns. Beside manually declaring the type (on the backend or
 on the frontend), you can use the generic `FunctionReturnType` and
 `UsePaginatedQueryReturnType` types with a function reference:
 
-> **⚠ snippet " FunctionReturnTypes " not found**
+
+```ts
+import { FunctionReturnType } from "convex/server";
+import { UsePaginatedQueryReturnType } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export function MyHelperComponent(props: {
+  data: FunctionReturnType<typeof api.myFunctions.getSomething>;
+}) {
+  // ...
+}
+
+export function MyPaginationHelperComponent(props: {
+  paginatedData: UsePaginatedQueryReturnType<
+    typeof api.myFunctions.getSomethingPaginated
+  >;
+}) {
+  // ...
+}
+
+```
+
 
 ## Turning `string`s into valid document IDs
 
