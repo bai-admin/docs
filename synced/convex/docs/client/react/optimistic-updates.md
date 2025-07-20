@@ -3,6 +3,7 @@ title: "Optimistic Updates"
 slug: "optimistic-updates"
 hidden: false
 sidebar_position: 90
+description: "Make your React app more responsive with optimistic UI updates"
 ---
 
 

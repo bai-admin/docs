@@ -3,6 +3,9 @@ title: "TanStack Start with Clerk"
 slug: "tanstack-start-with-clerk"
 sidebar_label: With Clerk
 sidebar_position: 10
+description:
+  "Learn how to integrate Clerk authentication with Convex in TanStack Start
+  applications using ID tokens and ConvexProviderWithClerk."
 ---
 
 

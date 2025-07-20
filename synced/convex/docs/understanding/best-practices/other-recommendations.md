@@ -3,6 +3,9 @@ title: "Other Recommendations"
 sidebar_position: 170
 sidebar_class_name: "hidden"
 pagination_next: null
+description:
+  "Additional Convex development recommendations including TypeScript usage,
+  helper functions, database patterns, and UI optimization techniques."
 ---
 
 
