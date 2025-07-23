@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.12 alpha
+
+- Limit ctx arg type to not require supporting "public" function running
+
+## 0.2.11
+
+- Allow passing config to hookAPI
+
+## 0.2.10
+
+- Throws on reservations going negative when reserve & throws both passed to check
+
 ## 0.2.9
 
 - Passing `throw: true` and `reserve: true` will throw if it would have returned a `retryAfter`,
