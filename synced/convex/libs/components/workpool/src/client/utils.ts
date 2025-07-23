@@ -1,20 +1,28 @@
 import {
   Expand,
+  FunctionArgs,
   FunctionReference,
-  GenericMutationCtx,
-  GenericQueryCtx,
+  FunctionReturnType,
+  FunctionType,
+  FunctionVisibility,
+  getFunctionAddress,
+  getFunctionName,
 } from "convex/server";
 import { GenericId } from "convex/values";
-
-import { GenericDataModel } from "convex/server";
 
 /* Type utils follow */
 
 export type RunQueryCtx = {
-  runQuery: GenericQueryCtx<GenericDataModel>["runQuery"];
+  runQuery: <Query extends FunctionReference<"query", "internal">>(
+    query: Query,
+    args: FunctionArgs<Query>
+  ) => Promise<FunctionReturnType<Query>>;
 };
-export type RunMutationCtx = {
-  runMutation: GenericMutationCtx<GenericDataModel>["runMutation"];
+export type RunMutationCtx = RunQueryCtx & {
+  runMutation: <Mutation extends FunctionReference<"mutation", "internal">>(
+    mutation: Mutation,
+    args: FunctionArgs<Mutation>
+  ) => Promise<FunctionReturnType<Mutation>>;
 };
 
 export type OpaqueIds<T> =
@@ -43,3 +51,15 @@ export type UseApi<API> = Expand<{
       >
     : UseApi<API[mod]>;
 }>;
+
+export function safeFunctionName(
+  f: FunctionReference<FunctionType, FunctionVisibility>
+) {
+  const address = getFunctionAddress(f);
+  return (
+    address.name ||
+    address.reference ||
+    address.functionHandle ||
+    getFunctionName(f)
+  );
+}
