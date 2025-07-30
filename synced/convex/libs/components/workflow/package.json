@@ -1,6 +1,6 @@
 {
   "name": "@convex-dev/workflow",
-  "version": "0.2.5",
+  "version": "0.2.6-alpha.1",
   "description": "Convex component for durably executing workflows.",
   "keywords": [
     "convex",
@@ -50,7 +50,7 @@
     }
   },
   "peerDependencies": {
-    "@convex-dev/workpool": "^0.2.16",
+    "@convex-dev/workpool": "^0.2.17",
     "convex": ">=1.25.0 <1.35.0",
     "convex-helpers": "^0.1.99"
   },
