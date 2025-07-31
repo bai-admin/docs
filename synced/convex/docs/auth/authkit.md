@@ -170,7 +170,7 @@ have a working React app with Convex. If not follow the
     In a new terminal window, install the AuthKit React SDK:
 
     ```sh
-    npm install @workos-inc/authkit-react
+    npm install @workos-inc/authkit-react @convex-dev/workos
     ```
 
   </Step>
@@ -376,7 +376,7 @@ have a working Next.js app with Convex. If not follow the
     In a new terminal window, install the AuthKit Next.js SDK:
 
     ```sh
-    npm install @workos-inc/authkit-nextjs
+    npm install @workos-inc/authkit-nextjs @convex-dev/workos
     ```
 
   </Step>
