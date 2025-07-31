@@ -136,10 +136,10 @@ have a working React app with Convex. If not follow the
       providers: [
         {
           type: 'customJwt',
-          issuer: `https://api.workos.com/${clientId}`,
+          issuer: `https://api.workos.com/`,
           algorithm: 'RS256',
-      applicationID: clientId,
       jwks: `https://api.workos.com/sso/jwks/${clientId}`,
+      applicationID: clientId,
         },
         {
           type: 'customJwt',
@@ -342,10 +342,10 @@ have a working Next.js app with Convex. If not follow the
       providers: [
         {
           type: 'customJwt',
-          issuer: `https://api.workos.com/${clientId}`,
+          issuer: `https://api.workos.com/`,
           algorithm: 'RS256',
-      applicationID: clientId,
-      jwks: `https://api.workos.com/sso/jwks/${clientId}`,
+          applicationID: clientId,
+          jwks: `https://api.workos.com/sso/jwks/${clientId}`,
         },
         {
           type: 'customJwt',
@@ -730,7 +730,7 @@ export default {
   providers: [
     {
       type: "customJwt",
-      issuer: `https://api.workos.com/${clientId}`,
+      issuer: `https://api.workos.com/`,
       algorithm: "RS256",
       applicationID: clientId,
       jwks: `https://api.workos.com/sso/jwks/${clientId}`,
