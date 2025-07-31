@@ -18,7 +18,7 @@ const cache = new ActionCache(components.actionCache, {
 export const myFunction = action({
   // NOTE: If we're returning the result, we need explicitly type the return value.
   // Refer to https://docs.convex.dev/functions/actions#dealing-with-circular-type-inference for more info.
-  handler: async (ctx, args): Promise<string> => {
+  handler: async (ctx, args): Promise<{ text: string }> => {
     // Call it with the parameters to `myExpensiveAction`
     const result = await cache.fetch(ctx, { foo: "bar" });
 
@@ -29,7 +29,7 @@ export const myFunction = action({
 
 export const myExpensiveAction = internalAction({
   args: { foo: v.string() },
-  handler: async (ctx, args): Promise<string> {
+  handler: async (ctx, args): Promise<{ text: string }> {
     const data = await generateLLMResponse(ctx, args);
     return data;
   }
@@ -166,6 +166,19 @@ same action. You can specify a custom `name` argument to denote which cache you
 want to use, or change the name to start fresh, like `embed-v2`.
 
 If the return value changes, it is important to change the name so you don't get unexpected values.
+
+### Updating the cache before it expires
+
+It's convenient to lazily run the action when there is a cache miss. However,
+this means that some requests will be slow, and many competeing requests may
+race to all run the action and populate the cache.
+
+You can avoid this by calling `fetch` with the `force` option. This will force
+the action to run and update the cache, even if there is a cache hit. In the
+meantime, other requests will get a cache hit.
+
+If you call this from a cron job, the cache will always have an entry (unless
+the action fails).
 
 ### Clearing values
 

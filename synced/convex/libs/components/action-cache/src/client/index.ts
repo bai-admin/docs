@@ -71,14 +71,15 @@ export class ActionCache<
   async fetch(
     ctx: RunQueryCtx & RunMutationCtx & RunActionCtx,
     args: FunctionArgs<Action>,
-    opts?: { ttl: number }
+    opts?: { ttl?: number; force?: boolean }
   ) {
     const fn = await createFunctionHandle(this.config.action);
     const ttl = opts?.ttl ?? this.config.ttl ?? null;
     const result = await ctx.runQuery(this.component.lib.get, {
       name: this.name,
       args,
-      ttl,
+      // If we're forcing a cache miss, we want to get the current value.
+      ttl: opts?.force ? 0 : ttl,
     });
     if (result.kind === "hit") {
       this.#log({ get: "hit" });
@@ -150,6 +151,14 @@ export class ActionCache<
   async removeAll(ctx: RunMutationCtx, before?: number) {
     return ctx.runMutation(this.component.lib.removeAll, { before });
   }
+}
+
+export async function removeAll(
+  ctx: RunMutationCtx,
+  component: UseApi<typeof api>,
+  before?: number
+) {
+  return ctx.runMutation(component.lib.removeAll, { before });
 }
 
 /* Type utils follow */
