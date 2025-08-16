@@ -1,10 +1,10 @@
-import { v } from "convex/values";
+import { Infer, ObjectType, v } from "convex/values";
 import { api } from "./_generated/api.js";
 import { fnType } from "./shared.js";
 import { Id } from "./_generated/dataModel.js";
-import { mutation, MutationCtx, query } from "./_generated/server.js";
+import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server.js";
 import { kickMainLoop } from "./kick.js";
-import { createLogger, LogLevel, logLevel } from "./logging.js";
+import { createLogger, Logger, LogLevel, logLevel } from "./logging.js";
 import {
   boundScheduledTime,
   config,
@@ -20,44 +20,75 @@ import { recordEnqueued } from "./stats.js";
 const MAX_POSSIBLE_PARALLELISM = 100;
 const MAX_PARALLELISM_SOFT_LIMIT = 50;
 
+const itemArgs = {
+  fnHandle: v.string(),
+  fnName: v.string(),
+  fnArgs: v.any(),
+  fnType,
+  runAt: v.number(),
+  // TODO: annotation?
+  onComplete: v.optional(onComplete),
+  retryBehavior: v.optional(retryBehavior),
+};
+const enqueueArgs = {
+  ...itemArgs,
+  config,
+};
 export const enqueue = mutation({
+  args: enqueueArgs,
+  returns: v.id("work"),
+  handler: async (ctx, { config, ...itemArgs }) => {
+    validateConfig(config);
+    const console = createLogger(config.logLevel);
+    const kickSegment = await kickMainLoop(ctx, "enqueue", config);
+    return await enqueueHandler(ctx, console, kickSegment, itemArgs);
+  },
+});
+async function enqueueHandler(
+  ctx: MutationCtx,
+  console: Logger,
+  kickSegment: bigint,
+  { runAt, ...workArgs }: ObjectType<typeof itemArgs>
+) {
+  runAt = boundScheduledTime(runAt, console);
+  const workId = await ctx.db.insert("work", {
+    ...workArgs,
+    attempts: 0,
+  });
+  await ctx.db.insert("pendingStart", {
+    workId,
+    segment: max(toSegment(runAt), kickSegment),
+  });
+  recordEnqueued(console, { workId, fnName: workArgs.fnName, runAt });
+  return workId;
+}
+
+type Config = Infer<typeof config>;
+function validateConfig(config: Config) {
+  if (config.maxParallelism > MAX_POSSIBLE_PARALLELISM) {
+    throw new Error(`maxParallelism must be <= ${MAX_PARALLELISM_SOFT_LIMIT}`);
+  } else if (config.maxParallelism > MAX_PARALLELISM_SOFT_LIMIT) {
+    createLogger(config.logLevel).warn(
+      `maxParallelism should be <= ${MAX_PARALLELISM_SOFT_LIMIT}, but is set to ${config.maxParallelism}. This will be an error in a future version.`
+    );
+  } else if (config.maxParallelism < 1) {
+    throw new Error("maxParallelism must be >= 1");
+  }
+}
+
+export const enqueueBatch = mutation({
   args: {
-    fnHandle: v.string(),
-    fnName: v.string(),
-    fnArgs: v.any(),
-    fnType,
-    runAt: v.number(),
-    // TODO: annotation?
-    onComplete: v.optional(onComplete),
-    retryBehavior: v.optional(retryBehavior),
+    items: v.array(v.object(itemArgs)),
     config,
   },
-  returns: v.id("work"),
-  handler: async (ctx, { config, runAt, ...workArgs }) => {
+  returns: v.array(v.id("work")),
+  handler: async (ctx, { config, items }) => {
+    validateConfig(config);
     const console = createLogger(config.logLevel);
-    if (config.maxParallelism > MAX_POSSIBLE_PARALLELISM) {
-      throw new Error(
-        `maxParallelism must be <= ${MAX_PARALLELISM_SOFT_LIMIT}`
-      );
-    } else if (config.maxParallelism > MAX_PARALLELISM_SOFT_LIMIT) {
-      console.warn(
-        `maxParallelism should be <= ${MAX_PARALLELISM_SOFT_LIMIT}, but is set to ${config.maxParallelism}. This will be an error in a future version.`
-      );
-    } else if (config.maxParallelism < 1) {
-      throw new Error("maxParallelism must be >= 1");
-    }
-    runAt = boundScheduledTime(runAt, console);
-    const workId = await ctx.db.insert("work", {
-      ...workArgs,
-      attempts: 0,
-    });
-    const limit = await kickMainLoop(ctx, "enqueue", config);
-    await ctx.db.insert("pendingStart", {
-      workId,
-      segment: max(toSegment(runAt), limit),
-    });
-    recordEnqueued(console, { workId, fnName: workArgs.fnName, runAt });
-    return workId;
+    const kickSegment = await kickMainLoop(ctx, "enqueue", config);
+    return Promise.all(
+      items.map((item) => enqueueHandler(ctx, console, kickSegment, item))
+    );
   },
 });
 
@@ -119,27 +150,38 @@ export const cancelAll = mutation({
 export const status = query({
   args: { id: v.id("work") },
   returns: statusValidator,
-  handler: async (ctx, { id }) => {
-    const work = await ctx.db.get(id);
-    if (!work) {
-      return { state: "finished" } as const;
-    }
-    const pendingStart = await ctx.db
-      .query("pendingStart")
-      .withIndex("workId", (q) => q.eq("workId", id))
-      .unique();
-    if (pendingStart) {
-      return { state: "pending", previousAttempts: work.attempts } as const;
-    }
-    const pendingCompletion = await ctx.db
-      .query("pendingCompletion")
-      .withIndex("workId", (q) => q.eq("workId", id))
-      .unique();
-    if (pendingCompletion?.retry) {
-      return { state: "pending", previousAttempts: work.attempts } as const;
-    }
-    // Assume it's in progress. It could be pending cancelation
-    return { state: "running", previousAttempts: work.attempts } as const;
+  handler: statusHandler,
+});
+async function statusHandler(ctx: QueryCtx, { id }: { id: Id<"work"> }) {
+  const work = await ctx.db.get(id);
+  if (!work) {
+    return { state: "finished" } as const;
+  }
+  const pendingStart = await ctx.db
+    .query("pendingStart")
+    .withIndex("workId", (q) => q.eq("workId", id))
+    .unique();
+  if (pendingStart) {
+    return { state: "pending", previousAttempts: work.attempts } as const;
+  }
+  const pendingCompletion = await ctx.db
+    .query("pendingCompletion")
+    .withIndex("workId", (q) => q.eq("workId", id))
+    .unique();
+  if (pendingCompletion?.retry) {
+    return { state: "pending", previousAttempts: work.attempts } as const;
+  }
+  // Assume it's in progress. It could be pending cancelation
+  return { state: "running", previousAttempts: work.attempts } as const;
+}
+
+export const statusBatch = query({
+  args: { ids: v.array(v.id("work")) },
+  returns: v.array(statusValidator),
+  handler: async (ctx, { ids }) => {
+    return await Promise.all(
+      ids.map(async (id) => await statusHandler(ctx, { id }))
+    );
   },
 });
 

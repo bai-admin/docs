@@ -89,6 +89,30 @@ export type Mounts = {
       },
       string
     >;
+    enqueueBatch: FunctionReference<
+      "mutation",
+      "public",
+      {
+        config: {
+          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+          maxParallelism: number;
+        };
+        items: Array<{
+          fnArgs: any;
+          fnHandle: string;
+          fnName: string;
+          fnType: "action" | "mutation" | "query";
+          onComplete?: { context?: any; fnHandle: string };
+          retryBehavior?: {
+            base: number;
+            initialBackoffMs: number;
+            maxAttempts: number;
+          };
+          runAt: number;
+        }>;
+      },
+      Array<string>
+    >;
     status: FunctionReference<
       "query",
       "public",
@@ -96,6 +120,16 @@ export type Mounts = {
       | { previousAttempts: number; state: "pending" }
       | { previousAttempts: number; state: "running" }
       | { state: "finished" }
+    >;
+    statusBatch: FunctionReference<
+      "query",
+      "public",
+      { ids: Array<string> },
+      Array<
+        | { previousAttempts: number; state: "pending" }
+        | { previousAttempts: number; state: "running" }
+        | { state: "finished" }
+      >
     >;
   };
 };
