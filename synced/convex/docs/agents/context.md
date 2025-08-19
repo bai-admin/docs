@@ -68,6 +68,23 @@ const messages: MessageDoc[] = await agent.fetchContextMessages(ctx, {
 });
 ```
 
+Note: you can also search for messages without an agent. The main difference is
+that in order to do vector search, you need to create the embeddings yourself,
+and it will not run your usage handler.
+
+```ts
+import { fetchContextMessages } from "@convex-dev/agent";
+
+const messages = await fetchContextMessages(ctx, components.agent, {
+  threadId,
+  messages: [{ role: "user", content: prompt }],
+  getEmbedding: async (text) => {
+    const embedding = await textEmbeddingModel.embed(text);
+    return { embedding, textEmbeddingModel };
+  },
+});
+```
+
 ## Searching other threads
 
 If you set `searchOtherThreads` to `true`, the agent will search across all
@@ -93,8 +110,8 @@ will not be saved automatically, but that the LLM will receive as context.
 
 ## Manage embeddings manually
 
-The `textEmbedding` argument to the Agent constructor allows you to specify a
-text embedding model.
+The `textEmbeddingModel` argument to the Agent constructor allows you to specify
+a text embedding model to use for vector search.
 
 If you set this, the agent will automatically generate embeddings for messages
 and use them for vector search.
@@ -108,6 +125,14 @@ Generate embeddings for a set of messages.
 const embeddings = await supportAgent.generateEmbeddings([
   { role: "user", content: "What is love?" },
 ]);
+```
+
+Generate and save embeddings for existing messages.
+
+```ts
+const embeddings = await supportAgent.generateAndSaveEmbeddings(ctx, {
+  messageIds,
+});
 ```
 
 Get and update embeddings, e.g. for a migration to a new model.
