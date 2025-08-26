@@ -35,7 +35,7 @@ for Convex.
     To get started, install the `convex` package.
 
     ```sh
-    cd my-vue-app && npm install @convex-vue/core @vueuse/core convex
+    cd my-vue-app && npm install convex-vue
     ```
 
   </Step>
@@ -112,20 +112,17 @@ export const get = query({
 
     
 ```ts
-import "./assets/main.css";
+import { convexVue } from 'convex-vue'
+import { createApp } from 'vue'
+import App from './App.vue'
 
-import { createApp } from "vue";
-import App from "./App.vue";
-import { createConvexVue } from "@convex-vue/core";
+const app = createApp(App)
 
-const app = createApp(App);
+app.use(convexVue, {
+  url: import.meta.env.VITE_CONVEX_URL,
+})
 
-const convexVue = createConvexVue({
-  convexUrl: import.meta.env.VITE_CONVEX_URL,
-});
-
-app.use(convexVue).mount("#app");
-
+app.mount('#app')
 ```
 
 
@@ -138,22 +135,19 @@ app.use(convexVue).mount("#app");
     
 ```vue
 <script setup lang="ts">
-
-import { useConvexQuery } from "@convex-vue/core";
+import { useConvexQuery } from "convex-vue";
 import { api } from "../convex/_generated/api";
 
-const { data, isLoading } = useConvexQuery(api.tasks.get, {});
+const { data, isPending } = useConvexQuery(api.tasks.get);
 </script>
 
 <template>
-  <div class="wrapper">
-    <ul v-if="!isLoading">
-      <li v-for="todo in data">
-        {{ todo.text }} {{ todo.isCompleted ? "☑" : "☐" }}
-      </li>
-    </ul>
-    <span v-else> loading... </span>
-  </div>
+  <span v-if="isPending"> Loading... </span>
+  <ul v-else>
+    <li v-for="todo in data">
+      {{ todo.text }} {{ todo.isCompleted ? "☑" : "☐" }}
+    </li>
+  </ul>
 </template>
 
 ```
@@ -174,4 +168,4 @@ const { data, isLoading } = useConvexQuery(api.tasks.get, {});
 </StepByStep>
 
 See the complete
-[Vue npm package documentation](https://www.npmjs.com/package/@convex-vue/core).
+[Vue npm package documentation](https://www.npmjs.com/package/convex-vue).
