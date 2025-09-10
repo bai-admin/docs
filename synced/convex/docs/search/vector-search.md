@@ -129,7 +129,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     // highlight-start
@@ -284,7 +284,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     const results = await ctx.vectorSearch("foods", "by_embedding", {
@@ -330,7 +330,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     // highlight-start
@@ -418,7 +418,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     // highlight-start
@@ -506,7 +506,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     // highlight-start
@@ -690,7 +690,7 @@ export const similarFoods = action({
     descriptionQuery: v.string(),
   },
   handler: async (ctx, args) => {
-    // 1. Generate an embedding from you favorite third party API:
+    // 1. Generate an embedding from your favorite third party API:
     const embedding = await embed(args.descriptionQuery);
     // 2. Then search for similar foods!
     // highlight-start
