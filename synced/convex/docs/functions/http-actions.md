@@ -11,6 +11,22 @@ description: "Build HTTP APIs directly in Convex"
 
 HTTP actions allow you to build an HTTP API right in Convex!
 
+```ts title="convex/http.ts"
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+
+const http = httpRouter();
+
+http.route({
+  path: "/",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    return new Response(`Hello from ${request.url}`);
+  }),
+});
+export default http;
+```
+
 HTTP actions take in a
 [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) and return a
 [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) following
