@@ -107,9 +107,8 @@ export const get = query({
 ```py
 import os
 
-from dotenv import load_dotenv
-
 from convex import ConvexClient
+from dotenv import load_dotenv
 
 load_dotenv(".env.local")
 CONVEX_URL = os.getenv("CONVEX_URL")
