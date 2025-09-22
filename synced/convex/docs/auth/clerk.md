@@ -14,7 +14,7 @@ description: "Integrate Clerk authentication with Convex"
 
 [Clerk](https://clerk.com) is an authentication platform providing login via
 passwords, social identity providers, one-time email or SMS access codes, and
-multi-factor authentication and basic user management.
+multi-factor authentication and user management.
 
 ## Get started
 
