@@ -64,6 +64,7 @@ export function createRouter() {
       defaultErrorComponent: DefaultCatchBoundary,
       defaultNotFoundComponent: () => <NotFound />,
       context: { queryClient, convexClient: convex, convexQueryClient },
+      scrollRestoration: true,
       Wrap: ({ children }) => (
         <ConvexProvider client={convexQueryClient.convexClient}>
           {children}
@@ -93,7 +94,6 @@ and modifying `app/routes/__root.tsx` like this:
 import {
   Link,
   Outlet,
-  ScrollRestoration,
   createRootRouteWithContext,
   useRouteContext,
 } from '@tanstack/react-router'
@@ -242,7 +242,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </div>
         <hr />
         {children}
-        <ScrollRestoration />
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>

@@ -11,11 +11,11 @@ sidebar_position: 200
 
 
 
-<Admonition type="caution" title="TanStack Start is in Beta">
+<Admonition type="caution" title="TanStack Start is in Release Candidate">
 
 [TanStack Start](https://tanstack.com/start/latest) is a new React framework
-currently in beta. You can try it today but there are likely to be breaking
-changes before a stable release.
+currently in the Release Candidate stage. You can try it today but there might
+still be bug or issues.
 
 </Admonition>
 
@@ -39,29 +39,11 @@ Learn how to query data from Convex in a TanStack Start site.
 <StepByStep>
   <Step title="Create a TanStack Start site">
 
-The TanStack team intends to release a CLI template starter soon, but until the
-official way to create a new TanStack Start site is to follow the TanStack Start
-[getting started](https://tanstack.com/router/latest/docs/framework/react/start/getting-started)
-guide.
+Create a TanStack Start app using the `create-start-app` command:
 
-Once you've finished you'll have a directory called myApp with a minimal
-TanStack Start app in it.
-
-      ```sh
-      .
-      ├── app/
-      │   ├── routes/
-      │   │   ├── `index.tsx`
-      │   │   └── `__root.tsx`
-      │   ├── `client.tsx`
-      │   ├── `router.tsx`
-      │   ├── `routeTree.gen.ts`
-      │   └── `ssr.tsx`
-      ├── `.gitignore`
-      ├── `app.config.ts`
-      ├── `package.json`
-      └── `tsconfig.json`
-      ```
+    ```sh
+    npx create-start-app@latest
+    ```
 
 </Step>
   <Step title="Install the Convex client and server library">
@@ -80,8 +62,7 @@ TanStack Start app in it.
 ```tsx
 import { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext } from "@tanstack/react-router";
-import { Outlet, ScrollRestoration } from "@tanstack/react-router";
-import { Meta, Scripts } from "@tanstack/start";
+import { Outlet, Scripts, HeadContent } from "@tanstack/react-router";
 import * as React from "react";
 
 export const Route = createRootRouteWithContext<{
@@ -116,11 +97,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html>
       <head>
-        <Meta />
+        <HeadContent />
       </head>
       <body>
         {children}
-        <ScrollRestoration />
         <Scripts />
       </body>
     </html>
