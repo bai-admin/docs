@@ -1,8 +1,6 @@
 ---
 title: "TanStack Start with Clerk"
-slug: "tanstack-start-with-clerk"
 sidebar_label: With Clerk
-sidebar_position: 10
 description:
   "Learn how to integrate Clerk authentication with Convex in TanStack Start
   applications using ID tokens and ConvexProviderWithClerk."
@@ -256,5 +254,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 
 Now all queries, mutations and action made with
-[TanStack Query](/client/tanstack-query.mdx) will be authenticated by a Clerk
-identity token.
+[TanStack Query](/client/tanstack/tanstack-query/index.mdx) will be
+authenticated by a Clerk identity token.

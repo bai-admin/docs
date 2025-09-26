@@ -486,7 +486,7 @@ export default function App() {
 [Tanstack Start with Convex and Clerk](https://github.com/get-convex/templates/tree/main/template-tanstack-start)
 
 See the
-[Tanstack Start with Clerk guide](/client/react/tanstack-start/clerk.mdx) for
+[Tanstack Start with Clerk guide](/client/tanstack/tanstack-start/clerk.mdx) for
 more information.
 
 ## Next steps
