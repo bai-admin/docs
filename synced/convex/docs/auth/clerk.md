@@ -69,6 +69,8 @@ follow the [Convex React Quickstart](/quickstart/react.mdx) first. Then:
     In your app's `convex` folder, create a new file <JSDialectFileName name="auth.config.ts" /> with the following code. This is the server-side configuration for validating access tokens.
 
     ```ts title="convex/auth.config.ts"
+    import { AuthConfig } from "convex/server";
+
     export default {
       providers: [
         {
@@ -76,11 +78,11 @@ follow the [Convex React Quickstart](/quickstart/react.mdx) first. Then:
           // or with `process.env.CLERK_JWT_ISSUER_DOMAIN`
           // and configure CLERK_JWT_ISSUER_DOMAIN on the Convex Dashboard
           // See https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances
-          domain: process.env.CLERK_JWT_ISSUER_DOMAIN,
+          domain: process.env.CLERK_JWT_ISSUER_DOMAIN!,
           applicationID: "convex",
         },
       ]
-    };
+    } satisfies AuthConfig;
     ```
 
   </Step>
@@ -263,6 +265,8 @@ follow the [Convex Next.js Quickstart](/quickstart/nextjs.mdx) first. Then:
     In your app's `convex` folder, create a new file <JSDialectFileName name="auth.config.ts" /> with the following code. This is the server-side configuration for validating access tokens.
 
     ```ts title="convex/auth.config.ts"
+    import { AuthConfig } from "convex/server";
+
     export default {
       providers: [
         {
@@ -270,11 +274,11 @@ follow the [Convex Next.js Quickstart](/quickstart/nextjs.mdx) first. Then:
           // or with `process.env.CLERK_JWT_ISSUER_DOMAIN`
           // and configure CLERK_JWT_ISSUER_DOMAIN on the Convex Dashboard
           // See https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances
-          domain: process.env.CLERK_JWT_ISSUER_DOMAIN,
+          domain: process.env.CLERK_JWT_ISSUER_DOMAIN!,
           applicationID: "convex",
         },
       ]
-    };
+    } satisfies AuthConfig;
     ```
 
   </Step>
@@ -541,14 +545,16 @@ Then, update your <JSDialectFileName name="auth.config.ts" /> file to use the
 environment variable.
 
 ```ts title="convex/auth.config.ts"
+import { AuthConfig } from "convex/server";
+
 export default {
   providers: [
     {
-      domain: process.env.CLERK_JWT_ISSUER_DOMAIN,
+      domain: process.env.CLERK_JWT_ISSUER_DOMAIN!,
       applicationID: "convex",
     },
   ],
-};
+} satisfies AuthConfig;
 ```
 
 **Development configuration**
