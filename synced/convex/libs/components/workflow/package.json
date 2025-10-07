@@ -1,6 +1,6 @@
 {
   "name": "@convex-dev/workflow",
-  "version": "0.2.7-alpha.0",
+  "version": "0.2.7",
   "description": "Convex component for durably executing workflows.",
   "keywords": [
     "convex",
@@ -43,6 +43,7 @@
       "types": "./dist/client/index.d.ts",
       "default": "./dist/client/index.js"
     },
+    "./test": "./src/test.ts",
     "./convex.config": {
       "@convex-dev/component-source": "./src/component/convex.config.ts",
       "types": "./dist/component/convex.config.d.ts",
@@ -58,7 +59,7 @@
     "async-channel": "^0.2.0"
   },
   "devDependencies": {
-    "@convex-dev/workflow": "file:.",
+    "@convex-dev/workpool": "0.2.19-alpha.2",
     "@edge-runtime/vm": "5.0.0",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.37.0",
@@ -66,6 +67,7 @@
     "@typescript-eslint/eslint-plugin": "8.40.0",
     "@typescript-eslint/parser": "8.40.0",
     "chokidar-cli": "3.0.0",
+    "convex": "1.27.4",
     "convex-test": "0.0.38",
     "cpy-cli": "6.0.0",
     "eslint": "9.37.0",
