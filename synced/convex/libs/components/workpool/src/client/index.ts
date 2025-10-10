@@ -1,44 +1,50 @@
 import {
   createFunctionHandle,
-  DefaultFunctionArgs,
-  FunctionHandle,
-  FunctionReference,
-  FunctionType,
-  FunctionVisibility,
-  GenericDataModel,
-  GenericMutationCtx,
+  type DefaultFunctionArgs,
+  type FunctionHandle,
+  type FunctionReference,
+  type FunctionType,
+  type FunctionVisibility,
+  type GenericDataModel,
+  type GenericMutationCtx,
   internalMutationGeneric,
-  RegisteredMutation,
+  type RegisteredMutation,
 } from "convex/server";
-import { Infer, v, Validator, VAny, VString } from "convex/values";
-import { Mounts } from "../component/_generated/api.js";
+import {
+  type Infer,
+  v,
+  type Validator,
+  type VAny,
+  type VString,
+} from "convex/values";
+import type { Mounts } from "../component/_generated/api.js";
 import { DEFAULT_LOG_LEVEL, type LogLevel } from "../component/logging.js";
 import {
-  Config,
+  type Config,
   DEFAULT_MAX_PARALLELISM,
-  OnComplete,
-  vResultValidator,
+  type OnComplete,
   type RetryBehavior,
-  RunResult,
-  OnCompleteArgs as SharedOnCompleteArgs,
-  Status,
+  type RunResult,
+  type OnCompleteArgs as SharedOnCompleteArgs,
+  type Status,
+  vResultValidator,
 } from "../component/shared.js";
 import {
-  RunMutationCtx,
-  RunQueryCtx,
+  type RunMutationCtx,
+  type RunQueryCtx,
   safeFunctionName,
-  UseApi,
+  type UseApi,
 } from "./utils.js";
-export { vResultValidator, type RunResult, type RetryBehavior };
-export { retryBehavior as vRetryBehavior } from "../component/shared.js";
 export { logLevel as vLogLevel, type LogLevel } from "../component/logging.js";
+export { retryBehavior as vRetryBehavior } from "../component/shared.js";
+export { vResultValidator, type RetryBehavior, type RunResult };
 export type WorkId = string & { __isWorkId: true };
 export const vWorkIdValidator = v.string() as VString<WorkId>;
 export {
-  /** @deprecated Use `vWorkIdValidator` instead. */
-  vWorkIdValidator as workIdValidator,
   /** @deprecated Use `vResultValidator` instead. */
   vResultValidator as resultValidator,
+  /** @deprecated Use `vWorkIdValidator` instead. */
+  vWorkIdValidator as workIdValidator,
 };
 /** Equivalent to `vOnCompleteArgs(<your-context-validator>)`. */
 export const vOnComplete = vOnCompleteArgs(v.any());
@@ -297,7 +303,6 @@ export class Workpool {
    */
   defineOnComplete<
     DataModel extends GenericDataModel,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     V extends Validator<any, any, any> = VAny<any, "optional">,
   >({
     context,
@@ -335,7 +340,6 @@ export class Workpool {
  * @returns The validator for the onComplete mutation.
  */
 export function vOnCompleteArgs<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   V extends Validator<any, "required", any> = VAny,
 >(context?: V) {
   return v.object({
@@ -374,6 +378,8 @@ export type WorkpoolOptions = {
 
 export type WorkpoolRetryOptions = {
   /** Default retry behavior for enqueued actions.
+   * Note: setting this doesn't mean actions will be retried by default.
+   * To retry actions by default, set `retryActionsByDefault: true`.
    * See {@link RetryBehavior}.
    */
   defaultRetryBehavior?: RetryBehavior;
@@ -448,7 +454,7 @@ export type OnCompleteArgs = {
   /**
    * The ID of the work that completed.
    */
-  workId: WorkId;
+  workId: string;
   /**
    * The context object passed when enqueuing the work.
    * Useful for passing data from the enqueue site to the onComplete site.
@@ -462,9 +468,6 @@ export type OnCompleteArgs = {
 
 // ensure OnCompleteArgs satisfies SharedOnCompleteArgs
 const _ = {} as OnCompleteArgs satisfies SharedOnCompleteArgs;
-const _2 = {} as OnCompleteArgs satisfies Infer<
-  ReturnType<typeof vOnCompleteArgs<VAny>>
->;
 
 //
 // Helper functions

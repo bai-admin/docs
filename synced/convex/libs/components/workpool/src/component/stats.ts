@@ -1,16 +1,16 @@
 import { v } from "convex/values";
-import { Doc, Id } from "./_generated/dataModel.js";
+import type { Doc, Id } from "./_generated/dataModel.js";
 import {
   internalMutation,
   internalQuery,
-  MutationCtx,
+  type MutationCtx,
 } from "./_generated/server.js";
 import {
-  Config,
+  type Config,
   DEFAULT_MAX_PARALLELISM,
   getCurrentSegment,
 } from "./shared.js";
-import { createLogger, Logger, logLevel, shouldLog } from "./logging.js";
+import { createLogger, type Logger, logLevel, shouldLog } from "./logging.js";
 import { internal } from "./_generated/api.js";
 import schema from "./schema.js";
 import { paginator } from "convex-helpers/server/pagination";
@@ -112,7 +112,6 @@ export const calculateBacklogAndReport = internalMutation({
     logLevel,
   },
   handler: async (ctx, args) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pendingStart = await (ctx.db.query("pendingStart") as any).count();
 
     const console = createLogger(args.logLevel);
@@ -151,7 +150,6 @@ export const diagnostics = internalQuery({
     const internalState = await ctx.db.query("internalState").unique();
     const inProgressWork = internalState?.running.length ?? 0;
     const maxParallelism = global?.maxParallelism ?? DEFAULT_MAX_PARALLELISM;
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     const pendingStart = await (ctx.db.query("pendingStart") as any).count();
     const pendingCompletion = await (
       ctx.db.query("pendingCompletion") as any
@@ -160,7 +158,6 @@ export const diagnostics = internalQuery({
       ctx.db.query("pendingCancelation") as any
     ).count();
     const runStatus = await ctx.db.query("runStatus").unique();
-    /* eslint-enable @typescript-eslint/no-explicit-any */
     return {
       canceling: pendingCancelation,
       waiting: pendingStart,
