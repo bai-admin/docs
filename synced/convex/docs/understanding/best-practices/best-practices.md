@@ -5157,11 +5157,6 @@ type DataModel = DataModelFromSchemaDefinition<typeof schema>;
 
 declare const OMIT_ME: any;
 
-declare const query: QueryBuilder<DataModel, "public">;
-declare const action: ActionBuilder<DataModel, "public">;
-declare const internalMutation: MutationBuilder<DataModel, "internal">;
-declare const internalQuery: QueryBuilder<DataModel, "internal">;
-
 const api = anyApi;
 const internal = anyApi;
 
@@ -5380,11 +5375,6 @@ const schema = defineSchema({
 type DataModel = DataModelFromSchemaDefinition<typeof schema>;
 
 declare const OMIT_ME: any;
-
-declare const query: QueryBuilder<DataModel, "public">;
-declare const action: ActionBuilder<DataModel, "public">;
-declare const internalMutation: MutationBuilder<DataModel, "internal">;
-declare const internalQuery: QueryBuilder<DataModel, "internal">;
 
 const api = anyApi;
 const internal = anyApi;
@@ -5609,11 +5599,6 @@ type DataModel = DataModelFromSchemaDefinition<typeof schema>;
 
 declare const OMIT_ME: any;
 
-declare const query: QueryBuilder<DataModel, "public">;
-declare const action: ActionBuilder<DataModel, "public">;
-declare const internalMutation: MutationBuilder<DataModel, "internal">;
-declare const internalQuery: QueryBuilder<DataModel, "internal">;
-
 const api = anyApi;
 const internal = anyApi;
 
@@ -5833,11 +5818,6 @@ type DataModel = DataModelFromSchemaDefinition<typeof schema>;
 
 declare const OMIT_ME: any;
 
-declare const query: QueryBuilder<DataModel, "public">;
-declare const action: ActionBuilder<DataModel, "public">;
-declare const internalMutation: MutationBuilder<DataModel, "internal">;
-declare const internalQuery: QueryBuilder<DataModel, "internal">;
-
 const api = anyApi;
 const internal = anyApi;
 
@@ -6056,11 +6036,6 @@ const schema = defineSchema({
 type DataModel = DataModelFromSchemaDefinition<typeof schema>;
 
 declare const OMIT_ME: any;
-
-declare const query: QueryBuilder<DataModel, "public">;
-declare const action: ActionBuilder<DataModel, "public">;
-declare const internalMutation: MutationBuilder<DataModel, "internal">;
-declare const internalQuery: QueryBuilder<DataModel, "internal">;
 
 const api = anyApi;
 const internal = anyApi;
