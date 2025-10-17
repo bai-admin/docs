@@ -53,14 +53,63 @@ module.exports =
 
 </Details>
 
+<Details summary={<>If your Convex functions are in a directory other than <code>convex</code></>}>
+
+By default, the Convex ESLint plugin will only apply rules in the `convex`
+directory.
+
+If you’re
+[customizing the Convex directory location](/production/project-configuration#changing-the-convex-folder-name-or-location),
+here’s how to adapt your ESLint configuration:
+
+```ts
+// eslint.config.js
+
+
+const recommendedConfig = convexPlugin.configs.recommended[0];
+const recommendedRules = recommendedConfig.rules;
+
+export default [
+  // Other configurations go here...
+
+  // Custom configuration with modified directory pattern
+  {
+    files: ["**/src/convex/**/*.ts"],
+    plugins: {
+      "@convex-dev": convexPlugin,
+    },
+    rules: recommendedRules,
+  },
+];
+```
+
+</Details>
+
+<Details summary={<>If you’re using the <code>next lint</code> command from Next.js</>}>
+
+For `next lint` to run ESLint on your `convex` directory you need to add that
+directory to the default set of directories. Add this section to your
+`next.config.ts`:
+
+```ts
+const nextConfig: NextConfig = {
+  /* other options here */
+
+  eslint: {
+    dirs: ["pages", "app", "components", "lib", "src", "convex"],
+  },
+};
+```
+
+</Details>
+
 ## Rules
 
-| Rule                                                                                                                                          | Recommended | Auto-fixable |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | :---------: | :----------: |
-| [`@convex-dev/no-old-registered-function-syntax`](#no-old-registered-function-syntax)<br/>Prefer object syntax for registered functions       |     ✅      |      🔧      |
-| [`@convex-dev/no-missing-args-validator`](#no-missing-args-validator)<br/>Require argument validators for all Convex functions                |             |      🔧      |
-| [`@convex-dev/no-args-without-validator`](#no-args-without-validator)<br/>Require argument validators for all Convex functions with arguments |     ✅      |      🔧      |
-| [`@convex-dev/import-wrong-runtime`](#import-wrong-runtime)<br/>Prevent Convex runtime files from importing from Node runtime files           |             |              |
+| Rule                                                                                                                                    | Recommended | Auto-fixable |
+| --------------------------------------------------------------------------------------------------------------------------------------- | :---------: | :----------: |
+| [`@convex-dev/no-old-registered-function-syntax`](#no-old-registered-function-syntax)<br/>Prefer object syntax for registered functions |     ✅      |      🔧      |
+| [`@convex-dev/require-argument-validators`](#require-argument-validators)<br/>Require argument validators for Convex functions          |     ✅      |      🔧      |
+| [`@convex-dev/import-wrong-runtime`](#import-wrong-runtime)<br/>Prevent Convex runtime files from importing from Node runtime files     |             |              |
 
 ### no-old-registered-function-syntax
 
@@ -86,9 +135,9 @@ export const list = query(async (ctx) => {
 });
 ```
 
-### no-missing-args-validator
+### require-argument-validators
 
-Require argument validators for all Convex functions.
+Require argument validators for Convex functions.
 
 Convex queries, mutations, and actions can validate their arguments before
 beginning to run the handler function. Besides being a concise way to validate,
@@ -112,7 +161,8 @@ export const list = query({
   },
 });
 
-// ❌ Not allowed by this rule:
+// ❌ Not allowed with option { ignoreUnusedArguments: false } (default)
+// ✅ Allowed with option { ignoreUnusedArguments: true }
 export const list = query({
   handler: async (ctx) => {
     ...
@@ -127,44 +177,28 @@ export const list = query({
 });
 ```
 
-### no-args-without-validator
-
-Require argument validators for all Convex functions with arguments.
-
-This rule is similar to
-[`no-missing-args-validator`](#no-missing-args-validator), but it doesn’t throw
-an error if the function has no arguments.
+This rule can be customized to tolerate functions that don’t define an argument
+validator but don’t use their arguments. Here’s how you can set up the rule to
+work this way:
 
 ```ts
-// ✅ Allowed by this rule:
-export const list = query({
-  args: {},
-  handler: async (ctx) => {
-    ...
-  },
-});
+// eslint.config.js
 
-// ✅ Allowed by this rule:
-export const list = query({
-  args: { channel: v.id('channel') },
-  handler: async (ctx, { channel }) => {
-    ...
-  },
-});
+export default defineConfig([
+  // Your other rules…
 
-// ✅ Allowed by this rule:
-export const list = query({
-  handler: async (ctx) => {
-    ...
+  {
+    files: ["**/convex/**/*.ts"],
+    rules: {
+      "@convex-dev/require-args-validator": [
+        "error",
+        {
+          ignoreUnusedArguments: true,
+        },
+      ],
+    },
   },
-});
-
-// ❌ Not allowed by this rule:
-export const list = query({
-  handler: async (ctx, { channel }: { channel: Id<"channel"> }) => {
-    ...
-  },
-});
+]);
 ```
 
 ### import-wrong-runtime
