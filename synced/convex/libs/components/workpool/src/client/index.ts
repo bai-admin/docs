@@ -17,11 +17,12 @@ import {
   type VAny,
   type VString,
 } from "convex/values";
-import type { Mounts } from "../component/_generated/api.js";
+import type { api } from "../component/_generated/api.js";
 import { DEFAULT_LOG_LEVEL, type LogLevel } from "../component/logging.js";
 import {
   type Config,
   DEFAULT_MAX_PARALLELISM,
+  DEFAULT_RETRY_BEHAVIOR,
   type OnComplete,
   type RetryBehavior,
   type RunResult,
@@ -41,6 +42,7 @@ export { vResultValidator, type RetryBehavior, type RunResult };
 export type WorkId = string & { __isWorkId: true };
 export const vWorkIdValidator = v.string() as VString<WorkId>;
 export {
+  DEFAULT_RETRY_BEHAVIOR,
   /** @deprecated Use `vResultValidator` instead. */
   vResultValidator as resultValidator,
   /** @deprecated Use `vWorkIdValidator` instead. */
@@ -51,15 +53,8 @@ export const vOnComplete = vOnCompleteArgs(v.any());
 /** @deprecated Use `vOnCompleteArgs()` instead. */
 export const vOnCompleteValidator = vOnCompleteArgs;
 
-// Attempts will run with delay [0, 250, 500, 1000, 2000] (ms)
-export const DEFAULT_RETRY_BEHAVIOR: RetryBehavior = {
-  maxAttempts: 5,
-  initialBackoffMs: 250,
-  base: 2,
-};
-
 // UseApi<api> for jump to definition
-export type WorkpoolComponent = UseApi<Mounts>;
+export type WorkpoolComponent = UseApi<typeof api>;
 
 export class Workpool {
   /**
@@ -545,7 +540,7 @@ export async function enqueueBatch<
   Args extends DefaultFunctionArgs,
   ReturnType,
 >(
-  component: UseApi<Mounts>,
+  component: WorkpoolComponent,
   ctx: RunMutationCtx,
   fnType: FnType,
   fn: FunctionReference<FnType, FunctionVisibility, Args, ReturnType>,
@@ -573,7 +568,7 @@ export async function enqueue<
   Args extends DefaultFunctionArgs,
   ReturnType,
 >(
-  component: UseApi<Mounts>,
+  component: WorkpoolComponent,
   ctx: RunMutationCtx,
   fnType: FnType,
   fn: FunctionReference<FnType, FunctionVisibility, Args, ReturnType>,
