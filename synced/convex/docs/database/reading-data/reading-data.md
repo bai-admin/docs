@@ -48,6 +48,7 @@ Document queries always begin by choosing the table to query with the
 import { query } from "./_generated/server";
 
 export const listTasks = query({
+  args: {},
   handler: async (ctx) => {
     const tasks = await ctx.db.query("tasks").collect();
     // do something with `tasks`

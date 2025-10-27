@@ -96,6 +96,7 @@ Pass it an object with a `handler` function, which returns the query result:
 import { query } from "./_generated/server";
 
 export const myConstantString = query({
+  args: {},
   handler: () => {
     return "My never changing string";
   },
@@ -113,6 +114,8 @@ the second parameter of the handler function:
 ```ts
 import { query } from "./_generated/server";
 
+// @skipNextLine
+// eslint-disable-next-line @convex-dev/require-args-validator
 export const sum = query({
   handler: (_, args: { a: number; b: number }) => {
     return args.a + args.b;

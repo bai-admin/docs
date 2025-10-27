@@ -58,6 +58,7 @@ an object with a `handler` function, which performs the mutation:
 import { mutation } from "./_generated/server";
 
 export const mutateSomething = mutation({
+  args: {},
   handler: () => {
     // implementation will be here
   },
@@ -77,6 +78,8 @@ accessible as fields of the second parameter of the `handler` function:
 ```ts
 import { mutation } from "./_generated/server";
 
+// @skipNextLine
+// eslint-disable-next-line @convex-dev/require-args-validator
 export const mutateSomething = mutation({
   handler: (_, args: { a: number; b: number }) => {
     // do something with `args.a` and `args.b`

@@ -40,6 +40,7 @@ an object with a `handler` function, which performs the action:
 import { action } from "./_generated/server";
 
 export const doSomething = action({
+  args: {},
   handler: () => {
     // implementation goes here
 
