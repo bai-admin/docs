@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.8 alpha
+
+- Adds asynchronous events - wait for an event in a workflow, send
+  events asynchronously - allows pause/resume, human-in-loop, etc.
+- Supports nested workflows with step.runWorkflow.
+- Surfaces return value of the workflow in the status
+- You can start a workflow directly from the CLI / dashboard without having to
+  make a mutation to call workflow.start:
+  - `{ fn: "path/to/file:workflowName", args: { ...your workflow args } }`
+- Reduces read bandwidth when reading the journal after running many steps in parallel.
+- Simplifies the onComplete type requirement so you can accept a workflowId as a string.
+  This helps when you have statically generated types which can't do branded strings.
+- Adds a /test entrypoint to make testing easier
+- Exports the `WorkflowCtx` and `WorkflowStep` types
+- Support for Math.random via seeded PRNG.
+
 ## 0.2.7
 
 - Support for console logging & timing in workflows

@@ -1,7 +1,9 @@
 import type {
+  RunResult,
   WorkpoolOptions,
   WorkpoolRetryOptions,
 } from "@convex-dev/workpool";
+import { parse } from "convex-helpers/validators";
 import {
   createFunctionHandle,
   type FunctionArgs,
@@ -10,18 +12,36 @@ import {
   type GenericDataModel,
   type GenericMutationCtx,
   type GenericQueryCtx,
+  type PaginationOptions,
+  type PaginationResult,
   type RegisteredMutation,
   type ReturnValueForOptionalValidator,
 } from "convex/server";
-import type { ObjectType, PropertyValidators, Validator } from "convex/values";
+import type {
+  Infer,
+  ObjectType,
+  PropertyValidators,
+  Validator,
+} from "convex/values";
 import type { Step } from "../component/schema.js";
-import type { OnCompleteArgs, WorkflowId } from "../types.js";
+import type {
+  EventId,
+  OnCompleteArgs,
+  WorkflowId,
+  WorkflowStep,
+} from "../types.js";
 import { safeFunctionName } from "./safeFunctionName.js";
-import type { OpaqueIds, WorkflowComponent, WorkflowStep } from "./types.js";
+import type { OpaqueIds, WorkflowComponent } from "./types.js";
+import type { WorkflowCtx } from "./workflowContext.js";
 import { workflowMutation } from "./workflowMutation.js";
 
-export { vWorkflowId, type WorkflowId } from "../types.js";
-export type { RunOptions } from "./types.js";
+export {
+  vWorkflowId,
+  vWorkflowStep,
+  type WorkflowId,
+  type WorkflowStep,
+} from "../types.js";
+export type { RunOptions, WorkflowCtx } from "./workflowContext.js";
 
 export type CallbackOptions = {
   /**
@@ -56,23 +76,20 @@ export type CallbackOptions = {
 
 export type WorkflowDefinition<
   ArgsValidator extends PropertyValidators,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReturnsValidator extends Validator<any, "required", any> | void = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ReturnValue extends ReturnValueForOptionalValidator<ReturnsValidator> = any,
 > = {
   args?: ArgsValidator;
   handler: (
-    step: WorkflowStep,
+    step: WorkflowCtx,
     args: ObjectType<ArgsValidator>,
-  ) => Promise<ReturnValue>;
+  ) => Promise<ReturnValueForOptionalValidator<ReturnsValidator>>;
   returns?: ReturnsValidator;
   workpoolOptions?: WorkpoolRetryOptions;
 };
 
 export type WorkflowStatus =
   | { type: "inProgress"; running: OpaqueIds<Step>[] }
-  | { type: "completed" }
+  | { type: "completed"; result: unknown }
   | { type: "canceled" }
   | { type: "failed"; error: string };
 
@@ -93,11 +110,18 @@ export class WorkflowManager {
   define<
     ArgsValidator extends PropertyValidators,
     ReturnsValidator extends Validator<unknown, "required", string> | void,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ReturnValue extends ReturnValueForOptionalValidator<ReturnsValidator> = any,
   >(
-    workflow: WorkflowDefinition<ArgsValidator, ReturnsValidator, ReturnValue>,
-  ): RegisteredMutation<"internal", ObjectType<ArgsValidator>, void> {
+    workflow: WorkflowDefinition<ArgsValidator, ReturnsValidator>,
+  ): RegisteredMutation<
+    "internal",
+    {
+      fn: "You should not call this directly, call workflow.start instead";
+      args: ObjectType<ArgsValidator>;
+    },
+    ReturnsValidator extends Validator<unknown, "required", string>
+      ? Infer<ReturnsValidator>
+      : void
+  > {
     return workflowMutation(
       this.component,
       workflow,
@@ -116,7 +140,7 @@ export class WorkflowManager {
   async start<F extends FunctionReference<"mutation", "internal">>(
     ctx: RunMutationCtx,
     workflow: F,
-    args: FunctionArgs<F>,
+    args: FunctionArgs<F>["args"],
     options?: CallbackOptions & {
       /**
        * By default, during creation the workflow will be initiated immediately.
@@ -176,7 +200,7 @@ export class WorkflowManager {
       case "failed":
         return { type: "failed", error: workflow.runResult.error };
       case "success":
-        return { type: "completed" };
+        return { type: "completed", result: workflow.runResult.returnValue };
     }
   }
 
@@ -193,6 +217,36 @@ export class WorkflowManager {
   }
 
   /**
+   * List the steps in a workflow, including their name, args, return value etc.
+   *
+   * @param ctx - The Convex context from a query, mutation, or action.
+   * @param workflowId - The workflow ID.
+   * @param opts - How many steps to fetch and in what order.
+   *   e.g. `{ order: "desc", paginationOpts: { cursor: null, numItems: 10 } }`
+   *   will get the last 10 steps in descending order.
+   *   Defaults to 100 steps in ascending order.
+   * @returns The pagination result with per-step data.
+   */
+  async listSteps(
+    ctx: RunQueryCtx,
+    workflowId: WorkflowId,
+    opts?: {
+      order?: "asc" | "desc";
+      paginationOpts?: PaginationOptions;
+    },
+  ): Promise<PaginationResult<WorkflowStep>> {
+    const steps = await ctx.runQuery(this.component.workflow.listSteps, {
+      workflowId,
+      order: opts?.order ?? "asc",
+      paginationOpts: opts?.paginationOpts ?? {
+        cursor: null,
+        numItems: 100,
+      },
+    });
+    return steps as PaginationResult<WorkflowStep>;
+  }
+
+  /**
    * Clean up a completed workflow's storage.
    *
    * @param ctx - The Convex context.
@@ -204,6 +258,95 @@ export class WorkflowManager {
       workflowId,
     });
   }
+
+  /**
+   * Send an event to a workflow.
+   *
+   * @param ctx - From a mutation, action or workflow step.
+   * @param args - Either send an event by its ID, or by name and workflow ID.
+   *   If you have a validator, you must provide a value.
+   *   If you provide an error string, awaiting the event will throw an error.
+   */
+  async sendEvent<T = null, Name extends string = string>(
+    ctx: RunMutationCtx,
+    args: (
+      | { workflowId: WorkflowId; name: Name; id?: EventId<Name> }
+      | { workflowId?: undefined; name?: Name; id: EventId<Name> }
+    ) &
+      (
+        | { validator?: undefined; value?: T }
+        | { validator: Validator<T, any, any>; value: T }
+        | { error: string; value?: undefined }
+      ),
+  ): Promise<EventId<Name>> {
+    let result: RunResult =
+      "error" in args
+        ? {
+            kind: "failed",
+            error: args.error,
+          }
+        : {
+            kind: "success" as const,
+            returnValue: args.validator
+              ? parse(args.validator, args.value)
+              : "value" in args
+                ? args.value
+                : null,
+          };
+    return (await ctx.runMutation(this.component.event.send, {
+      eventId: args.id,
+      result,
+      name: args.name,
+      workflowId: args.workflowId,
+      workpoolOptions: this.options?.workpoolOptions,
+    })) as EventId<Name>;
+  }
+
+  /**
+   * Create an event ahead of time, enabling awaiting a specific event by ID.
+   * @param ctx - From an action, mutation or workflow step.
+   * @param args - The name of the event and what workflow it belongs to.
+   * @returns The event ID, which can be used to send the event or await it.
+   */
+  async createEvent<Name extends string>(
+    ctx: RunMutationCtx,
+    args: { name: Name; workflowId: WorkflowId },
+  ): Promise<EventId<Name>> {
+    return (await ctx.runMutation(this.component.event.create, {
+      name: args.name,
+      workflowId: args.workflowId,
+    })) as EventId<Name>;
+  }
+}
+
+/**
+ * Define an event specification: a name and a validator.
+ * This helps share definitions between workflow.sendEvent and ctx.awaitEvent.
+ * e.g.
+ * ```ts
+ * const approvalEvent = defineEvent({
+ *   name: "approval",
+ *   validator: v.object({ approved: v.boolean() }),
+ * });
+ * ```
+ * Then you can await it in a workflow:
+ * ```ts
+ * const result = await ctx.awaitEvent(approvalEvent);
+ * ```
+ * And send from somewhere else:
+ * ```ts
+ * await workflow.sendEvent(ctx, {
+ *   ...approvalEvent,
+ *   workflowId,
+ *   value: { approved: true },
+ * });
+ * ```
+ */
+export function defineEvent<
+  Name extends string,
+  V extends Validator<unknown, "required", string>,
+>(spec: { name: Name; validator: V }) {
+  return spec;
 }
 
 type RunQueryCtx = {

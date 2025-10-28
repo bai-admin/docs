@@ -17,7 +17,9 @@ import {
   journalEntrySize,
   valueSize,
 } from "../component/schema.js";
-import type { SchedulerOptions, WorkflowComponent } from "./types.js";
+import type { WorkflowComponent } from "./types.js";
+import { MAX_JOURNAL_SIZE } from "../shared.js";
+import type { EventId, SchedulerOptions } from "../types.js";
 
 export type WorkerResult =
   | { type: "handlerDone"; runResult: RunResult }
@@ -25,17 +27,28 @@ export type WorkerResult =
 
 export type StepRequest = {
   name: string;
-  functionType: FunctionType;
-  function: FunctionReference<FunctionType, "internal">;
-  args: unknown;
+  target:
+    | {
+        kind: "function";
+        functionType: FunctionType;
+        function: FunctionReference<FunctionType, "internal">;
+        args: unknown;
+      }
+    | {
+        kind: "event";
+        args: { eventId?: EventId };
+      }
+    | {
+        kind: "workflow";
+        function: FunctionReference<"mutation", "internal">;
+        args: unknown;
+      };
   retry: RetryBehavior | boolean | undefined;
   schedulerOptions: SchedulerOptions;
 
   resolve: (result: unknown) => void;
   reject: (error: unknown) => void;
 };
-
-const MAX_JOURNAL_SIZE = 8 << 20;
 
 export class StepExecutor {
   private journalEntrySize: number;
@@ -56,6 +69,7 @@ export class StepExecutor {
     );
 
     if (this.journalEntrySize > MAX_JOURNAL_SIZE) {
+      // This should never happen, but we'll throw an error just in case.
       throw new Error(journalSizeError(this.journalEntrySize, this.workflowId));
     }
   }
@@ -76,7 +90,14 @@ export class StepExecutor {
         const message = await this.receiver.get();
         messages.push(message);
       }
-      await this.startSteps(messages);
+      const entries = await this.startSteps(messages);
+      if (entries.every((entry) => entry.step.runResult)) {
+        for (let i = 0; i < entries.length; i++) {
+          const entry = entries[i];
+          this.completeMessage(messages[i], entry);
+        }
+        continue;
+      }
       return {
         type: "executorBlocked",
       };
@@ -104,10 +125,12 @@ export class StepExecutor {
       );
     }
     const stepArgsJson = JSON.stringify(convexToJson(entry.step.args));
-    const messageArgsJson = JSON.stringify(convexToJson(message.args as Value));
+    const messageArgsJson = JSON.stringify(
+      convexToJson(message.target.args as Value),
+    );
     if (stepArgsJson !== messageArgsJson) {
       throw new Error(
-        `Journal entry mismatch: ${entry.step.args} !== ${message.args}`,
+        `Journal entry mismatch: ${entry.step.args} !== ${message.target.args}`,
       );
     }
     if (entry.step.runResult === undefined) {
@@ -131,17 +154,36 @@ export class StepExecutor {
   async startSteps(messages: StepRequest[]): Promise<JournalEntry[]> {
     const steps = await Promise.all(
       messages.map(async (message) => {
-        const step = {
+        const commonFields = {
           inProgress: true,
           name: message.name,
-          functionType: message.functionType,
-          handle: await createFunctionHandle(message.function),
-          args: message.args,
-          argsSize: valueSize(message.args as Value),
+          args: message.target.args,
+          argsSize: valueSize(message.target.args as Value),
           outcome: undefined,
           startedAt: this.now,
           completedAt: undefined,
         };
+        const target = message.target;
+        const step =
+          target.kind === "function"
+            ? {
+                kind: "function" as const,
+                functionType: target.functionType,
+                handle: await createFunctionHandle(target.function),
+                ...commonFields,
+              }
+            : target.kind === "workflow"
+              ? {
+                  kind: "workflow" as const,
+                  handle: await createFunctionHandle(target.function),
+                  ...commonFields,
+                }
+              : {
+                  kind: "event" as const,
+                  eventId: target.args.eventId,
+                  ...commonFields,
+                  args: target.args,
+                };
         return {
           retry: message.retry,
           schedulerOptions: message.schedulerOptions,

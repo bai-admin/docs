@@ -16,36 +16,58 @@ import {
   workpoolOptions,
 } from "./pool.js";
 import { internal } from "./_generated/api.js";
-import { type FunctionHandle } from "convex/server";
+import { createFunctionHandle, type FunctionHandle } from "convex/server";
 import { getDefaultLogger } from "./utils.js";
 import { assert } from "convex-helpers";
+import { MAX_JOURNAL_SIZE } from "../shared.js";
+import { awaitEvent } from "./event.js";
+import { createHandler } from "./workflow.js";
 
 export const load = query({
   args: {
     workflowId: v.id("workflows"),
+    shortCircuit: v.optional(v.boolean()),
   },
   returns: v.object({
     workflow: workflowDocument,
     journalEntries: v.array(journalDocument),
     ok: v.boolean(),
     logLevel,
+    blocked: v.optional(v.boolean()),
   }),
-  handler: async (ctx, { workflowId }) => {
+  handler: async (ctx, { workflowId, shortCircuit }) => {
     const workflow = await ctx.db.get(workflowId);
     assert(workflow, `Workflow not found: ${workflowId}`);
     const { logLevel } = await getDefaultLogger(ctx);
     const journalEntries: JournalEntry[] = [];
-    let sizeSoFar = 0;
+    let journalSize = 0;
+    if (shortCircuit) {
+      const inProgress = await ctx.db
+        .query("steps")
+        .withIndex("inProgress", (q) =>
+          q.eq("step.inProgress", true).eq("workflowId", workflowId),
+        )
+        .first();
+      if (inProgress) {
+        return {
+          journalEntries: [inProgress],
+          blocked: true,
+          workflow,
+          logLevel,
+          ok: true,
+        };
+      }
+    }
     for await (const entry of ctx.db
       .query("steps")
       .withIndex("workflow", (q) => q.eq("workflowId", workflowId))) {
       journalEntries.push(entry);
-      sizeSoFar += journalEntrySize(entry);
-      if (sizeSoFar > 4 * 1024 * 1024) {
-        return { journalEntries, ok: false, workflow, logLevel };
+      journalSize += journalEntrySize(entry);
+      if (journalSize > MAX_JOURNAL_SIZE) {
+        return { journalEntries, workflow, logLevel, ok: false };
       }
     }
-    return { journalEntries, ok: true, workflow, logLevel };
+    return { journalEntries, workflow, logLevel, ok: true };
   },
 });
 
@@ -90,51 +112,90 @@ export const startSteps = mutation({
 
     const entries = await Promise.all(
       args.steps.map(async (stepArgs, index) => {
-        const { step, retry, schedulerOptions } = stepArgs;
-        const { name, handle, args } = step;
+        const { retry, schedulerOptions } = stepArgs;
         const stepNumber = stepNumberBase + index;
         const stepId = await ctx.db.insert("steps", {
           workflowId: workflow._id,
           stepNumber,
-          step,
+          step: stepArgs.step,
         });
-        const entry = await ctx.db.get(stepId);
+        let entry = await ctx.db.get(stepId);
         assert(entry, "Step not found");
-        const context: OnCompleteContext = {
-          generationNumber,
-          stepId,
-        };
-        let workId: WorkId;
-        switch (step.functionType) {
-          case "query": {
-            workId = await workpool.enqueueQuery(
-              ctx,
-              handle as FunctionHandle<"query">,
-              args,
-              { context, onComplete, name, ...schedulerOptions },
-            );
-            break;
+        const step = entry.step;
+        const { name } = step;
+        if (step.kind === "event") {
+          // Note: This modifies entry in place as well.
+          entry = await awaitEvent(ctx, entry, {
+            name,
+            eventId: step.args.eventId,
+          });
+          if (step.runResult) {
+            console.event("eventConsumed", {
+              workflowId: entry.workflowId,
+              workflowName: workflow.name,
+              status: step.runResult.kind,
+              eventName: step.name,
+              stepNumber: stepNumber,
+              durationMs: step.completedAt! - step.startedAt,
+            });
           }
-          case "mutation": {
-            workId = await workpool.enqueueMutation(
-              ctx,
-              handle as FunctionHandle<"mutation">,
-              args,
-              { context, onComplete, name, ...schedulerOptions },
-            );
-            break;
+        } else if (step.kind === "workflow") {
+          const workflowId = await createHandler(ctx, {
+            workflowName: step.name,
+            workflowHandle: step.handle,
+            workflowArgs: step.args,
+            maxParallelism: args.workpoolOptions?.maxParallelism,
+            onComplete: {
+              fnHandle: await createFunctionHandle(
+                internal.pool.nestedWorkflowOnComplete,
+              ),
+              context: {
+                stepId,
+                generationNumber,
+                workpoolOptions: args.workpoolOptions,
+              } satisfies OnCompleteContext,
+            },
+            startAsync: true,
+          });
+          step.workflowId = workflowId;
+        } else {
+          const context: OnCompleteContext = {
+            generationNumber,
+            stepId,
+            workpoolOptions: args.workpoolOptions,
+          };
+          let workId: WorkId;
+          switch (step.functionType) {
+            case "query": {
+              workId = await workpool.enqueueQuery(
+                ctx,
+                step.handle as FunctionHandle<"query">,
+                step.args,
+                { context, onComplete, name, ...schedulerOptions },
+              );
+              break;
+            }
+            case "mutation": {
+              workId = await workpool.enqueueMutation(
+                ctx,
+                step.handle as FunctionHandle<"mutation">,
+                step.args,
+                { context, onComplete, name, ...schedulerOptions },
+              );
+              break;
+            }
+            case "action": {
+              workId = await workpool.enqueueAction(
+                ctx,
+                step.handle as FunctionHandle<"action">,
+                step.args,
+                { context, onComplete, name, retry, ...schedulerOptions },
+              );
+              break;
+            }
           }
-          case "action": {
-            workId = await workpool.enqueueAction(
-              ctx,
-              handle as FunctionHandle<"action">,
-              args,
-              { context, onComplete, name, retry, ...schedulerOptions },
-            );
-            break;
-          }
+          step.workId = workId;
         }
-        entry.step.workId = workId;
         await ctx.db.replace(entry._id, entry);
 
         console.event("started", {

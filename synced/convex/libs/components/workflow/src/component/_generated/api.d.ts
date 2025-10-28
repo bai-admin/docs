@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as event from "../event.js";
 import type * as journal from "../journal.js";
 import type * as logging from "../logging.js";
 import type * as model from "../model.js";
@@ -30,6 +31,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  event: typeof event;
   journal: typeof journal;
   logging: typeof logging;
   model: typeof model;
@@ -38,30 +40,94 @@ declare const fullApi: ApiFromModules<{
   workflow: typeof workflow;
 }>;
 export type Mounts = {
+  event: {
+    create: FunctionReference<
+      "mutation",
+      "public",
+      { name: string; workflowId: string },
+      string
+    >;
+    send: FunctionReference<
+      "mutation",
+      "public",
+      {
+        eventId?: string;
+        name?: string;
+        result:
+          | { kind: "success"; returnValue: any }
+          | { error: string; kind: "failed" }
+          | { kind: "canceled" };
+        workflowId?: string;
+        workpoolOptions?: {
+          defaultRetryBehavior?: {
+            base: number;
+            initialBackoffMs: number;
+            maxAttempts: number;
+          };
+          logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+          maxParallelism?: number;
+          retryActionsByDefault?: boolean;
+        };
+      },
+      string
+    >;
+  };
   journal: {
     load: FunctionReference<
       "query",
       "public",
-      { workflowId: string },
+      { shortCircuit?: boolean; workflowId: string },
       {
+        blocked?: boolean;
         journalEntries: Array<{
           _creationTime: number;
           _id: string;
-          step: {
-            args: any;
-            argsSize: number;
-            completedAt?: number;
-            functionType: "query" | "mutation" | "action";
-            handle: string;
-            inProgress: boolean;
-            name: string;
-            runResult?:
-              | { kind: "success"; returnValue: any }
-              | { error: string; kind: "failed" }
-              | { kind: "canceled" };
-            startedAt: number;
-            workId?: string;
-          };
+          step:
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                functionType: "query" | "mutation" | "action";
+                handle: string;
+                inProgress: boolean;
+                kind?: "function";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workId?: string;
+              }
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                handle: string;
+                inProgress: boolean;
+                kind: "workflow";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workflowId?: string;
+              }
+            | {
+                args: { eventId?: string };
+                argsSize: number;
+                completedAt?: number;
+                eventId?: string;
+                inProgress: boolean;
+                kind: "event";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+              };
           stepNumber: number;
           workflowId: string;
         }>;
@@ -95,21 +161,52 @@ export type Mounts = {
             | boolean
             | { base: number; initialBackoffMs: number; maxAttempts: number };
           schedulerOptions?: { runAt?: number } | { runAfter?: number };
-          step: {
-            args: any;
-            argsSize: number;
-            completedAt?: number;
-            functionType: "query" | "mutation" | "action";
-            handle: string;
-            inProgress: boolean;
-            name: string;
-            runResult?:
-              | { kind: "success"; returnValue: any }
-              | { error: string; kind: "failed" }
-              | { kind: "canceled" };
-            startedAt: number;
-            workId?: string;
-          };
+          step:
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                functionType: "query" | "mutation" | "action";
+                handle: string;
+                inProgress: boolean;
+                kind?: "function";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workId?: string;
+              }
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                handle: string;
+                inProgress: boolean;
+                kind: "workflow";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workflowId?: string;
+              }
+            | {
+                args: { eventId?: string };
+                argsSize: number;
+                completedAt?: number;
+                eventId?: string;
+                inProgress: boolean;
+                kind: "event";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+              };
         }>;
         workflowId: string;
         workpoolOptions?: {
@@ -126,21 +223,52 @@ export type Mounts = {
       Array<{
         _creationTime: number;
         _id: string;
-        step: {
-          args: any;
-          argsSize: number;
-          completedAt?: number;
-          functionType: "query" | "mutation" | "action";
-          handle: string;
-          inProgress: boolean;
-          name: string;
-          runResult?:
-            | { kind: "success"; returnValue: any }
-            | { error: string; kind: "failed" }
-            | { kind: "canceled" };
-          startedAt: number;
-          workId?: string;
-        };
+        step:
+          | {
+              args: any;
+              argsSize: number;
+              completedAt?: number;
+              functionType: "query" | "mutation" | "action";
+              handle: string;
+              inProgress: boolean;
+              kind?: "function";
+              name: string;
+              runResult?:
+                | { kind: "success"; returnValue: any }
+                | { error: string; kind: "failed" }
+                | { kind: "canceled" };
+              startedAt: number;
+              workId?: string;
+            }
+          | {
+              args: any;
+              argsSize: number;
+              completedAt?: number;
+              handle: string;
+              inProgress: boolean;
+              kind: "workflow";
+              name: string;
+              runResult?:
+                | { kind: "success"; returnValue: any }
+                | { error: string; kind: "failed" }
+                | { kind: "canceled" };
+              startedAt: number;
+              workflowId?: string;
+            }
+          | {
+              args: { eventId?: string };
+              argsSize: number;
+              completedAt?: number;
+              eventId?: string;
+              inProgress: boolean;
+              kind: "event";
+              name: string;
+              runResult?:
+                | { kind: "success"; returnValue: any }
+                | { error: string; kind: "failed" }
+                | { kind: "canceled" };
+              startedAt: number;
+            };
         stepNumber: number;
         workflowId: string;
       }>
@@ -193,21 +321,52 @@ export type Mounts = {
         inProgress: Array<{
           _creationTime: number;
           _id: string;
-          step: {
-            args: any;
-            argsSize: number;
-            completedAt?: number;
-            functionType: "query" | "mutation" | "action";
-            handle: string;
-            inProgress: boolean;
-            name: string;
-            runResult?:
-              | { kind: "success"; returnValue: any }
-              | { error: string; kind: "failed" }
-              | { kind: "canceled" };
-            startedAt: number;
-            workId?: string;
-          };
+          step:
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                functionType: "query" | "mutation" | "action";
+                handle: string;
+                inProgress: boolean;
+                kind?: "function";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workId?: string;
+              }
+            | {
+                args: any;
+                argsSize: number;
+                completedAt?: number;
+                handle: string;
+                inProgress: boolean;
+                kind: "workflow";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+                workflowId?: string;
+              }
+            | {
+                args: { eventId?: string };
+                argsSize: number;
+                completedAt?: number;
+                eventId?: string;
+                inProgress: boolean;
+                kind: "event";
+                name: string;
+                runResult?:
+                  | { kind: "success"; returnValue: any }
+                  | { error: string; kind: "failed" }
+                  | { kind: "canceled" };
+                startedAt: number;
+              };
           stepNumber: number;
           workflowId: string;
         }>;
@@ -228,6 +387,45 @@ export type Mounts = {
           state?: any;
           workflowHandle: string;
         };
+      }
+    >;
+    listSteps: FunctionReference<
+      "query",
+      "public",
+      {
+        order: "asc" | "desc";
+        paginationOpts: {
+          cursor: string | null;
+          endCursor?: string | null;
+          id?: number;
+          maximumBytesRead?: number;
+          maximumRowsRead?: number;
+          numItems: number;
+        };
+        workflowId: string;
+      },
+      {
+        continueCursor: string;
+        isDone: boolean;
+        page: Array<{
+          args: any;
+          completedAt?: number;
+          eventId?: string;
+          kind: "function" | "workflow" | "event";
+          name: string;
+          nestedWorkflowId?: string;
+          runResult?:
+            | { kind: "success"; returnValue: any }
+            | { error: string; kind: "failed" }
+            | { kind: "canceled" };
+          startedAt: number;
+          stepId: string;
+          stepNumber: number;
+          workId?: string;
+          workflowId: string;
+        }>;
+        pageStatus?: "SplitRecommended" | "SplitRequired" | null;
+        splitCursor?: string | null;
       }
     >;
   };
@@ -263,6 +461,7 @@ export declare const components: {
         "internal",
         {
           before?: number;
+          limit?: number;
           logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
         },
         any

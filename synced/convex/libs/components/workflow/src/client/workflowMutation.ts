@@ -2,7 +2,9 @@ import { BaseChannel } from "async-channel";
 import { assert } from "convex-helpers";
 import { validate, ValidationError } from "convex-helpers/validators";
 import {
+  createFunctionHandle,
   internalMutationGeneric,
+  makeFunctionReference,
   type RegisteredMutation,
 } from "convex/server";
 import {
@@ -16,18 +18,25 @@ import { type JournalEntry } from "../component/schema.js";
 import { setupEnvironment } from "./environment.js";
 import type { WorkflowDefinition } from "./index.js";
 import { StepExecutor, type StepRequest, type WorkerResult } from "./step.js";
-import { StepContext } from "./stepContext.js";
+import { createWorkflowCtx } from "./workflowContext.js";
 import { checkArgs } from "./validator.js";
 import { type RunResult, type WorkpoolOptions } from "@convex-dev/workpool";
 import { type WorkflowComponent } from "./types.js";
 import { vWorkflowId } from "../types.js";
 import { formatErrorWithStack } from "../shared.js";
+import { safeFunctionName } from "./safeFunctionName.js";
 
-const workflowArgs = v.object({
-  workflowId: vWorkflowId,
-  generationNumber: v.number(),
-});
-const INVALID_WORKFLOW_MESSAGE = `Invalid arguments for workflow: Did you invoke the workflow with ctx.runMutation() instead of workflow.start()?`;
+const workflowArgs = v.union(
+  v.object({
+    workflowId: vWorkflowId,
+    generationNumber: v.number(),
+  }),
+  v.object({
+    fn: v.string(),
+    args: v.any(),
+  }),
+);
+const INVALID_WORKFLOW_MESSAGE = `Invalid arguments for workflow: Did you invoke the workflow with ctx.runMutation() instead of workflow.start()? Pro tip: to start a workflow directly from the CLI or dashboard, you can use args '{ fn: "path/to/file:workflowName", args: { ...your workflow args } }'`;
 
 // This function is defined in the calling component but then gets passed by
 // function handle to the workflow component for execution. This function runs
@@ -37,7 +46,14 @@ export function workflowMutation<ArgsValidator extends PropertyValidators>(
   component: WorkflowComponent,
   registered: WorkflowDefinition<ArgsValidator>,
   defaultWorkpoolOptions?: WorkpoolOptions,
-): RegisteredMutation<"internal", ObjectType<ArgsValidator>, void> {
+): RegisteredMutation<
+  "internal",
+  {
+    fn: "You should not call this directly, call workflow.start instead";
+    args: ObjectType<ArgsValidator>;
+  },
+  void
+> {
   const workpoolOptions = {
     ...defaultWorkpoolOptions,
     ...registered.workpoolOptions,
@@ -47,10 +63,20 @@ export function workflowMutation<ArgsValidator extends PropertyValidators>(
       if (!validate(workflowArgs, args)) {
         throw new Error(INVALID_WORKFLOW_MESSAGE);
       }
+      if ("fn" in args) {
+        const fn = makeFunctionReference(args.fn);
+        const workflowId = await ctx.runMutation(component.workflow.create, {
+          workflowName: safeFunctionName(fn),
+          workflowHandle: await createFunctionHandle(fn),
+          workflowArgs: args.args,
+          maxParallelism: workpoolOptions.maxParallelism,
+        });
+        return workflowId;
+      }
       const { workflowId, generationNumber } = args;
       const { workflow, logLevel, journalEntries, ok } = await ctx.runQuery(
         component.journal.load,
-        { workflowId },
+        { workflowId, shortCircuit: true },
       );
       const inProgress = journalEntries.filter(({ step }) => step.inProgress);
       const console = createLogger(logLevel);
@@ -91,7 +117,7 @@ export function workflowMutation<ArgsValidator extends PropertyValidators>(
       const channel = new BaseChannel<StepRequest>(
         workpoolOptions.maxParallelism ?? 10,
       );
-      const step = new StepContext(workflowId, channel);
+      const step = createWorkflowCtx(workflowId, channel);
       const executor = new StepExecutor(
         workflowId,
         generationNumber,
@@ -102,7 +128,7 @@ export function workflowMutation<ArgsValidator extends PropertyValidators>(
         Date.now(),
         workpoolOptions,
       );
-      setupEnvironment(executor.getGenerationState.bind(executor));
+      setupEnvironment(executor.getGenerationState.bind(executor), workflowId);
 
       const handlerWorker = async (): Promise<WorkerResult> => {
         let runResult: RunResult;
@@ -157,7 +183,6 @@ export function workflowMutation<ArgsValidator extends PropertyValidators>(
         }
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any;
 }
 
