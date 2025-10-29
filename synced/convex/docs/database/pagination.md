@@ -249,8 +249,9 @@ function multiple times to collect the items:
 ```ts
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
+import * as dotenv from "dotenv";
 
-require("dotenv").config();
+dotenv.config();
 
 const client = new ConvexHttpClient(process.env.VITE_CONVEX_URL!);
 
