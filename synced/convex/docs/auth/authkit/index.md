@@ -152,7 +152,6 @@ React app with Convex. If not follow the
           issuer: `https://api.workos.com/user_management/${clientId}`,
           algorithm: 'RS256',
           jwks: `https://api.workos.com/sso/jwks/${clientId}`,
-          applicationID: clientId,
         },
       ],
     };
@@ -360,7 +359,6 @@ Next.js app with Convex. If not follow the
           issuer: `https://api.workos.com/user_management/${clientId}`,
           algorithm: 'RS256',
           jwks: `https://api.workos.com/sso/jwks/${clientId}`,
-          applicationID: clientId,
         },
       ],
     };
@@ -748,7 +746,6 @@ export default {
       issuer: `https://api.workos.com/user_management/${clientId}`,
       algorithm: "RS256",
       jwks: `https://api.workos.com/sso/jwks/${clientId}`,
-      applicationID: clientId,
     },
   ],
 };
