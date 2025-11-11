@@ -9,7 +9,7 @@ import {
   queryGeneric,
 } from "convex/server";
 import { ConvexError, v } from "convex/values";
-import type { api } from "../component/_generated/api.js";
+import type { ComponentApi } from "../component/_generated/component.js";
 import type {
   RateLimitArgs,
   RateLimitConfig,
@@ -31,11 +31,10 @@ export const MINUTE = 60 * SECOND;
 export const HOUR = 60 * MINUTE;
 
 export function isRateLimitError(
-  error: unknown
+  error: unknown,
 ): error is { data: RateLimitError } {
   return (
     error instanceof ConvexError &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any).data["kind"] === "RateLimited"
   );
 }
@@ -69,8 +68,8 @@ export class RateLimiter<
   Limits extends Record<string, RateLimitConfig> = Record<never, never>,
 > {
   constructor(
-    public component: RateLimiterApi,
-    public limits?: Limits
+    public component: ComponentApi,
+    public limits?: Limits,
   ) {}
 
   /**
@@ -156,7 +155,7 @@ export class RateLimiter<
   async reset<Name extends string = keyof Limits & string>(
     { runMutation }: RunMutationCtx,
     name: Name,
-    args?: { key?: string }
+    args?: { key?: string },
   ): Promise<void> {
     await runMutation(this.component.lib.resetRateLimit, {
       ...(args ?? null),
@@ -270,7 +269,7 @@ export class RateLimiter<
 
   private getConfig<Name extends string, Args>(
     args: WithKnownNameOrInlinedConfig<Limits, Name, Args> | undefined,
-    name: Name
+    name: Name,
   ): RateLimitConfig {
     const config =
       (args && "config" in args && args.config) ||
@@ -278,7 +277,7 @@ export class RateLimiter<
     if (!config) {
       throw new Error(
         `Rate limit ${name} not defined. ` +
-          `You must provide a config inline or define it in the constructor.`
+          `You must provide a config inline or define it in the constructor.`,
       );
     }
     return config;
@@ -292,13 +291,13 @@ export default RateLimiter;
 export type RunQueryCtx = {
   runQuery: <Query extends FunctionReference<"query", "internal">>(
     query: Query,
-    args: FunctionArgs<Query>
+    args: FunctionArgs<Query>,
   ) => Promise<FunctionReturnType<Query>>;
 };
 export type RunMutationCtx = RunQueryCtx & {
   runMutation: <Mutation extends FunctionReference<"mutation", "internal">>(
     mutation: Mutation,
-    args: FunctionArgs<Mutation>
+    args: FunctionArgs<Mutation>,
   ) => Promise<FunctionReturnType<Mutation>>;
 };
 type WithKnownNameOrInlinedConfig<
@@ -317,19 +316,6 @@ type WithKnownNameOrInlinedConfig<
           config: RateLimitConfig;
         })
 >;
-
-type UseApi<API> = Expand<{
-  [K in keyof API]: API[K] extends FunctionReference<
-    infer T,
-    "public",
-    infer A,
-    infer R,
-    infer P
-  >
-    ? FunctionReference<T, "internal", A, R, P>
-    : UseApi<API[K]>;
-}>;
-type RateLimiterApi = UseApi<typeof api>;
 
 type HookOpts<DataModel extends GenericDataModel> = {
   key?:

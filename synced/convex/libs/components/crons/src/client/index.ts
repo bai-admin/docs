@@ -2,13 +2,13 @@
 
 import {
   createFunctionHandle,
-  FunctionArgs,
-  FunctionHandle,
-  SchedulableFunctionReference,
+  type FunctionArgs,
+  type FunctionHandle,
+  type SchedulableFunctionReference,
 } from "convex/server";
-import { api } from "../component/_generated/api.js";
-import { CronInfo, Schedule } from "../component/public.js";
-import { RunMutationCtx, RunQueryCtx, UseApi } from "./utils.js";
+import type { ComponentApi } from "../component/_generated/component.js";
+import type { CronInfo, Schedule } from "../component/public.js";
+import type { RunMutationCtx, RunQueryCtx } from "./utils.js";
 
 export type { CronInfo };
 
@@ -52,7 +52,7 @@ export class Crons {
    * }
    * ```
    */
-  constructor(private component: UseApi<typeof api>) {}
+  constructor(private component: ComponentApi) {}
 
   /**
    * Schedule a mutation or action to run on a cron schedule or interval.
@@ -71,7 +71,7 @@ export class Crons {
     schedule: Schedule,
     func: F,
     args: FunctionArgs<F>,
-    name?: string
+    name?: string,
   ): Promise<string> {
     return ctx.runMutation(this.component.public.register, {
       name,
@@ -104,7 +104,7 @@ export class Crons {
    */
   async get(
     ctx: RunQueryCtx,
-    identifier: { id: string } | { name: string }
+    identifier: { id: string } | { name: string },
   ): Promise<CronInfo | null> {
     const cron = await ctx.runQuery(this.component.public.get, { identifier });
     if (cron === null) {
@@ -125,7 +125,7 @@ export class Crons {
    */
   async delete(
     ctx: RunMutationCtx,
-    identifier: { id: string } | { name: string }
+    identifier: { id: string } | { name: string },
   ): Promise<null> {
     return ctx.runMutation(this.component.public.del, { identifier });
   }
