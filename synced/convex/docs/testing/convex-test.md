@@ -5,13 +5,60 @@ sidebar_position: 100
 description: "Mock Convex backend for fast automated testing of functions"
 ---
 
+
 The `convex-test` library provides a mock implementation of the Convex backend
 in JavaScript. It enables fast automated testing of the logic in your
 [functions](/functions.mdx).
 
-**Example:** The library includes a
-[test suite](https://github.com/get-convex/convex-test/tree/main/convex) which
-you can browse to see examples of using it.
+## Example
+
+
+```ts
+import { convexTest } from "convex-test";
+import { describe, it, expect } from "vitest";
+import { api, internal } from "./_generated/api";
+import schema from "./schema";
+
+describe("posts.list", () => {
+  it("returns empty array when no posts exist", async () => {
+    const t = convexTest(schema, modules);
+
+    // Initially, there are no posts, so `list` returns an empty array
+    const posts = await t.query(api.posts.list);
+    expect(posts).toEqual([]);
+  });
+
+  it("returns all posts ordered by creation time when there are posts", async () => {
+    const t = convexTest(schema, modules);
+
+    // Create some posts
+    await t.mutation(internal.posts.add, {
+      title: "First Post",
+      content: "This is the first post",
+      author: "Alice",
+    });
+    await t.mutation(internal.posts.add, {
+      title: "Second Post",
+      content: "This is the second post",
+      author: "Bob",
+    });
+
+    // `list` returns all posts ordered by creation time
+    const posts = await t.query(api.posts.list);
+    expect(posts).toHaveLength(2);
+    expect(posts[0].title).toBe("Second Post");
+    expect(posts[1].title).toBe("First Post");
+  });
+});
+
+const modules = import.meta.glob("./**/*.ts");
+
+```
+
+
+You can see more examples in the
+[test suite](https://github.com/get-convex/convex-test/tree/main/convex) of the
+convex-test library.
 
 ## Get Started
 
