@@ -4,6 +4,8 @@ title: Getting Started
 
 # {% $markdoc.frontmatter.title %}
 
+> **⚠️ Maintenance Mode:** This project is currently in maintenance mode and is not under active development. We recommend using [Railpack](https://github.com/railwayapp/railpack) as a replacement.
+
 To get started with Nixpacks you need an app that you want to build and package. You can bring your own or use one of the [many examples on GitHub](https://github.com/railwayapp/nixpacks/tree/main/examples).
 
 ## 1. Install

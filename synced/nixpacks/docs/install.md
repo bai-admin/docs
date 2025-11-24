@@ -4,6 +4,8 @@ title: Installation
 
 # {% $markdoc.frontmatter.title %}
 
+> **⚠️ Maintenance Mode:** This project is currently in maintenance mode and is not under active development. We recommend using [Railpack](https://github.com/railwayapp/railpack) as a replacement.
+
 ## Homebrew
 
 Install Nixpacks with [Homebrew](https://brew.sh/) (macOS Only)

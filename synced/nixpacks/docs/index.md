@@ -4,7 +4,7 @@ title: Introduction
 
 # {% $markdoc.frontmatter.title %}
 
-> **Note:** Nixpacks is currently in maintenance mode and is not under active development.
+> **⚠️ Maintenance Mode:** This project is currently in maintenance mode and is not under active development. We recommend using [Railpack](https://github.com/railwayapp/railpack) as a replacement.
 
 Nixpacks takes a source directory and produces an OCI compliant image that can be deployed anywhere. The project was started by [Railway](https://railway.app) and is open source on [GitHub](https://github.com/railwayapp/nixpacks).
 
