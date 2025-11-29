@@ -36,9 +36,9 @@ alt="Screenshot of bucket credentials"
 layout="responsive"
 width={2554} height={1970} quality={80} />
 
-### Use virtual-hosted—style URLs
+### Use virtual-hosted–style URLs
 
-Railway Buckets use virtual-hosted—style URLs, which include your bucket name in the subdomain. This is the modern S3 standard and what most libraries expect.
+Railway Buckets use virtual-hosted–style URLs, which include your bucket name in the subdomain. This is the modern S3 standard and what most libraries expect.
 
 Here's the format:
 
@@ -46,7 +46,7 @@ Here's the format:
 https://your-bucket-name-hash.storage.railway.app/key-name
 ```
 
-When working with S3 libraries or tools, you'll typically only need to provide the endpoint `https://storage.railway.app` and your bucket name. The library handles creating the virtual-hosted—style URL for you.
+When working with S3 libraries or tools, you'll typically only need to provide the endpoint `https://storage.railway.app` and your bucket name. The library handles creating the virtual-hosted–style URL for you.
 
 If you're using an older bucket created before this standard, it might require path-style URLs instead (like `https://storage.railway.app/bucket-name/key-name`). Check the Bucket Credentials tab to see which URL style your bucket needs.
 
@@ -140,9 +140,9 @@ Want this feature? Leave your feedback [in this feature request](https://station
 
 </Collapse>
 
-<Collapse title="What infrastructure are buckets using?">
+<Collapse title="What hardware do buckets run on?">
 
-Railway Buckets run on [Tigris's](https://www.tigrisdata.com/) bare-metal infrastructure, which provides real object storage with high performance and durability.
+Railway Buckets run on [Tigris's](https://www.tigrisdata.com/) metal servers, which provides real object storage with high performance and durability.
 
 This is true object storage, not block storage like Volumes, so concepts like IOPS don't apply here.
 
