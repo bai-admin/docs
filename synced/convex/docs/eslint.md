@@ -18,8 +18,8 @@ npm i @convex-dev/eslint-plugin --save-dev
 and add this to your `eslint.config.js` file:
 
 ```ts
-
 import { defineConfig } from "eslint/config";
+
 
 export default defineConfig([
   // Other configurations
@@ -62,12 +62,13 @@ here’s how to adapt your ESLint configuration:
 
 ```ts
 // eslint.config.js
+import { defineConfig } from "eslint/config";
 
 
 const recommendedConfig = convexPlugin.configs.recommended[0];
 const recommendedRules = recommendedConfig.rules;
 
-export default [
+export default defineConfig([
   // Other configurations go here...
 
   // Custom configuration with modified directory pattern
@@ -78,7 +79,7 @@ export default [
     },
     rules: recommendedRules,
   },
-];
+]);
 ```
 
 </Details>
