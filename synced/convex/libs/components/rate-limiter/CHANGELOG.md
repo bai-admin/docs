@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2
+
+- Pass client-provided keys to the key function, don't trust them by default.
+  This was a quick follow-up to 0.3.1 to prevent passing arbitrary keys from the
+  client un-validated
+
+## 0.3.1
+
+- Allow client-provided key for rate limiter hooks (credit: marcoshernanz)
+- Add consts for WEEK and DAY (credit: marwand)
+
 ## 0.3.0
 
 - Adds /test and /\_generated/component.js entrypoints
