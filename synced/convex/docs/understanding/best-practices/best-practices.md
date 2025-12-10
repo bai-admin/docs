@@ -324,6 +324,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -338,7 +340,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -357,7 +359,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -379,7 +381,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -398,7 +400,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -416,7 +418,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -975,6 +977,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -989,7 +993,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1008,7 +1012,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1030,7 +1034,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1049,7 +1053,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -1067,7 +1071,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -1588,6 +1592,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -1602,7 +1608,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1621,7 +1627,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1643,7 +1649,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -1662,7 +1668,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -1680,7 +1686,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -2201,6 +2207,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -2215,7 +2223,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2234,7 +2242,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2256,7 +2264,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2275,7 +2283,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -2293,7 +2301,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -2836,6 +2844,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -2850,7 +2860,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2869,7 +2879,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2891,7 +2901,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -2910,7 +2920,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -2928,7 +2938,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -3475,6 +3485,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -3489,7 +3501,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -3508,7 +3520,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -3530,7 +3542,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -3549,7 +3561,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -3567,7 +3579,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -4117,6 +4129,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -4131,7 +4145,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4150,7 +4164,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4172,7 +4186,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4191,7 +4205,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -4209,7 +4223,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -4773,6 +4787,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -4787,7 +4803,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4806,7 +4822,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4828,7 +4844,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -4847,7 +4863,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -4865,7 +4881,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -5204,7 +5220,7 @@ export const listMessages_OMIT_1 = query({
   },
   handler: async (ctx, { conversationId }) => {
     const user = await ctx.runQuery(api.users.getCurrentUser);
-    const conversation = await ctx.db.get(conversationId);
+    const conversation = await ctx.db.get("conversations", conversationId);
     if (conversation === null || !conversation.members.includes(user._id)) {
       throw new Error("Unauthorized");
     }
@@ -5254,7 +5270,7 @@ export async function ensureHasAccess(
   { conversationId }: { conversationId: Id<"conversations"> },
 ) {
   const user = await Users.getCurrentUser(ctx);
-  const conversation = await ctx.db.get(conversationId);
+  const conversation = await ctx.db.get("conversations", conversationId);
   if (conversation === null || !conversation.members.includes(user._id)) {
     throw new Error("Unauthorized");
   }
@@ -5278,7 +5294,7 @@ export async function addSummary_OMIT_1(
   }: { conversationId: Id<"conversations">; summary: string },
 ) {
   await ensureHasAccess(ctx, { conversationId });
-  await ctx.db.patch(conversationId, { summary });
+  await ctx.db.patch("conversations", conversationId, { summary });
 }
 
 export async function generateSummary(
@@ -5423,7 +5439,7 @@ export const listMessages_OMIT_1 = query({
   },
   handler: async (ctx, { conversationId }) => {
     const user = await ctx.runQuery(api.users.getCurrentUser);
-    const conversation = await ctx.db.get(conversationId);
+    const conversation = await ctx.db.get("conversations", conversationId);
     if (conversation === null || !conversation.members.includes(user._id)) {
       throw new Error("Unauthorized");
     }
@@ -5473,7 +5489,7 @@ export async function ensureHasAccess(
   { conversationId }: { conversationId: Id<"conversations"> },
 ) {
   const user = await Users.getCurrentUser(ctx);
-  const conversation = await ctx.db.get(conversationId);
+  const conversation = await ctx.db.get("conversations", conversationId);
   if (conversation === null || !conversation.members.includes(user._id)) {
     throw new Error("Unauthorized");
   }
@@ -5497,7 +5513,7 @@ export async function addSummary_OMIT_1(
   }: { conversationId: Id<"conversations">; summary: string },
 ) {
   await ensureHasAccess(ctx, { conversationId });
-  await ctx.db.patch(conversationId, { summary });
+  await ctx.db.patch("conversations", conversationId, { summary });
 }
 
 export async function generateSummary(
@@ -5646,7 +5662,7 @@ export const listMessages_OMIT_1 = query({
   },
   handler: async (ctx, { conversationId }) => {
     const user = await ctx.runQuery(api.users.getCurrentUser);
-    const conversation = await ctx.db.get(conversationId);
+    const conversation = await ctx.db.get("conversations", conversationId);
     if (conversation === null || !conversation.members.includes(user._id)) {
       throw new Error("Unauthorized");
     }
@@ -5696,7 +5712,7 @@ export async function ensureHasAccess(
   { conversationId }: { conversationId: Id<"conversations"> },
 ) {
   const user = await Users.getCurrentUser(ctx);
-  const conversation = await ctx.db.get(conversationId);
+  const conversation = await ctx.db.get("conversations", conversationId);
   if (conversation === null || !conversation.members.includes(user._id)) {
     throw new Error("Unauthorized");
   }
@@ -5720,7 +5736,7 @@ export async function addSummary_OMIT_1(
   }: { conversationId: Id<"conversations">; summary: string },
 ) {
   await ensureHasAccess(ctx, { conversationId });
-  await ctx.db.patch(conversationId, { summary });
+  await ctx.db.patch("conversations", conversationId, { summary });
 }
 
 export async function generateSummary(
@@ -5865,7 +5881,7 @@ export const listMessages_OMIT_1 = query({
   },
   handler: async (ctx, { conversationId }) => {
     const user = await ctx.runQuery(api.users.getCurrentUser);
-    const conversation = await ctx.db.get(conversationId);
+    const conversation = await ctx.db.get("conversations", conversationId);
     if (conversation === null || !conversation.members.includes(user._id)) {
       throw new Error("Unauthorized");
     }
@@ -5915,7 +5931,7 @@ export async function ensureHasAccess(
   { conversationId }: { conversationId: Id<"conversations"> },
 ) {
   const user = await Users.getCurrentUser(ctx);
-  const conversation = await ctx.db.get(conversationId);
+  const conversation = await ctx.db.get("conversations", conversationId);
   if (conversation === null || !conversation.members.includes(user._id)) {
     throw new Error("Unauthorized");
   }
@@ -5939,7 +5955,7 @@ export async function addSummary_OMIT_1(
   }: { conversationId: Id<"conversations">; summary: string },
 ) {
   await ensureHasAccess(ctx, { conversationId });
-  await ctx.db.patch(conversationId, { summary });
+  await ctx.db.patch("conversations", conversationId, { summary });
 }
 
 export async function generateSummary(
@@ -6084,7 +6100,7 @@ export const listMessages_OMIT_1 = query({
   },
   handler: async (ctx, { conversationId }) => {
     const user = await ctx.runQuery(api.users.getCurrentUser);
-    const conversation = await ctx.db.get(conversationId);
+    const conversation = await ctx.db.get("conversations", conversationId);
     if (conversation === null || !conversation.members.includes(user._id)) {
       throw new Error("Unauthorized");
     }
@@ -6134,7 +6150,7 @@ export async function ensureHasAccess(
   { conversationId }: { conversationId: Id<"conversations"> },
 ) {
   const user = await Users.getCurrentUser(ctx);
-  const conversation = await ctx.db.get(conversationId);
+  const conversation = await ctx.db.get("conversations", conversationId);
   if (conversation === null || !conversation.members.includes(user._id)) {
     throw new Error("Unauthorized");
   }
@@ -6158,7 +6174,7 @@ export async function addSummary_OMIT_1(
   }: { conversationId: Id<"conversations">; summary: string },
 ) {
   await ensureHasAccess(ctx, { conversationId });
-  await ctx.db.patch(conversationId, { summary });
+  await ctx.db.patch("conversations", conversationId, { summary });
 }
 
 export async function generateSummary(
@@ -6522,6 +6538,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -6536,7 +6554,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -6555,7 +6573,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -6577,7 +6595,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -6596,7 +6614,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -6614,7 +6632,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -7133,6 +7151,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -7147,7 +7167,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7166,7 +7186,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7188,7 +7208,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7207,7 +7227,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -7225,7 +7245,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -7744,6 +7764,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -7758,7 +7780,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7777,7 +7799,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7799,7 +7821,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -7818,7 +7840,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -7836,7 +7858,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -8380,6 +8402,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -8394,7 +8418,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -8413,7 +8437,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -8435,7 +8459,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -8454,7 +8478,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -8472,7 +8496,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -8991,6 +9015,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -9005,7 +9031,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9024,7 +9050,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9046,7 +9072,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9065,7 +9091,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -9083,7 +9109,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -9604,6 +9630,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -9618,7 +9646,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9637,7 +9665,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9659,7 +9687,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -9678,7 +9706,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -9696,7 +9724,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -10215,6 +10243,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -10229,7 +10259,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10248,7 +10278,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10270,7 +10300,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10289,7 +10319,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -10307,7 +10337,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl
@@ -10858,6 +10888,8 @@ export const updateMessage_OMIT_2 = mutation({
 });
 // @snippet end validation
 
+// TODO(nicolas) Update the example above to make sense with the explicit table API
+
 type TeamMember = {
   email: string;
 };
@@ -10872,7 +10904,7 @@ export const updateTeam_OMIT_1 = mutation({
     }),
   },
   handler: async (ctx, { id, update }) => {
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10891,7 +10923,7 @@ export const updateTeam_OMIT_2 = mutation({
     if (!teamMembers.some((m) => m.email === email)) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10913,7 +10945,7 @@ export const updateTeam = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, update);
+    await ctx.db.patch("teams", id, update);
   },
 });
 
@@ -10932,7 +10964,7 @@ export const setTeamOwner = mutation({
     if (!isTeamOwner) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { owner: owner });
+    await ctx.db.patch("teams", id, { owner: owner });
   },
 });
 
@@ -10950,7 +10982,7 @@ export const setTeamName = mutation({
     if (!isTeamMember) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(id, { name: name });
+    await ctx.db.patch("teams", id, { name: name });
   },
 });
 // @snippet end accessControl

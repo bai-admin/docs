@@ -94,7 +94,7 @@ export const remove = mutation({
   handler: async (ctx, { teamId }) => {
     const currentUser = await getCurrentUser(ctx);
     await ensureTeamAdmin(ctx, currentUser, teamId);
-    await ctx.db.delete(teamId);
+    await ctx.db.delete("teams", teamId);
   },
 });
 

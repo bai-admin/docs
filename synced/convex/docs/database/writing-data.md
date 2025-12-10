@@ -64,17 +64,17 @@ export const updateTask = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
     const { id } = args;
-    console.log(await ctx.db.get(id));
+    console.log(await ctx.db.get("tasks", id));
     // { text: "foo", status: { done: true }, _id: ... }
 
     // Add `tag` and overwrite `status`:
-    await ctx.db.patch(id, { tag: "bar", status: { archived: true } });
-    console.log(await ctx.db.get(id));
+    await ctx.db.patch("tasks", id, { tag: "bar", status: { archived: true } });
+    console.log(await ctx.db.get("tasks", id));
     // { text: "foo", tag: "bar", status: { archived: true }, _id: ... }
 
     // Unset `tag` by setting it to `undefined`
-    await ctx.db.patch(id, { tag: undefined });
-    console.log(await ctx.db.get(id));
+    await ctx.db.patch("tasks", id, { tag: undefined });
+    console.log(await ctx.db.get("tasks", id));
     // { text: "foo", status: { archived: true }, _id: ... }
   },
 });
@@ -95,12 +95,12 @@ export const replaceTask = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
     const { id } = args;
-    console.log(await ctx.db.get(id));
+    console.log(await ctx.db.get("tasks", id));
     // { text: "foo", _id: ... }
 
     // Replace the whole document
-    await ctx.db.replace(id, { invalid: true });
-    console.log(await ctx.db.get(id));
+    await ctx.db.replace("tasks", id, { invalid: true });
+    console.log(await ctx.db.get("tasks", id));
     // { invalid: true, _id: ... }
   },
 });
@@ -121,7 +121,7 @@ import { v } from "convex/values";
 export const deleteTask = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
+    await ctx.db.delete("tasks", args.id);
   },
 });
 

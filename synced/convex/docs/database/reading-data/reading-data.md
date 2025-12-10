@@ -27,7 +27,7 @@ import { v } from "convex/values";
 export const getTask = query({
   args: { taskId: v.id("tasks") },
   handler: async (ctx, args) => {
-    const task = await ctx.db.get(args.taskId);
+    const task = await ctx.db.get("tasks", args.taskId);
     // do something with `task`
   },
 });
@@ -259,10 +259,10 @@ import { v } from "convex/values";
 export const eventAttendees = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId);
+    const event = await ctx.db.get("events", args.eventId);
     // highlight-start
     return Promise.all(
-      (event?.attendeeIds ?? []).map((userId) => ctx.db.get(userId)),
+      (event?.attendeeIds ?? []).map((userId) => ctx.db.get("users", userId)),
     );
     // highlight-end
   },

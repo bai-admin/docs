@@ -55,7 +55,7 @@ export const destruct = internalMutation({
     messageId: v.id("messages"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.messageId);
+    await ctx.db.delete("messages", args.messageId);
   },
 });
 // @snippet end scheduling-runAfter
@@ -73,7 +73,7 @@ export const getScheduledMessage = query({
     id: v.id("_scheduled_functions"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.system.get(args.id);
+    return await ctx.db.system.get("_scheduled_functions", args.id);
   },
 });
 // @snippet end scheduling-status
@@ -218,7 +218,7 @@ export const destruct = internalMutation({
     messageId: v.id("messages"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.messageId);
+    await ctx.db.delete("messages", args.messageId);
   },
 });
 // @snippet end scheduling-runAfter
@@ -236,7 +236,7 @@ export const getScheduledMessage = query({
     id: v.id("_scheduled_functions"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.system.get(args.id);
+    return await ctx.db.system.get("_scheduled_functions", args.id);
   },
 });
 // @snippet end scheduling-status
@@ -383,7 +383,7 @@ export const destruct = internalMutation({
     messageId: v.id("messages"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.messageId);
+    await ctx.db.delete("messages", args.messageId);
   },
 });
 // @snippet end scheduling-runAfter
@@ -401,7 +401,7 @@ export const getScheduledMessage = query({
     id: v.id("_scheduled_functions"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.system.get(args.id);
+    return await ctx.db.system.get("_scheduled_functions", args.id);
   },
 });
 // @snippet end scheduling-status

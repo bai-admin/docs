@@ -51,7 +51,7 @@ import { v } from "convex/values";
 export const markPlanAsProfessional = internalMutation({
   args: { planId: v.id("plans") },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.planId, { planType: "professional" });
+    await ctx.db.patch("plans", args.planId, { planType: "professional" });
   },
 });
 
