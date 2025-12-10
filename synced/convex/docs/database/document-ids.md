@@ -20,7 +20,7 @@ You can use this ID to efficiently read a single document using the `get`
 method:
 
 ```ts
-const retrievedUser = await ctx.db.get(userId);
+const retrievedUser = await ctx.db.get("users", userId);
 ```
 
 You can access the ID of a document in the
@@ -33,7 +33,7 @@ const userId = retrievedUser._id;
 Also, this same ID can be used to update that document in place:
 
 ```ts
-await ctx.db.patch(userId, { name: "Steph Curry" });
+await ctx.db.patch("users", userId, { name: "Steph Curry" });
 ```
 
 Convex generates an [`Id`](/generated-api/data-model#id) TypeScript type based
@@ -64,7 +64,7 @@ await ctx.db.insert("books", {
 You can follow references with `ctx.db.get`:
 
 ```ts
-const user = await ctx.db.get(book.ownerId);
+const user = await ctx.db.get("books", book.ownerId);
 ```
 
 And [query for documents](/database/reading-data/reading-data.mdx) with a
