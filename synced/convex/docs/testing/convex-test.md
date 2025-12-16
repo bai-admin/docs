@@ -6,6 +6,13 @@ description: "Mock Convex backend for fast automated testing of functions"
 ---
 
 
+
+
+
+
+
+
+
 The `convex-test` library provides a mock implementation of the Convex backend
 in JavaScript. It enables fast automated testing of the logic in your
 [functions](/functions.mdx).
@@ -268,34 +275,47 @@ needing a declared function in your project. You can use the `t.run` method
 which takes a handler that is given a `ctx` that allows reading from and writing
 to the mock backend:
 
-```ts title="convex/tasks.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
+import schema from "./schema";
 
 test("functions", async () => {
-  const t = convexTest();
+  const t = convexTest(schema, modules);
   const firstTask = await t.run(async (ctx) => {
     await ctx.db.insert("tasks", { text: "Eat breakfast" });
     return await ctx.db.query("tasks").first();
   });
   expect(firstTask).toMatchObject({ text: "Eat breakfast" });
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 ### HTTP actions
 
 Your test can call [HTTP actions](/functions/http-actions.mdx) registered by
 your router:
 
-```ts title="convex/http.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
-import { test } from "vitest";
+import { expect, test } from "vitest";
+import schema from "./schema";
 
 test("functions", async () => {
-  const t = convexTest();
+  const t = convexTest(schema, modules);
   const response = await t.fetch("/some/path", { method: "POST" });
+  expect(response.status).toBe(200);
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 Mocking the global `fetch` function doesn't affect `t.fetch`, but you can use
 `t.fetch` in a `fetch` mock to route to your HTTP actions.
@@ -309,16 +329,18 @@ implementations relying on
 [Vitest's fake timers](https://vitest.dev/guide/mocking.html#timers) in
 combination with `t.finishInProgressScheduledFunctions`:
 
-```ts title="convex/scheduling.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
 import { expect, test, vi } from "vitest";
 import { api } from "./_generated/api";
+import schema from "./schema";
 
 test("mutation scheduling action", async () => {
   // Enable fake timers
   vi.useFakeTimers();
 
-  const t = convexTest(schema);
+  const t = convexTest(schema, modules);
 
   // Call a function that schedules a mutation or action
   const scheduledFunctionId = await t.mutation(
@@ -340,31 +362,37 @@ test("mutation scheduling action", async () => {
   await t.finishInProgressScheduledFunctions();
 
   // Assert that the scheduled function succeeded or failed
-  const scheduledFunctionStatus = t.run(async (ctx) => {
-    return await ctx.db.get(scheduledFunctionId);
+  const scheduledFunctionStatus = await t.run(async (ctx) => {
+    return await ctx.db.system.get("_scheduled_functions", scheduledFunctionId);
   });
   expect(scheduledFunctionStatus).toMatchObject({ state: { kind: "success" } });
 
   // Reset to normal `setTimeout` etc. implementation
   vi.useRealTimers();
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 If you have a chain of several scheduled functions, for example a mutation that
 schedules an action that schedules another action, you can use
 `t.finishAllScheduledFunctions` to wait for all scheduled functions, including
 recursively scheduled functions, to finish:
 
-```ts title="convex/chainedScheduling.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
 import { expect, test, vi } from "vitest";
 import { api } from "./_generated/api";
+import schema from "./schema";
 
 test("mutation scheduling action scheduling action", async () => {
   // Enable fake timers
   vi.useFakeTimers();
 
-  const t = convexTest(schema);
+  const t = convexTest(schema, modules);
 
   // Call a function that schedules a mutation or action
   await t.mutation(api.scheduler.mutationSchedulingActionSchedulingAction);
@@ -375,7 +403,7 @@ test("mutation scheduling action scheduling action", async () => {
   await t.finishAllScheduledFunctions(vi.runAllTimers);
 
   // Assert the resulting state after all scheduled functions finished
-  const createdTask = t.run(async (ctx) => {
+  const createdTask = await t.run(async (ctx) => {
     return await ctx.db.query("tasks").first();
   });
   expect(createdTask).toMatchObject({ author: "AI" });
@@ -383,7 +411,11 @@ test("mutation scheduling action scheduling action", async () => {
   // Reset to normal `setTimeout` etc. implementation
   vi.useRealTimers();
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 Check out more examples in
 [this file](https://github.com/get-convex/convex-test/blob/main/convex/scheduler.test.ts).
@@ -396,13 +428,15 @@ identity you can create a version of the `t` accessor with given
 provide them, `issuer`, `subject` and `tokenIdentifier` will be generated
 automatically:
 
-```ts title="convex/tasks.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
+import schema from "./schema";
 
 test("authenticated functions", async () => {
-  const t = convexTest(schema);
+  const t = convexTest(schema, modules);
 
   const asSarah = t.withIdentity({ name: "Sarah" });
   await asSarah.mutation(api.tasks.create, { text: "Add tests" });
@@ -414,7 +448,11 @@ test("authenticated functions", async () => {
   const leesTasks = await asLee.query(api.tasks.list);
   expect(leesTasks).toEqual([]);
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 ## Vitest tips
 
@@ -431,31 +469,39 @@ every object field.
 To assert that a function throws, use
 [`.rejects.toThrowError()`](https://vitest.dev/api/expect.html#tothrowerror):
 
-```ts title="convex/messages.test.ts"
+
+```ts
 import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
+import schema from "./schema";
 
 test("messages validation", async () => {
-  const t = convexTest(schema);
-  expect(async () => {
+  const t = convexTest(schema, modules);
+  await expect(async () => {
     await t.mutation(api.messages.send, { body: "", author: "James" });
   }).rejects.toThrowError("Empty message body is not allowed");
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 ### Mocking `fetch` calls
 
 You can use Vitest's
 [vi.stubGlobal](https://vitest.dev/guide/mocking.html#globals) method:
 
-```ts title="convex/ai.test.ts"
+
+```ts
 import { expect, test, vi } from "vitest";
-import { convexTest } from "../index";
 import { api } from "./_generated/api";
+import schema from "./schema";
+import { convexTest } from "convex-test";
 
 test("ai", async () => {
-  const t = convexTest(schema);
+  const t = convexTest(schema, modules);
 
   vi.stubGlobal(
     "fetch",
@@ -467,7 +513,11 @@ test("ai", async () => {
 
   vi.unstubAllGlobals();
 });
+
+const modules = import.meta.glob("./**/*.ts");
+
 ```
+
 
 ### Measuring test coverage
 
