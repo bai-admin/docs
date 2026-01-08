@@ -3,9 +3,9 @@ import { v } from "convex/values";
 import {
   fnType,
   config,
-  onComplete,
+  vOnCompleteFnContext,
   retryBehavior,
-  vResultValidator,
+  vResult,
 } from "./shared.js";
 
 // Represents a slice of time to process work.
@@ -64,7 +64,7 @@ export default defineSchema({
     fnName: v.string(),
     fnArgs: v.any(),
     attempts: v.number(), // number of completed attempts
-    onComplete: v.optional(onComplete),
+    onComplete: v.optional(vOnCompleteFnContext),
     retryBehavior: v.optional(retryBehavior),
     canceled: v.optional(v.boolean()),
   }),
@@ -80,7 +80,7 @@ export default defineSchema({
   // Written by complete, read & deleted by `main`.
   pendingCompletion: defineTable({
     segment,
-    runResult: vResultValidator,
+    runResult: vResult,
     workId: v.id("work"),
     retry: v.boolean(),
   })
