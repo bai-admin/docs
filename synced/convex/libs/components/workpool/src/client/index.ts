@@ -19,10 +19,9 @@ import {
   type VString,
 } from "convex/values";
 import type { ComponentApi } from "../component/_generated/component.js";
-import { DEFAULT_LOG_LEVEL, type LogLevel } from "../component/logging.js";
+import { type LogLevel } from "../component/logging.js";
 import {
   type Config,
-  DEFAULT_MAX_PARALLELISM,
   DEFAULT_RETRY_BEHAVIOR,
   type RetryBehavior,
   type RunResult,
@@ -239,7 +238,7 @@ export class Workpool {
   async cancel(ctx: RunMutationCtx, id: WorkId): Promise<void> {
     await ctx.runMutation(this.component.lib.cancel, {
       id,
-      logLevel: this.options.logLevel ?? DEFAULT_LOG_LEVEL,
+      logLevel: this.options.logLevel,
     });
   }
   /**
@@ -252,23 +251,8 @@ export class Workpool {
     options?: { limit?: number },
   ): Promise<void> {
     await ctx.runMutation(this.component.lib.cancelAll, {
-      logLevel: this.options.logLevel ?? DEFAULT_LOG_LEVEL,
+      logLevel: this.options.logLevel,
       ...options,
-    });
-  }
-
-  /**
-   * Kicks the workpool to wake it up and sync config (e.g. maxParallelism).
-   * Useful for resuming after pausing (setting maxParallelism to 0).
-   *
-   * @param ctx - The mutation or action context that can call ctx.runMutation.
-   */
-  async kick(ctx: RunMutationCtx): Promise<void> {
-    await ctx.runMutation(this.component.lib.kick, {
-      config: {
-        logLevel: this.options.logLevel ?? DEFAULT_LOG_LEVEL,
-        maxParallelism: this.options.maxParallelism ?? DEFAULT_MAX_PARALLELISM,
-      },
     });
   }
 
@@ -376,7 +360,8 @@ export type RetryOption = {
 
 export type WorkpoolOptions = {
   /** How many actions/mutations can be running at once within this pool.
-   * Min 0 (no new work starts), Suggested max: 100 on Pro, 20 on free plan.
+   * Suggested max: 100 on Pro, 20 on free plan.
+   * If set to 0, no new work will be started.
    */
   maxParallelism?: number;
   /** How much to log. This is updated on each call to `enqueue*`,
@@ -528,8 +513,8 @@ async function enqueueArgs(
     runAt: getRunAt(opts),
     retryBehavior: opts?.retryBehavior,
     config: {
-      logLevel: opts?.logLevel ?? DEFAULT_LOG_LEVEL,
-      maxParallelism: opts?.maxParallelism ?? DEFAULT_MAX_PARALLELISM,
+      logLevel: opts?.logLevel,
+      maxParallelism: opts?.maxParallelism,
     },
   } satisfies Omit<
     FunctionArgs<ComponentApi["lib"]["enqueue"]>,

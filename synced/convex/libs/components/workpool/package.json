@@ -7,7 +7,7 @@
     "email": "support@convex.dev",
     "url": "https://github.com/get-convex/workpool/issues"
   },
-  "version": "0.3.1-alpha.0",
+  "version": "0.3.1",
   "license": "Apache-2.0",
   "keywords": [
     "convex",
@@ -35,7 +35,7 @@
     "test:coverage": "vitest run --coverage --coverage.reporter=text",
     "prepare": "npm run build",
     "alpha": "npm run clean && npm ci && run-p test lint typecheck && npm version prerelease --preid alpha && npm publish --tag alpha && git push --tags",
-    "release": "npm run clean && npm ci && run-p test lint typecheck && npm version patch && npm publish && git push --tags",
+    "release": "(npm whoami || npm login) && npm run clean && npm ci && run-p test lint typecheck && npm version patch && npm publish && git push --tags",
     "version": "pbcopy <<<$npm_package_version; vim CHANGELOG.md && prettier -w CHANGELOG.md && git add CHANGELOG.md"
   },
   "files": [

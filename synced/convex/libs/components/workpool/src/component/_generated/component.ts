@@ -23,13 +23,25 @@ import type { FunctionReference } from "convex/server";
  */
 export type ComponentApi<Name extends string | undefined = string | undefined> =
   {
+    config: {
+      update: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+          maxParallelism?: number;
+        },
+        any,
+        Name
+      >;
+    };
     lib: {
       cancel: FunctionReference<
         "mutation",
         "internal",
         {
           id: string;
-          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+          logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
         },
         any,
         Name
@@ -40,7 +52,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         {
           before?: number;
           limit?: number;
-          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+          logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
         },
         any,
         Name
@@ -50,8 +62,8 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           config: {
-            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
-            maxParallelism: number;
+            logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism?: number;
           };
           fnArgs: any;
           fnHandle: string;
@@ -73,8 +85,8 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           config: {
-            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
-            maxParallelism: number;
+            logLevel?: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism?: number;
           };
           items: Array<{
             fnArgs: any;
@@ -91,18 +103,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           }>;
         },
         Array<string>,
-        Name
-      >;
-      kick: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          config: {
-            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
-            maxParallelism: number;
-          };
-        },
-        null,
         Name
       >;
       status: FunctionReference<
