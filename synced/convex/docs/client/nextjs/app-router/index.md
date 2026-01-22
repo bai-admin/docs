@@ -3,6 +3,7 @@ title: "Next.js"
 sidebar_label: "Next.js App Router"
 sidebar_position: 200
 description: "How Convex works in a Next.js app"
+pagination_next: client/nextjs/app-router/server-rendering
 ---
 
 

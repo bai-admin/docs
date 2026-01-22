@@ -35,7 +35,7 @@ for Convex.
     To get started, install the `convex` package.
 
     ```sh
-    cd my-vue-app && npm install convex-vue
+    cd my-vue-app && npm install convex convex-vue
     ```
 
   </Step>
